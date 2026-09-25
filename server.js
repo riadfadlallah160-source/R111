@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import { paymentMiddleware } from '@x402/express';
 import { x402ResourceServer, HTTPFacilitatorClient } from '@x402/core/server';
 import { registerExactEvmScheme } from '@x402/evm/exact/server';
+import { declareDiscoveryExtension, bazaarResourceServerExtension } from '@x402/extensions/bazaar';
 
 const app = express();
 app.disable('x-powered-by');
@@ -12,6 +13,7 @@ const PORT = Number(process.env.PORT || 3000);
 const PAY_TO = '0xf744573cdfFC211163c11c0a31730851Da78f708';
 const NETWORK = 'eip155:8453';
 const FACILITATOR = 'https://facilitator.openx402.ai';
+const PUBLIC_BASE = 'https://fifty-million-agent-gateway.onrender.com';
 const TOTAL_AGENTS = 50000000;
 const AGENTS_PER_QUEUE = 5000;
 const QUEUES = TOTAL_AGENTS / AGENTS_PER_QUEUE;
@@ -22,47 +24,216 @@ let nextAgent = 0;
 const facilitatorClient = new HTTPFacilitatorClient({ url: FACILITATOR });
 const resourceServer = new x402ResourceServer(facilitatorClient);
 registerExactEvmScheme(resourceServer);
+resourceServer.registerExtension(bazaarResourceServerExtension);
 
 const paidRoutes = {
   'POST /v1/text/metrics': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
     description: 'Text metrics, reading time, vocabulary and sentence statistics.',
-    mimeType: 'application/json'
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/text/metrics',
+      description: 'Text metrics, reading time, vocabulary and sentence statistics.',
+      mimeType: 'application/json',
+      serviceName: '50M Agent Utility Gateway',
+      tags: ["text","metrics","analysis"]
+    },
+    extensions: {
+      ...declareDiscoveryExtension({
+        input: {"text":"Agent-ready text for analysis."},
+        inputSchema: {
+          type: 'object',
+          properties: {"text":{"type":"string","description":"Input parameter for this utility."}},
+          required: ["text"]
+        },
+        output: {
+          example: {"agentId":1,"queueId":1,"skill":"text-metrics","metrics":{"words":5,"characters":29}},
+          schema: { type: 'object', additionalProperties: true }
+        }
+      })
+    }
   },
   'POST /v1/text/extract': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
     description: 'Extract emails, URLs, hashtags, mentions, IPv4 addresses and numbers.',
-    mimeType: 'application/json'
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/text/extract',
+      description: 'Extract emails, URLs, hashtags, mentions, IPv4 addresses and numbers.',
+      mimeType: 'application/json',
+      serviceName: '50M Agent Utility Gateway',
+      tags: ["text","extract","data"]
+    },
+    extensions: {
+      ...declareDiscoveryExtension({
+        input: {"text":"Contact test@example.com and visit https://example.com"},
+        inputSchema: {
+          type: 'object',
+          properties: {"text":{"type":"string","description":"Input parameter for this utility."}},
+          required: ["text"]
+        },
+        output: {
+          example: {"agentId":2,"skill":"text-extract","extracted":{"emails":["test@example.com"],"urls":["https://example.com"]}},
+          schema: { type: 'object', additionalProperties: true }
+        }
+      })
+    }
   },
   'POST /v1/text/keywords': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
     description: 'Keyword frequency analysis with stop-word removal.',
-    mimeType: 'application/json'
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/text/keywords',
+      description: 'Keyword frequency analysis with stop-word removal.',
+      mimeType: 'application/json',
+      serviceName: '50M Agent Utility Gateway',
+      tags: ["keywords","text","analysis"]
+    },
+    extensions: {
+      ...declareDiscoveryExtension({
+        input: {"text":"AI agents use APIs. AI agents buy APIs.","limit":20},
+        inputSchema: {
+          type: 'object',
+          properties: {"text":{"type":"string","description":"Input parameter for this utility."},"limit":{"type":"number","description":"Input parameter for this utility."}},
+          required: ["text"]
+        },
+        output: {
+          example: {"agentId":3,"skill":"keyword-frequency","keywords":[{"keyword":"ai","count":2}]},
+          schema: { type: 'object', additionalProperties: true }
+        }
+      })
+    }
   },
   'POST /v1/text/dedupe': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
     description: 'Remove duplicate lines or list items while preserving order.',
-    mimeType: 'application/json'
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/text/dedupe',
+      description: 'Remove duplicate lines or list items while preserving order.',
+      mimeType: 'application/json',
+      serviceName: '50M Agent Utility Gateway',
+      tags: ["dedupe","cleanup","text"]
+    },
+    extensions: {
+      ...declareDiscoveryExtension({
+        input: {"items":["alpha","alpha","beta"]},
+        inputSchema: {
+          type: 'object',
+          properties: {"items":{"type":"array","description":"Input parameter for this utility."}},
+          required: ["items"]
+        },
+        output: {
+          example: {"agentId":4,"skill":"dedupe","inputCount":3,"outputCount":2,"items":["alpha","beta"]},
+          schema: { type: 'object', additionalProperties: true }
+        }
+      })
+    }
   },
   'POST /v1/url/normalize': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
     description: 'Normalize and validate URLs for agent pipelines.',
-    mimeType: 'application/json'
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/url/normalize',
+      description: 'Normalize and validate URLs for agent pipelines.',
+      mimeType: 'application/json',
+      serviceName: '50M Agent Utility Gateway',
+      tags: ["url","normalize","data"]
+    },
+    extensions: {
+      ...declareDiscoveryExtension({
+        input: {"urls":["example.com","https://openai.com"]},
+        inputSchema: {
+          type: 'object',
+          properties: {"urls":{"type":"array","description":"Input parameter for this utility."}},
+          required: ["urls"]
+        },
+        output: {
+          example: {"agentId":5,"skill":"url-normalize","results":[{"input":"example.com","valid":true,"normalized":"https://example.com/"}]},
+          schema: { type: 'object', additionalProperties: true }
+        }
+      })
+    }
   },
   'POST /v1/data/csv-to-json': {
     accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Convert CSV into structured JSON.',
-    mimeType: 'application/json'
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/data/csv-to-json',
+      description: 'Convert CSV into structured JSON.',
+      mimeType: 'application/json',
+      serviceName: '50M Agent Utility Gateway',
+      tags: ["csv","json","convert"]
+    },
+    extensions: {
+      ...declareDiscoveryExtension({
+        input: {"csv":"name,age\\nAda,36"},
+        inputSchema: {
+          type: 'object',
+          properties: {"csv":{"type":"string","description":"Input parameter for this utility."}},
+          required: ["csv"]
+        },
+        output: {
+          example: {"agentId":6,"skill":"csv-to-json","rows":1,"data":[{"name":"Ada","age":"36"}]},
+          schema: { type: 'object', additionalProperties: true }
+        }
+      })
+    }
   },
   'POST /v1/data/json-validate': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
     description: 'Validate JSON and return normalized compact and pretty forms.',
-    mimeType: 'application/json'
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/data/json-validate',
+      description: 'Validate JSON and return normalized compact and pretty forms.',
+      mimeType: 'application/json',
+      serviceName: '50M Agent Utility Gateway',
+      tags: ["json","validate","data"]
+    },
+    extensions: {
+      ...declareDiscoveryExtension({
+        input: {"json":"{\"ok\":true}"},
+        inputSchema: {
+          type: 'object',
+          properties: {"json":{"type":"string","description":"Input parameter for this utility."}},
+          required: ["json"]
+        },
+        output: {
+          example: {"agentId":7,"skill":"json-validate","valid":true,"type":"object"},
+          schema: { type: 'object', additionalProperties: true }
+        }
+      })
+    }
   },
   'POST /v1/data/hash': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
     description: 'Generate SHA-256, SHA-1 and MD5 hashes for supplied text.',
-    mimeType: 'application/json'
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/data/hash',
+      description: 'Generate SHA-256, SHA-1 and MD5 hashes for supplied text.',
+      mimeType: 'application/json',
+      serviceName: '50M Agent Utility Gateway',
+      tags: ["hash","sha256","utility"]
+    },
+    extensions: {
+      ...declareDiscoveryExtension({
+        input: {"text":"hello"},
+        inputSchema: {
+          type: 'object',
+          properties: {"text":{"type":"string","description":"Input parameter for this utility."}},
+          required: ["text"]
+        },
+        output: {
+          example: {"agentId":8,"skill":"hash","hashes":{"sha256":"2cf24dba..."}},
+          schema: { type: 'object', additionalProperties: true }
+        }
+      })
+    }
   }
 };
 

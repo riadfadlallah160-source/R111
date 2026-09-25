@@ -603,8 +603,23 @@ app.use(function(err, _req, res, _next) {
   res.status(500).json({ error: 'Internal server error.' });
 });
 
+async function registerWithAgent402() {
+  try {
+    const response = await fetch('https://agent402.tools/api/index/register', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ origin: PUBLIC_BASE })
+    });
+    const text = await response.text();
+    console.log('Agent402 registration:', response.status, text.slice(0, 300));
+  } catch (error) {
+    console.error('Agent402 registration failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 app.listen(PORT, '0.0.0.0', function() {
   console.log('50M Agent Utility Gateway listening on port ' + PORT);
   console.log('x402 facilitator: ' + FACILITATOR);
   console.log('Base USDC payTo: ' + PAY_TO);
+  void registerWithAgent402();
 });

@@ -17,9 +17,31 @@ const PUBLIC_BASE = 'https://fifty-million-agent-gateway.onrender.com';
 const TOTAL_AGENTS = 50000000;
 const AGENTS_PER_QUEUE = 5000;
 const QUEUES = TOTAL_AGENTS / AGENTS_PER_QUEUE;
+const PRICE_PER_EXECUTION_USD = 1;
+const DAILY_TARGET_USD = TOTAL_AGENTS * PRICE_PER_EXECUTION_USD;
 
 let requestsSinceBoot = 0;
 let nextAgent = 0;
+let dailyFilled = 0;
+let currentLagosDay = lagosDayKey();
+
+function lagosDayKey() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Africa/Lagos',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+}
+
+function refreshDailyLedger() {
+  const today = lagosDayKey();
+  if (today !== currentLagosDay) {
+    currentLagosDay = today;
+    dailyFilled = 0;
+    nextAgent = 0;
+  }
+}
 
 const facilitatorClient = new HTTPFacilitatorClient({ url: FACILITATOR });
 const resourceServer = new x402ResourceServer(facilitatorClient);
@@ -28,7 +50,7 @@ resourceServer.registerExtension(bazaarResourceServerExtension);
 
 const paidRoutes = {
   'POST /v1/text/metrics': {
-    accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Text metrics, reading time, vocabulary and sentence statistics.',
     mimeType: 'application/json',
     resource: {
@@ -53,7 +75,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/text/extract': {
-    accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Extract emails, URLs, hashtags, mentions, IPv4 addresses and numbers.',
     mimeType: 'application/json',
     resource: {
@@ -78,7 +100,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/text/keywords': {
-    accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Keyword frequency analysis with stop-word removal.',
     mimeType: 'application/json',
     resource: {
@@ -103,7 +125,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/text/dedupe': {
-    accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Remove duplicate lines or list items while preserving order.',
     mimeType: 'application/json',
     resource: {
@@ -128,7 +150,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/url/normalize': {
-    accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Normalize and validate URLs for agent pipelines.',
     mimeType: 'application/json',
     resource: {
@@ -153,7 +175,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/data/csv-to-json': {
-    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Convert CSV into structured JSON.',
     mimeType: 'application/json',
     resource: {
@@ -178,7 +200,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/data/json-validate': {
-    accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Validate JSON and return normalized compact and pretty forms.',
     mimeType: 'application/json',
     resource: {
@@ -203,7 +225,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/data/hash': {
-    accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Generate SHA-256, SHA-1 and MD5 hashes for supplied text.',
     mimeType: 'application/json',
     resource: {
@@ -232,14 +254,39 @@ const paidRoutes = {
 app.use(paymentMiddleware(paidRoutes, resourceServer));
 
 function assignment(skill) {
-  nextAgent = (nextAgent % TOTAL_AGENTS) + 1;
+  refreshDailyLedger();
+  if (dailyFilled >= TOTAL_AGENTS) {
+    return {
+      agentId: null,
+      queueId: null,
+      skill: skill,
+      activePopulation: TOTAL_AGENTS,
+      totalQueues: QUEUES,
+      day: currentLagosDay,
+      dailyQuotaComplete: true,
+      filledToday: dailyFilled,
+      remainingToday: 0,
+      earnedByThisExecutionUsd: 0,
+      dailyTargetUsd: DAILY_TARGET_USD
+    };
+  }
+
+  nextAgent = dailyFilled + 1;
+  dailyFilled += 1;
   requestsSinceBoot += 1;
+
   return {
     agentId: nextAgent,
     queueId: Math.ceil(nextAgent / AGENTS_PER_QUEUE),
     skill: skill,
     activePopulation: TOTAL_AGENTS,
     totalQueues: QUEUES,
+    day: currentLagosDay,
+    dailyQuotaComplete: dailyFilled >= TOTAL_AGENTS,
+    filledToday: dailyFilled,
+    remainingToday: TOTAL_AGENTS - dailyFilled,
+    earnedByThisExecutionUsd: PRICE_PER_EXECUTION_USD,
+    dailyTargetUsd: DAILY_TARGET_USD,
     requestNumberSinceBoot: requestsSinceBoot
   };
 }
@@ -319,7 +366,9 @@ app.get('/', function(_req, res) {
     activeAgentPopulation: TOTAL_AGENTS,
     queues: QUEUES,
     docs: '/openapi.json',
-    discovery: '/.well-known/x402'
+    discovery: '/.well-known/x402',
+    pricePerSuccessfulExecutionUsd: PRICE_PER_EXECUTION_USD,
+    dailyAgentTargetUsd: DAILY_TARGET_USD
   });
 });
 
@@ -328,11 +377,18 @@ app.get('/health', function(_req, res) {
 });
 
 app.get('/v1/pool/status', function(_req, res) {
+  refreshDailyLedger();
   res.json({
     status: 'active',
+    day: currentLagosDay,
+    timezone: 'Africa/Lagos',
     activeAgentPopulation: TOTAL_AGENTS,
     queues: QUEUES,
     agentsPerQueue: AGENTS_PER_QUEUE,
+    pricePerSuccessfulExecutionUsd: PRICE_PER_EXECUTION_USD,
+    dailyTargetUsd: DAILY_TARGET_USD,
+    filledToday: dailyFilled,
+    remainingToday: TOTAL_AGENTS - dailyFilled,
     requestsSinceBoot: requestsSinceBoot,
     settlementRail: 'Base USDC via x402',
     treasury: PAY_TO
@@ -591,7 +647,7 @@ app.get('/openapi.json', function(req, res) {
     info: {
       title: '50M Agent Utility Gateway',
       version: '1.0.0',
-      description: 'Eight deterministic pay-per-call utilities for autonomous agents, settled in Base USDC via x402.'
+      description: 'Eight $1-per-successful-execution utilities for autonomous agents. Each paid execution fills one of 50,000,000 daily agent earning slots and settles in Base USDC via x402.'
     },
     servers: [{ url: protocol + '://' + host }],
     paths: paths

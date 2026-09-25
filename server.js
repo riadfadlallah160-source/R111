@@ -38,9 +38,9 @@ const paidRoutes = {
       serviceName: '50M Agent Utility Gateway',
       tags: ["text","metrics","analysis"]
     },
-    extensions: {
-      ...declareDiscoveryExtension({
-        input: {"text":"Agent-ready text for analysis."},
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"text":"Agent-ready text for analysis."},
         inputSchema: {
           type: 'object',
           properties: {"text":{"type":"string","description":"Input parameter for this utility."}},
@@ -50,8 +50,7 @@ const paidRoutes = {
           example: {"agentId":1,"queueId":1,"skill":"text-metrics","metrics":{"words":5,"characters":29}},
           schema: { type: 'object', additionalProperties: true }
         }
-      })
-    }
+    })
   },
   'POST /v1/text/extract': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
@@ -64,9 +63,9 @@ const paidRoutes = {
       serviceName: '50M Agent Utility Gateway',
       tags: ["text","extract","data"]
     },
-    extensions: {
-      ...declareDiscoveryExtension({
-        input: {"text":"Contact test@example.com and visit https://example.com"},
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"text":"Contact test@example.com and visit https://example.com"},
         inputSchema: {
           type: 'object',
           properties: {"text":{"type":"string","description":"Input parameter for this utility."}},
@@ -76,8 +75,7 @@ const paidRoutes = {
           example: {"agentId":2,"skill":"text-extract","extracted":{"emails":["test@example.com"],"urls":["https://example.com"]}},
           schema: { type: 'object', additionalProperties: true }
         }
-      })
-    }
+    })
   },
   'POST /v1/text/keywords': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
@@ -90,9 +88,9 @@ const paidRoutes = {
       serviceName: '50M Agent Utility Gateway',
       tags: ["keywords","text","analysis"]
     },
-    extensions: {
-      ...declareDiscoveryExtension({
-        input: {"text":"AI agents use APIs. AI agents buy APIs.","limit":20},
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"text":"AI agents use APIs. AI agents buy APIs.","limit":20},
         inputSchema: {
           type: 'object',
           properties: {"text":{"type":"string","description":"Input parameter for this utility."},"limit":{"type":"number","description":"Input parameter for this utility."}},
@@ -102,8 +100,7 @@ const paidRoutes = {
           example: {"agentId":3,"skill":"keyword-frequency","keywords":[{"keyword":"ai","count":2}]},
           schema: { type: 'object', additionalProperties: true }
         }
-      })
-    }
+    })
   },
   'POST /v1/text/dedupe': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
@@ -116,9 +113,9 @@ const paidRoutes = {
       serviceName: '50M Agent Utility Gateway',
       tags: ["dedupe","cleanup","text"]
     },
-    extensions: {
-      ...declareDiscoveryExtension({
-        input: {"items":["alpha","alpha","beta"]},
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"items":["alpha","alpha","beta"]},
         inputSchema: {
           type: 'object',
           properties: {"items":{"type":"array","description":"Input parameter for this utility."}},
@@ -128,8 +125,7 @@ const paidRoutes = {
           example: {"agentId":4,"skill":"dedupe","inputCount":3,"outputCount":2,"items":["alpha","beta"]},
           schema: { type: 'object', additionalProperties: true }
         }
-      })
-    }
+    })
   },
   'POST /v1/url/normalize': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
@@ -142,9 +138,9 @@ const paidRoutes = {
       serviceName: '50M Agent Utility Gateway',
       tags: ["url","normalize","data"]
     },
-    extensions: {
-      ...declareDiscoveryExtension({
-        input: {"urls":["example.com","https://openai.com"]},
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"urls":["example.com","https://openai.com"]},
         inputSchema: {
           type: 'object',
           properties: {"urls":{"type":"array","description":"Input parameter for this utility."}},
@@ -154,8 +150,7 @@ const paidRoutes = {
           example: {"agentId":5,"skill":"url-normalize","results":[{"input":"example.com","valid":true,"normalized":"https://example.com/"}]},
           schema: { type: 'object', additionalProperties: true }
         }
-      })
-    }
+    })
   },
   'POST /v1/data/csv-to-json': {
     accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
@@ -168,9 +163,9 @@ const paidRoutes = {
       serviceName: '50M Agent Utility Gateway',
       tags: ["csv","json","convert"]
     },
-    extensions: {
-      ...declareDiscoveryExtension({
-        input: {"csv":"name,age\\nAda,36"},
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"csv":"name,age\\nAda,36"},
         inputSchema: {
           type: 'object',
           properties: {"csv":{"type":"string","description":"Input parameter for this utility."}},
@@ -180,8 +175,7 @@ const paidRoutes = {
           example: {"agentId":6,"skill":"csv-to-json","rows":1,"data":[{"name":"Ada","age":"36"}]},
           schema: { type: 'object', additionalProperties: true }
         }
-      })
-    }
+    })
   },
   'POST /v1/data/json-validate': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
@@ -194,9 +188,9 @@ const paidRoutes = {
       serviceName: '50M Agent Utility Gateway',
       tags: ["json","validate","data"]
     },
-    extensions: {
-      ...declareDiscoveryExtension({
-        input: {"json":"{\"ok\":true}"},
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"json":"{\"ok\":true}"},
         inputSchema: {
           type: 'object',
           properties: {"json":{"type":"string","description":"Input parameter for this utility."}},
@@ -206,8 +200,7 @@ const paidRoutes = {
           example: {"agentId":7,"skill":"json-validate","valid":true,"type":"object"},
           schema: { type: 'object', additionalProperties: true }
         }
-      })
-    }
+    })
   },
   'POST /v1/data/hash': {
     accepts: [{ scheme: 'exact', price: '$0.001', network: NETWORK, payTo: PAY_TO }],
@@ -220,9 +213,9 @@ const paidRoutes = {
       serviceName: '50M Agent Utility Gateway',
       tags: ["hash","sha256","utility"]
     },
-    extensions: {
-      ...declareDiscoveryExtension({
-        input: {"text":"hello"},
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"text":"hello"},
         inputSchema: {
           type: 'object',
           properties: {"text":{"type":"string","description":"Input parameter for this utility."}},
@@ -232,8 +225,7 @@ const paidRoutes = {
           example: {"agentId":8,"skill":"hash","hashes":{"sha256":"2cf24dba..."}},
           schema: { type: 'object', additionalProperties: true }
         }
-      })
-    }
+    })
   }
 };
 

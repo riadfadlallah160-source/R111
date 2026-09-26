@@ -659,6 +659,100 @@ app.use(function(err, _req, res, _next) {
   res.status(500).json({ error: 'Internal server error.' });
 });
 
+
+const PAYAN_BASE = 'https://payanagent.com';
+const PAYAN_TITLES = [
+  '50M Dollar Slot — Text Metrics',
+  '50M Dollar Slot — Text Extraction',
+  '50M Dollar Slot — Keyword Analysis',
+  '50M Dollar Slot — Deduplication',
+  '50M Dollar Slot — URL Normalization',
+  '50M Dollar Slot — CSV to JSON',
+  '50M Dollar Slot — JSON Validation',
+  '50M Dollar Slot — Hashing'
+];
+
+const payanOffers = [
+  { title: PAYAN_TITLES[0], path: '/v1/text/metrics', category: 'Data', tags: ['text','metrics','agents'], body: { text: 'verification sample' } },
+  { title: PAYAN_TITLES[1], path: '/v1/text/extract', category: 'Data', tags: ['extract','text','agents'], body: { text: 'contact sample@example.com https://example.com' } },
+  { title: PAYAN_TITLES[2], path: '/v1/text/keywords', category: 'Data', tags: ['keywords','analysis','agents'], body: { text: 'agent agent marketplace data' } },
+  { title: PAYAN_TITLES[3], path: '/v1/text/dedupe', category: 'Data', tags: ['dedupe','cleanup','agents'], body: { items: ['alpha','alpha','beta'] } },
+  { title: PAYAN_TITLES[4], path: '/v1/url/normalize', category: 'Data', tags: ['url','normalize','agents'], body: { urls: ['example.com'] } },
+  { title: PAYAN_TITLES[5], path: '/v1/data/csv-to-json', category: 'Data', tags: ['csv','json','convert'], body: { csv: 'name,age\\nAda,36' } },
+  { title: PAYAN_TITLES[6], path: '/v1/data/json-validate', category: 'Data', tags: ['json','validate','agents'], body: { json: '{"ok":true}' } },
+  { title: PAYAN_TITLES[7], path: '/v1/data/hash', category: 'Data', tags: ['hash','sha256','agents'], body: { text: 'hello' } }
+];
+
+async function registerWithPayanAgent() {
+  try {
+    const lookup = await fetch(PAYAN_BASE + '/api/v1/offers?q=' + encodeURIComponent('50M Dollar Slot') + '&limit=50');
+    if (lookup.ok) {
+      const current = await lookup.json();
+      const offers = Array.isArray(current.offers) ? current.offers : [];
+      const existingTitles = new Set(offers.map(o => o.title));
+      const missing = payanOffers.filter(o => !existingTitles.has(o.title));
+      if (missing.length === 0) {
+        console.log('PayanAgent listing: all 8 dollar-slot offers already present');
+        return;
+      }
+    }
+
+    const registration = await fetch(PAYAN_BASE + '/api/v1/agents', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'FiftyMillionDollarPool',
+        description: 'Eight deterministic one-dollar machine services backed by a 50,000,000-slot daily earning pool.',
+        walletAddress: PAY_TO,
+        chain: 'base',
+        tags: ['x402','data','automation','agents'],
+        providerType: 'api',
+        agentUrl: PUBLIC_BASE
+      })
+    });
+
+    const regBody = await registration.json();
+    if (!registration.ok || !regBody.apiKey) {
+      console.error('PayanAgent registration failed:', registration.status, JSON.stringify(regBody).slice(0, 400));
+      return;
+    }
+
+    const apiKey = regBody.apiKey;
+    let created = 0;
+
+    for (const offer of payanOffers) {
+      const response = await fetch(PAYAN_BASE + '/api/v1/offers', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'authorization': 'Bearer ' + apiKey
+        },
+        body: JSON.stringify({
+          title: offer.title,
+          description: 'Deterministic ' + offer.title.replace('50M Dollar Slot — ', '') + ' service. One successful x402 call costs exactly $1 USDC on Base and fills one real daily earning slot.',
+          category: offer.category,
+          tags: offer.tags,
+          offerType: 'api',
+          externalUrl: PUBLIC_BASE + offer.path,
+          httpMethod: 'POST',
+          verificationBody: offer.body
+        })
+      });
+      const body = await response.json().catch(() => ({}));
+      if (response.ok) {
+        created += 1;
+        console.log('PayanAgent offer listed:', offer.title, body.offerId || body._id || 'ok');
+      } else {
+        console.error('PayanAgent offer failed:', offer.title, response.status, JSON.stringify(body).slice(0, 300));
+      }
+    }
+
+    console.log('PayanAgent listing session complete:', created, 'offers created');
+  } catch (error) {
+    console.error('PayanAgent listing failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithAgent402() {
   try {
     const response = await fetch('https://agent402.tools/api/index/register', {
@@ -678,4 +772,5 @@ app.listen(PORT, '0.0.0.0', function() {
   console.log('x402 facilitator: ' + FACILITATOR);
   console.log('Base USDC payTo: ' + PAY_TO);
   void registerWithAgent402();
+  void registerWithPayanAgent();
 });

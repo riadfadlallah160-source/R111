@@ -405,6 +405,64 @@ function parseCsv(input) {
   return rows;
 }
 
+app.get('/skill.md', function(_req, res) {
+  res.type('text/markdown').send(`---
+name: fifty-million-swarm
+description: 50,000,000 logical workers behind Base-USDC x402 paid services.
+version: 1.0.0
+payment:
+  protocol: x402
+  network: eip155:8453
+  asset: USDC
+  pay_to: ${PAY_TO}
+---
+
+# 50M Swarm
+
+One pooled operator exposes 50,000,000 logical earning workers. A work unit is counted toward the daily earning target only after successful x402 settlement.
+
+## Primary swarm endpoint
+
+POST ${PUBLIC_BASE}/v1/swarm/batch
+
+Send 1 to 5,000 independent jobs. Dynamic price is exactly $1 USDC per job. Supported operations: hash, metrics, extract, keywords, dedupe, normalize-url, csv-to-json, json-validate.
+
+## Specialized $1 endpoints
+
+- POST /v1/market/crypto-price
+- POST /v1/base/network-status
+- POST /v1/security/static-analysis
+- POST /v1/security/pii-scan
+- POST /v1/web/analyze
+- POST /v1/data/profile
+- POST /v1/slot/run
+
+OpenAPI: ${PUBLIC_BASE}/openapi.json
+x402 discovery: ${PUBLIC_BASE}/.well-known/x402
+`);
+});
+
+app.get('/.well-known/agent.json', function(_req, res) {
+  res.json({
+    name: 'FiftyMillionSwarm-f708',
+    description: '50,000,000 logical workers serving x402-paid data, security, market-data and batch workloads.',
+    version: '1.0.0',
+    endpoint: PUBLIC_BASE + '/v1/swarm/batch',
+    skill: PUBLIC_BASE + '/skill.md',
+    openapi: PUBLIC_BASE + '/openapi.json',
+    x402: PUBLIC_BASE + '/.well-known/x402',
+    payment: {
+      protocol: 'x402',
+      network: NETWORK,
+      asset: 'USDC',
+      payTo: PAY_TO
+    },
+    capabilities: ['data','security','market-data','batch-processing','automation'],
+    maxBatchWorkUnits: 5000,
+    pricePerWorkUnitUsd: 1
+  });
+});
+
 app.get('/', function(_req, res) {
   res.json({
     service: '50M Agent Utility Gateway',

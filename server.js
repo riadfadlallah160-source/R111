@@ -441,6 +441,82 @@ function parseCsv(input) {
   return rows;
 }
 
+app.get('/llms.txt', function(_req, res) {
+  res.type('text/plain').send(`# 50M Swarm Gateway
+
+- [Nevermined payments](/integrations/nevermined.md): Stablecoin/x402 payment instructions for autonomous buyers.
+- [x402 discovery](/.well-known/x402): Machine-readable payment metadata.
+- [Agent metadata](/.well-known/agent.json): Capabilities and service metadata.
+- [OpenAPI](/openapi.json): API specification.
+- [Enterprise procurement](/enterprise): Bulk workload and procurement information.
+
+Primary paid endpoint:
+POST /v1/swarm/batch
+
+Pricing:
+Exactly $1 USDC per successful work unit.
+Settlement network:
+Base mainnet.
+`);
+});
+
+app.get('/integrations/nevermined.md', function(_req, res) {
+  res.type('text/markdown').send(`# Nevermined / x402 Purchase Route
+
+Provider: 50M Swarm Gateway
+
+Base URL:
+${PUBLIC_BASE}
+
+Treasury:
+${PAY_TO}
+
+Settlement:
+USDC on Base mainnet
+
+Protocol:
+x402 v2
+
+## Primary endpoint
+
+POST ${PUBLIC_BASE}/v1/swarm/batch
+
+Request body:
+
+\`\`\`json
+{
+  "jobs": [
+    { "operation": "hash", "input": { "text": "hello" } }
+  ]
+}
+\`\`\`
+
+Price:
+$1 per successful work unit. A batch with N valid jobs requires exactly $N.
+
+## Specialized $1 endpoints
+
+- POST /v1/security/vulnerability-intel
+- POST /v1/security/static-analysis
+- POST /v1/security/pii-scan
+- POST /v1/data/profile
+- POST /v1/market/crypto-price
+- POST /v1/base/network-status
+- POST /v1/web/analyze
+- POST /v1/slot/run
+
+## Payment flow
+
+1. Call the desired endpoint.
+2. Receive HTTP 402 with x402 payment requirements.
+3. Pay using a compatible x402 buyer/router.
+4. Retry with the payment credential.
+5. Receive the paid result after successful settlement.
+
+Nevermined Router can pay public x402 endpoints without requiring the merchant to run Nevermined card checkout.
+`);
+});
+
 app.get('/skill.md', function(_req, res) {
   res.type('text/markdown').send(`---
 name: fifty-million-swarm

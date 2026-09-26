@@ -725,6 +725,16 @@ app.get('/.well-known/x402-service.json', function(_req, res) {
 });
 
 
+async function log402Opportunities() {
+  try {
+    const response = await fetch('https://402index.io/api/v1/opportunities?protocol=x402');
+    const body = await response.text();
+    console.log('402Index opportunities:', response.status, body.slice(0, 6000));
+  } catch (error) {
+    console.error('402Index opportunities failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWith402Index() {
   try {
     const response = await fetch('https://402index.io/api/v1/register', {
@@ -965,5 +975,6 @@ app.listen(PORT, '0.0.0.0', function() {
   void registerWithAgent402();
   void registerWithTrue402();
   void registerWith402Index();
+  void log402Opportunities();
   void registerWithPayanAgent();
 });

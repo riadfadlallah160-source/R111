@@ -26,7 +26,9 @@ const DAILY_TARGET_USD = TOTAL_AGENTS * PRICE_PER_EXECUTION_USD;
 let requestsSinceBoot = 0;
 let nextAgent = 0;
 let dailyFilled = 0;
+let settledUsdToday = 0;
 let currentLagosDay = lagosDayKey();
+const settledTransactions = new Set();
 
 function lagosDayKey() {
   return new Intl.DateTimeFormat('en-CA', {
@@ -42,7 +44,9 @@ function refreshDailyLedger() {
   if (today !== currentLagosDay) {
     currentLagosDay = today;
     dailyFilled = 0;
+    settledUsdToday = 0;
     nextAgent = 0;
+    settledTransactions.clear();
   }
 }
 
@@ -50,6 +54,33 @@ const facilitatorClient = new HTTPFacilitatorClient({ url: FACILITATOR });
 const resourceServer = new x402ResourceServer(facilitatorClient);
 registerExactEvmScheme(resourceServer);
 resourceServer.registerExtension(bazaarResourceServerExtension);
+
+resourceServer.onAfterSettle(async ({ result, requirements, phase }) => {
+  if (!result?.success || !result.transaction) return;
+  if (phase && phase !== 'after-handler' && phase !== 'upfront') return;
+  if (settledTransactions.has(result.transaction)) return;
+
+  const atomic = Number(result.amount || requirements.amount || '0');
+  if (!Number.isFinite(atomic) || atomic <= 0) return;
+
+  const usd = atomic / 1_000_000;
+  settledTransactions.add(result.transaction);
+  refreshDailyLedger();
+  settledUsdToday += usd;
+  dailyFilled = Math.min(TOTAL_AGENTS, Math.floor(settledUsdToday));
+
+  console.log(
+    'Confirmed settlement recorded:',
+    JSON.stringify({
+      transaction: result.transaction,
+      payer: result.payer || '',
+      usd,
+      settledUsdToday,
+      filledToday: dailyFilled,
+      remainingToday: Math.max(0, TOTAL_AGENTS - dailyFilled)
+    })
+  );
+});
 
 const paidRoutes = {
   ...createSwarmPaidRoute({ PAY_TO, NETWORK, PUBLIC_BASE }),
@@ -288,26 +319,8 @@ app.use(paymentMiddleware(paidRoutes, resourceServer));
 
 function assignment(skill) {
   refreshDailyLedger();
-  if (dailyFilled >= TOTAL_AGENTS) {
-    return {
-      agentId: null,
-      queueId: null,
-      skill: skill,
-      activePopulation: TOTAL_AGENTS,
-      totalQueues: QUEUES,
-      day: currentLagosDay,
-      dailyQuotaComplete: true,
-      filledToday: dailyFilled,
-      remainingToday: 0,
-      earnedByThisExecutionUsd: 0,
-      dailyTargetUsd: DAILY_TARGET_USD
-    };
-  }
-
-  nextAgent = dailyFilled + 1;
-  dailyFilled += 1;
   requestsSinceBoot += 1;
-
+  nextAgent = (nextAgent % TOTAL_AGENTS) + 1;
   return {
     agentId: nextAgent,
     queueId: Math.ceil(nextAgent / AGENTS_PER_QUEUE),
@@ -315,10 +328,9 @@ function assignment(skill) {
     activePopulation: TOTAL_AGENTS,
     totalQueues: QUEUES,
     day: currentLagosDay,
-    dailyQuotaComplete: dailyFilled >= TOTAL_AGENTS,
-    filledToday: dailyFilled,
-    remainingToday: TOTAL_AGENTS - dailyFilled,
-    earnedByThisExecutionUsd: PRICE_PER_EXECUTION_USD,
+    settlementStatus: 'pending-until-x402-settles',
+    confirmedFilledToday: dailyFilled,
+    confirmedRemainingToday: Math.max(0, TOTAL_AGENTS - dailyFilled),
     dailyTargetUsd: DAILY_TARGET_USD,
     requestNumberSinceBoot: requestsSinceBoot
   };
@@ -401,7 +413,8 @@ app.get('/', function(_req, res) {
     docs: '/openapi.json',
     discovery: '/.well-known/x402',
     pricePerSuccessfulExecutionUsd: PRICE_PER_EXECUTION_USD,
-    dailyAgentTargetUsd: DAILY_TARGET_USD
+    dailyAgentTargetUsd: DAILY_TARGET_USD,
+    accountingBasis: 'successful x402 settlement only'
   });
 });
 
@@ -421,7 +434,9 @@ app.get('/v1/pool/status', function(_req, res) {
     pricePerSuccessfulExecutionUsd: PRICE_PER_EXECUTION_USD,
     dailyTargetUsd: DAILY_TARGET_USD,
     filledToday: dailyFilled,
-    remainingToday: TOTAL_AGENTS - dailyFilled,
+    remainingToday: Math.max(0, TOTAL_AGENTS - dailyFilled),
+    confirmedSettledUsdToday: settledUsdToday,
+    accountingBasis: 'successful x402 settlement only',
     requestsSinceBoot: requestsSinceBoot,
     settlementRail: 'Base USDC via x402',
     treasury: PAY_TO

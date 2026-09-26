@@ -729,7 +729,21 @@ async function registerWithTrue402() {
     const response = await fetch('https://true402.dev/api/v1/services', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ url: PUBLIC_BASE })
+      body: JSON.stringify({
+        url: PUBLIC_BASE,
+        manifest: {
+          x402: '1.0',
+          name: '50m-dollar-slot',
+          capabilities: ['data','automation','text','json','csv','hashing','normalization'],
+          pricing: { currency: 'USDC', base: '1.00', unit: 'request' },
+          payment: {
+            address: PAY_TO,
+            chain: 'base',
+            facilitator: FACILITATOR
+          },
+          endpoint: PUBLIC_BASE + '/v1/slot/run'
+        }
+      })
     });
     const body = await response.text();
     console.log('true402 registration:', response.status, body.slice(0, 400));

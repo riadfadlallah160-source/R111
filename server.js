@@ -908,6 +908,13 @@ async function registerWith402Index() {
       probe: { records: [{ id: 1, score: 98 }] }
     },
     {
+      path: '/v1/security/vulnerability-intel',
+      name: '50M Vulnerability Intelligence',
+      category: 'data/vulnerability-intelligence',
+      description: 'Live batched package/version vulnerability intelligence from OSV. One successful call costs exactly $1 USDC.',
+      probe: { queries: [{ package: { name: 'jinja2', ecosystem: 'PyPI' }, version: '2.4.1' }] }
+    },
+    {
       path: '/v1/swarm/batch',
       name: '50M Swarm Batch',
       category: 'tools/data',
@@ -1216,6 +1223,7 @@ app.listen(PORT, '0.0.0.0', function() {
   console.log('50M Agent Utility Gateway listening on port ' + PORT);
   console.log('x402 facilitator: ' + FACILITATOR);
   console.log('Base USDC payTo: ' + PAY_TO);
+  void registerWith402Index();
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.

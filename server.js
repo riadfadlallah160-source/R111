@@ -982,7 +982,7 @@ async function registerWithTollbooth() {
     const payload = {
       name: '50M Swarm Batch',
       endpoint: PUBLIC_BASE + '/v1/swarm/batch',
-      category: 'developer-tools',
+      category: 'data',
       priceUsdc: 1,
       wallet: PAY_TO,
       chain: 'base',

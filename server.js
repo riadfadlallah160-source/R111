@@ -6,6 +6,7 @@ import { x402ResourceServer, HTTPFacilitatorClient } from '@x402/core/server';
 import { registerExactEvmScheme } from '@x402/evm/exact/server';
 import { declareDiscoveryExtension, bazaarResourceServerExtension } from '@x402/extensions/bazaar';
 import { createPremiumPaidRoutes, registerPremiumHandlers } from './premium.js';
+import { createSwarmPaidRoute, registerSwarmHandler } from './swarm.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -51,6 +52,7 @@ registerExactEvmScheme(resourceServer);
 resourceServer.registerExtension(bazaarResourceServerExtension);
 
 const paidRoutes = {
+  ...createSwarmPaidRoute({ PAY_TO, NETWORK, PUBLIC_BASE }),
   ...createPremiumPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
   'POST /v1/text/metrics': {
     accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
@@ -793,6 +795,7 @@ async function registerWithTrue402() {
 }
 
 registerPremiumHandlers(app, assignment);
+registerSwarmHandler(app, assignment, crypto);
 
 const routeMeta = Object.entries(paidRoutes).map(function(entry) {
   const parts = entry[0].split(' ');

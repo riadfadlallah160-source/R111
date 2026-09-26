@@ -1213,12 +1213,7 @@ app.listen(PORT, '0.0.0.0', function() {
   console.log('50M Agent Utility Gateway listening on port ' + PORT);
   console.log('x402 facilitator: ' + FACILITATOR);
   console.log('Base USDC payTo: ' + PAY_TO);
-  void registerWithAgent402();
-  void registerWithAgentWorld();
-  void registerWithTollbooth();
-  void registerWithTrue402();
-  void registerWith402Index();
-  void verify402IndexDomain();
-  void log402Opportunities();
-  void registerWithPayanAgent();
+  // Directory registrations are intentionally not repeated on every restart.
+  // Existing verified listings remain active; repeated submissions trigger
+  // marketplace probe backoff and rate limits.
 });

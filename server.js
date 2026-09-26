@@ -977,6 +977,29 @@ async function registerWithPayanAgent() {
   }
 }
 
+async function registerWithTollbooth() {
+  try {
+    const payload = {
+      name: '50M Swarm Batch',
+      endpoint: PUBLIC_BASE + '/v1/swarm/batch',
+      category: 'developer-tools',
+      priceUsdc: 1,
+      wallet: PAY_TO,
+      chain: 'base',
+      description: 'Dynamic x402 swarm endpoint: $1 per successful work unit, up to 5,000 units per paid batch.'
+    };
+    const response = await fetch('https://www.trytollbooth.com/api/services', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const body = await response.text();
+    console.log('Tollbooth registration:', response.status, body.slice(0, 700));
+  } catch (error) {
+    console.error('Tollbooth registration failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithAgent402() {
   try {
     const response = await fetch('https://agent402.tools/api/index/register', {
@@ -996,6 +1019,7 @@ app.listen(PORT, '0.0.0.0', function() {
   console.log('x402 facilitator: ' + FACILITATOR);
   console.log('Base USDC payTo: ' + PAY_TO);
   void registerWithAgent402();
+  void registerWithTollbooth();
   void registerWithTrue402();
   void registerWith402Index();
   void log402Opportunities();

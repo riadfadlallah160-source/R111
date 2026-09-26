@@ -18,6 +18,7 @@ const PAY_TO = '0xf744573cdfFC211163c11c0a31730851Da78f708';
 const NETWORK = 'eip155:8453';
 const FACILITATOR = 'https://facilitator.openx402.ai';
 const PUBLIC_BASE = 'https://fifty-million-agent-gateway.onrender.com';
+const DURABLE_LEDGER = 'https://50m-micro-agent-engine-4gntn5.v2.appdeploy.ai/api/settlement';
 const TOTAL_AGENTS = 50000000;
 const AGENTS_PER_QUEUE = 5000;
 const QUEUES = TOTAL_AGENTS / AGENTS_PER_QUEUE;
@@ -82,6 +83,39 @@ resourceServer.onAfterSettle(async ({ result, requirements, phase }) => {
       remainingToday: Math.max(0, TOTAL_AGENTS - dailyFilled)
     })
   );
+
+  try {
+    const persisted = await fetch(DURABLE_LEDGER + '/record', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ transaction: result.transaction })
+    });
+    const body = await persisted.json().catch(() => ({}));
+    if (!persisted.ok) {
+      console.error('Durable settlement ledger rejected transaction:', persisted.status, JSON.stringify(body).slice(0, 500));
+      return;
+    }
+
+    if (Number.isFinite(Number(body.settledUsd))) {
+      settledUsdToday = Number(body.settledUsd);
+      dailyFilled = Math.min(TOTAL_AGENTS, Math.floor(settledUsdToday));
+    }
+    console.log(
+      'Durable settlement ledger updated:',
+      JSON.stringify({
+        transaction: result.transaction,
+        settledUsd: body.settledUsd,
+        filledSlots: body.filledSlots,
+        remainingSlots: body.remainingSlots,
+        duplicate: body.duplicate
+      })
+    );
+  } catch (error) {
+    console.error(
+      'Durable settlement ledger unavailable:',
+      error instanceof Error ? error.message : String(error)
+    );
+  }
 });
 
 const paidRoutes = {
@@ -484,21 +518,42 @@ app.get('/health', function(_req, res) {
   res.json({ ok: true, activeAgentPopulation: TOTAL_AGENTS, requestsSinceBoot: requestsSinceBoot });
 });
 
-app.get('/v1/pool/status', function(_req, res) {
+app.get('/v1/pool/status', async function(_req, res) {
   refreshDailyLedger();
+
+  let durable = null;
+  try {
+    const response = await fetch(DURABLE_LEDGER + '/status');
+    if (response.ok) durable = await response.json();
+  } catch {
+    durable = null;
+  }
+
+  const confirmedSettledUsd = Number.isFinite(Number(durable?.settledUsd))
+    ? Number(durable.settledUsd)
+    : settledUsdToday;
+  const confirmedFilled = Number.isFinite(Number(durable?.filledSlots))
+    ? Number(durable.filledSlots)
+    : Math.min(TOTAL_AGENTS, Math.floor(confirmedSettledUsd));
+  const confirmedRemaining = Number.isFinite(Number(durable?.remainingSlots))
+    ? Number(durable.remainingSlots)
+    : Math.max(0, TOTAL_AGENTS - confirmedFilled);
+
   res.json({
     status: 'active',
-    day: currentLagosDay,
+    day: durable?.day || currentLagosDay,
     timezone: 'Africa/Lagos',
     activeAgentPopulation: TOTAL_AGENTS,
     queues: QUEUES,
     agentsPerQueue: AGENTS_PER_QUEUE,
     pricePerSuccessfulExecutionUsd: PRICE_PER_EXECUTION_USD,
     dailyTargetUsd: DAILY_TARGET_USD,
-    filledToday: dailyFilled,
-    remainingToday: Math.max(0, TOTAL_AGENTS - dailyFilled),
-    confirmedSettledUsdToday: settledUsdToday,
-    accountingBasis: 'successful x402 settlement only',
+    filledToday: confirmedFilled,
+    remainingToday: confirmedRemaining,
+    confirmedSettledUsdToday: confirmedSettledUsd,
+    settlementCount: Number(durable?.settlementCount || 0),
+    persistence: durable ? 'durable-on-chain-verified-ledger' : 'temporary-fallback',
+    accountingBasis: 'successful Base-USDC x402 settlement only',
     requestsSinceBoot: requestsSinceBoot,
     settlementRail: 'Base USDC via x402',
     treasury: PAY_TO
@@ -1042,7 +1097,7 @@ app.get('/openapi.json', function(req, res) {
     info: {
       title: '50M Agent Utility Gateway',
       version: '1.0.0',
-      description: 'Eight $1-per-successful-execution utilities for autonomous agents. Each paid execution fills one of 50,000,000 daily agent earning slots and settles in Base USDC via x402.'
+      description: 'x402-paid data, security, market-data and dynamic swarm services. Each confirmed $1 of Base-USDC settlement fills one of 50,000,000 daily earning slots.'
     },
     servers: [{ url: protocol + '://' + host }],
     paths: paths

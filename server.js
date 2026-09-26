@@ -8,6 +8,7 @@ import { createPremiumPaidRoutes, registerPremiumHandlers } from './premium.js';
 import { createSwarmPaidRoute, registerSwarmHandler } from './swarm.js';
 import { createMarketPaidRoutes, registerMarketHandlers } from './market.js';
 import { createIntelPaidRoutes, registerIntelHandlers } from './intel.js';
+import { registerEnterpriseRoutes } from './enterprise.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -1036,6 +1037,7 @@ registerPremiumHandlers(app, assignment);
 registerSwarmHandler(app, assignment, crypto);
 registerMarketHandlers(app, assignment);
 registerIntelHandlers(app, assignment);
+registerEnterpriseRoutes(app);
 
 const routeMeta = Object.entries(paidRoutes).map(function(entry) {
   const parts = entry[0].split(' ');

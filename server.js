@@ -248,6 +248,34 @@ const paidRoutes = {
           schema: { type: 'object', additionalProperties: true }
         }
     })
+  },
+  'POST /v1/slot/run': {
+    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    description: 'Universal one-dollar agent slot. Run one deterministic operation: metrics, extract, keywords, dedupe, normalize-url, csv-to-json, json-validate, or hash.',
+    mimeType: 'application/json',
+    resource: {
+      url: PUBLIC_BASE + '/v1/slot/run',
+      description: 'Universal one-dollar deterministic agent work endpoint.',
+      mimeType: 'application/json',
+      serviceName: '50M Dollar Slot',
+      tags: ["agent","dollar","utility","data","x402"]
+    },
+    extensions: declareDiscoveryExtension({
+      bodyType: 'json',
+      input: {"operation":"hash","input":{"text":"hello"}},
+      inputSchema: {
+        type: 'object',
+        properties: {
+          operation: { type: 'string', description: 'metrics | extract | keywords | dedupe | normalize-url | csv-to-json | json-validate | hash' },
+          input: { type: 'object', description: 'Operation-specific JSON input.' }
+        },
+        required: ["operation","input"]
+      },
+      output: {
+        example: {"agentId":1,"earnedByThisExecutionUsd":1,"operation":"hash","result":{"sha256":"..."}},
+        schema: { type: 'object', additionalProperties: true }
+      }
+    })
   }
 };
 
@@ -587,6 +615,129 @@ app.post('/v1/data/hash', function(req, res) {
   });
 });
 
+
+app.post('/v1/slot/run', function(req, res) {
+  const operation = String(req.body?.operation || '').toLowerCase();
+  const input = req.body?.input && typeof req.body.input === 'object' ? req.body.input : {};
+  let result;
+
+  if (operation === 'hash') {
+    const text = String(input.text || '');
+    if (!text) return res.status(400).json({ error: 'input.text is required for hash.' });
+    const digest = algorithm => crypto.createHash(algorithm).update(text, 'utf8').digest('hex');
+    result = { sha256: digest('sha256'), sha1: digest('sha1'), md5: digest('md5') };
+  } else if (operation === 'metrics') {
+    const text = String(input.text || '');
+    if (!text) return res.status(400).json({ error: 'input.text is required for metrics.' });
+    const ws = words(text);
+    result = {
+      characters: text.length,
+      charactersNoWhitespace: text.replace(/\s/g, '').length,
+      words: ws.length,
+      uniqueWords: new Set(ws).size,
+      lines: text.split(/\r?\n/).length
+    };
+  } else if (operation === 'extract') {
+    const text = String(input.text || '');
+    if (!text) return res.status(400).json({ error: 'input.text is required for extract.' });
+    const unique = list => Array.from(new Set(list));
+    result = {
+      emails: unique(text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || []),
+      urls: unique(text.match(/https?:\/\/[^\s<>"']+/gi) || []),
+      hashtags: unique(text.match(/#[\p{L}\p{N}_]+/gu) || []),
+      mentions: unique(text.match(/@[A-Za-z0-9_]{2,}/g) || []),
+      numbers: unique(text.match(/[-+]?\b\d+(?:\.\d+)?\b/g) || [])
+    };
+  } else if (operation === 'keywords') {
+    const text = String(input.text || '');
+    if (!text) return res.status(400).json({ error: 'input.text is required for keywords.' });
+    const counts = new Map();
+    for (const word of words(text)) {
+      if (word.length < 2 || stopWords.has(word)) continue;
+      counts.set(word, (counts.get(word) || 0) + 1);
+    }
+    result = Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, Math.min(100, Math.max(1, Number(input.limit || 20))))
+      .map(([keyword, count]) => ({ keyword, count }));
+  } else if (operation === 'dedupe') {
+    const items = Array.isArray(input.items)
+      ? input.items.map(String)
+      : String(input.text || '').split(/\r?\n/).filter(Boolean);
+    if (!items.length) return res.status(400).json({ error: 'input.items or input.text is required for dedupe.' });
+    result = Array.from(new Set(items));
+  } else if (operation === 'normalize-url') {
+    const raw = Array.isArray(input.urls) ? input.urls.map(String) : [String(input.url || '')].filter(Boolean);
+    if (!raw.length) return res.status(400).json({ error: 'input.url or input.urls is required.' });
+    result = raw.slice(0, 1000).map(value => {
+      try {
+        const candidate = /^https?:\/\//i.test(value) ? value : 'https://' + value;
+        const url = new URL(candidate);
+        url.hash = '';
+        url.hostname = url.hostname.toLowerCase();
+        return { input: value, valid: true, normalized: url.toString() };
+      } catch {
+        return { input: value, valid: false, normalized: null };
+      }
+    });
+  } else if (operation === 'csv-to-json') {
+    const csv = String(input.csv || '');
+    if (!csv) return res.status(400).json({ error: 'input.csv is required.' });
+    const rows = parseCsv(csv);
+    const headers = rows.shift() || [];
+    result = rows.filter(row => row.some(cell => cell !== '')).map(row => {
+      const record = {};
+      headers.forEach((header, i) => { record[header || 'column_' + (i + 1)] = row[i] || ''; });
+      return record;
+    });
+  } else if (operation === 'json-validate') {
+    try {
+      const parsed = typeof input.json === 'string' ? JSON.parse(input.json) : input.json;
+      if (parsed === undefined) throw new Error('input.json is required.');
+      result = { valid: true, type: Array.isArray(parsed) ? 'array' : parsed === null ? 'null' : typeof parsed, compact: JSON.stringify(parsed), pretty: JSON.stringify(parsed, null, 2) };
+    } catch (err) {
+      result = { valid: false, error: err instanceof Error ? err.message : String(err) };
+    }
+  } else {
+    return res.status(400).json({ error: 'Unknown operation.' });
+  }
+
+  res.json({
+    ...assignment('universal-' + operation),
+    operation,
+    result
+  });
+});
+
+app.get('/.well-known/x402-service.json', function(_req, res) {
+  res.json({
+    x402: '1.0',
+    name: '50m-dollar-slot',
+    capabilities: ['data','automation','text','json','csv','hashing','normalization'],
+    pricing: { currency: 'USDC', base: '1.00', unit: 'request' },
+    payment: {
+      address: PAY_TO,
+      chain: 'base',
+      facilitator: FACILITATOR
+    },
+    endpoint: PUBLIC_BASE + '/v1/slot/run'
+  });
+});
+
+async function registerWithTrue402() {
+  try {
+    const response = await fetch('https://true402.dev/api/v1/services', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url: PUBLIC_BASE })
+    });
+    const body = await response.text();
+    console.log('true402 registration:', response.status, body.slice(0, 400));
+  } catch (error) {
+    console.error('true402 registration failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 const routeMeta = Object.entries(paidRoutes).map(function(entry) {
   const parts = entry[0].split(' ');
   const config = entry[1];
@@ -771,5 +922,6 @@ app.listen(PORT, '0.0.0.0', function() {
   console.log('x402 facilitator: ' + FACILITATOR);
   console.log('Base USDC payTo: ' + PAY_TO);
   void registerWithAgent402();
+  void registerWithTrue402();
   void registerWithPayanAgent();
 });

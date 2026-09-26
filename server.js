@@ -23,6 +23,7 @@ const AGENTS_PER_QUEUE = 5000;
 const QUEUES = TOTAL_AGENTS / AGENTS_PER_QUEUE;
 const PRICE_PER_EXECUTION_USD = 1;
 const DAILY_TARGET_USD = TOTAL_AGENTS * PRICE_PER_EXECUTION_USD;
+let domainVerificationHash = '';
 
 let requestsSinceBoot = 0;
 let nextAgent = 0;
@@ -731,6 +732,11 @@ app.post('/v1/slot/run', function(req, res) {
   });
 });
 
+app.get('/.well-known/402index-verify.txt', function(_req, res) {
+  if (!domainVerificationHash) return res.status(503).type('text/plain').send('verification-not-ready');
+  res.type('text/plain').send(domainVerificationHash);
+});
+
 app.get('/.well-known/x402-service.json', function(_req, res) {
   res.json({
     x402: '1.0',
@@ -746,6 +752,39 @@ app.get('/.well-known/x402-service.json', function(_req, res) {
   });
 });
 
+
+async function verify402IndexDomain() {
+  try {
+    const claim = await fetch('https://402index.io/api/v1/claim', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ domain: 'fifty-million-agent-gateway.onrender.com' })
+    });
+    const body = await claim.json().catch(() => ({}));
+
+    if (claim.status === 409) {
+      console.log('402Index domain verification: already verified');
+      return;
+    }
+    if (!claim.ok || !body.verification_hash) {
+      console.error('402Index domain claim failed:', claim.status, JSON.stringify(body).slice(0, 300));
+      return;
+    }
+
+    domainVerificationHash = String(body.verification_hash);
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
+    const verify = await fetch('https://402index.io/api/v1/claim/verify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ domain: 'fifty-million-agent-gateway.onrender.com' })
+    });
+    const verified = await verify.text();
+    console.log('402Index domain verification:', verify.status, verified.slice(0, 500));
+  } catch (error) {
+    console.error('402Index domain verification failed:', error instanceof Error ? error.message : String(error));
+  }
+}
 
 async function log402Opportunities() {
   try {
@@ -1086,6 +1125,7 @@ app.listen(PORT, '0.0.0.0', function() {
   void registerWithTollbooth();
   void registerWithTrue402();
   void registerWith402Index();
+  void verify402IndexDomain();
   void log402Opportunities();
   void registerWithPayanAgent();
 });

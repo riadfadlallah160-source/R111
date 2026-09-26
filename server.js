@@ -772,7 +772,7 @@ async function verify402IndexDomain() {
     }
 
     domainVerificationHash = String(body.verification_hash);
-    await new Promise(resolve => setTimeout(resolve, 1200));
+    await new Promise(resolve => setTimeout(resolve, 15000));
 
     const verify = await fetch('https://402index.io/api/v1/claim/verify', {
       method: 'POST',

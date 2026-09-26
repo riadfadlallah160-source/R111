@@ -1,6 +1,5 @@
 import express from 'express';
 import crypto from 'node:crypto';
-import { startBasedAgentsHunter } from './worker.js';
 import { paymentMiddleware } from '@x402/express';
 import { x402ResourceServer, HTTPFacilitatorClient } from '@x402/core/server';
 import { registerExactEvmScheme } from '@x402/evm/exact/server';

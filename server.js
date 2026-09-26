@@ -758,28 +758,89 @@ async function log402Opportunities() {
 }
 
 async function registerWith402Index() {
-  try {
-    const response = await fetch('https://402index.io/api/v1/register', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        url: PUBLIC_BASE + '/v1/slot/run',
-        name: '50M Dollar Slot',
-        protocol: 'x402',
-        http_method: 'POST',
-        probe_body: JSON.stringify({ operation: 'hash', input: { text: 'verification' } }),
-        description: 'Universal deterministic agent work endpoint. Every successful execution costs exactly $1 USDC on Base and maps to one daily earning slot.',
-        price_usd: 1,
-        payment_asset: 'USDC',
-        payment_network: 'Base',
-        category: 'tools/data',
-        provider: '50M Agent Utility Gateway'
-      })
-    });
-    const body = await response.text();
-    console.log('402Index registration:', response.status, body.slice(0, 500));
-  } catch (error) {
-    console.error('402Index registration failed:', error instanceof Error ? error.message : String(error));
+  const listings = [
+    {
+      path: '/v1/slot/run',
+      name: '50M Dollar Slot',
+      category: 'tools/data',
+      description: 'Universal deterministic agent work endpoint. Every successful execution costs exactly $1 USDC on Base.',
+      probe: { operation: 'hash', input: { text: 'verification' } }
+    },
+    {
+      path: '/v1/market/crypto-price',
+      name: '50M Live Crypto Price',
+      category: 'market-data/crypto-price',
+      description: 'Live USD crypto spot-price lookup. One successful call costs exactly $1 USDC on Base.',
+      probe: { id: 'bitcoin' }
+    },
+    {
+      path: '/v1/base/network-status',
+      name: '50M Base Network Status',
+      category: 'blockchain-data/network-status',
+      description: 'Live Base mainnet block height, gas price and chain ID. One successful call costs exactly $1 USDC.',
+      probe: {}
+    },
+    {
+      path: '/v1/security/static-analysis',
+      name: '50M Static Security Analysis',
+      category: 'security/static-analysis',
+      description: 'Defensive source-code static analysis. One successful call costs exactly $1 USDC on Base.',
+      probe: { files: [{ path: 'app.js', content: 'const value = input;' }] }
+    },
+    {
+      path: '/v1/web/analyze',
+      name: '50M Web Analysis',
+      category: 'data/web-analysis',
+      description: 'HTML metadata, accessibility and security analysis. One successful call costs exactly $1 USDC.',
+      probe: { html: '<html><head><title>Example</title></head><body><h1>Hello</h1></body></html>', url: 'https://example.com' }
+    },
+    {
+      path: '/v1/security/pii-scan',
+      name: '50M Privacy Scan',
+      category: 'digital-products/security-tools',
+      description: 'PII and accidental-secret detection for text batches. One successful call costs exactly $1 USDC.',
+      probe: { texts: ['Contact sample@example.com'] }
+    },
+    {
+      path: '/v1/data/profile',
+      name: '50M Data Profiler',
+      category: 'digital-products/data-tools',
+      description: 'Batch JSON data profiling and quality statistics. One successful call costs exactly $1 USDC.',
+      probe: { records: [{ id: 1, score: 98 }] }
+    },
+    {
+      path: '/v1/swarm/batch',
+      name: '50M Swarm Batch',
+      category: 'tools/data',
+      description: 'Dynamic-price parallel swarm endpoint: exactly $1 per successful work unit, up to 5,000 units per paid batch.',
+      probe: { jobs: [{ operation: 'hash', input: { text: 'verification' } }] }
+    }
+  ];
+
+  for (const item of listings) {
+    try {
+      const response = await fetch('https://402index.io/api/v1/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          url: PUBLIC_BASE + item.path,
+          name: item.name,
+          protocol: 'x402',
+          http_method: 'POST',
+          probe_body: JSON.stringify(item.probe),
+          description: item.description,
+          price_usd: 1,
+          payment_asset: 'USDC',
+          payment_network: 'Base',
+          category: item.category,
+          provider: '50M Agent Utility Gateway'
+        })
+      });
+      const body = await response.text();
+      console.log('402Index registration:', item.name, response.status, body.slice(0, 350));
+    } catch (error) {
+      console.error('402Index registration failed:', item.name, error instanceof Error ? error.message : String(error));
+    }
   }
 }
 

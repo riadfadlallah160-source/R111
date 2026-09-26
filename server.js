@@ -8,6 +8,7 @@ import { declareDiscoveryExtension, bazaarResourceServerExtension } from '@x402/
 import { createPremiumPaidRoutes, registerPremiumHandlers } from './premium.js';
 import { createSwarmPaidRoute, registerSwarmHandler } from './swarm.js';
 import { createMarketPaidRoutes, registerMarketHandlers } from './market.js';
+import { createIntelPaidRoutes, registerIntelHandlers } from './intel.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -85,6 +86,7 @@ resourceServer.onAfterSettle(async ({ result, requirements, phase }) => {
 });
 
 const paidRoutes = {
+  ...createIntelPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
   ...createMarketPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
   ...createSwarmPaidRoute({ PAY_TO, NETWORK, PUBLIC_BASE }),
   ...createPremiumPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
@@ -972,6 +974,7 @@ async function registerWithTrue402() {
 registerPremiumHandlers(app, assignment);
 registerSwarmHandler(app, assignment, crypto);
 registerMarketHandlers(app, assignment);
+registerIntelHandlers(app, assignment);
 
 const routeMeta = Object.entries(paidRoutes).map(function(entry) {
   const parts = entry[0].split(' ');

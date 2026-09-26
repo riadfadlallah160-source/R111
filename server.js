@@ -701,13 +701,12 @@ async function registerWithPayanAgent() {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        name: 'FiftyMillionDollarPool',
+        name: 'FiftyMillionPool-f708',
         description: 'Eight deterministic one-dollar machine services backed by a 50,000,000-slot daily earning pool.',
         walletAddress: PAY_TO,
         chain: 'base',
         tags: ['x402','data','automation','agents'],
-        providerType: 'api',
-        agentUrl: PUBLIC_BASE
+        providerType: 'agent'
       })
     });
 

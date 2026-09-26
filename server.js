@@ -1080,6 +1080,40 @@ async function registerWithPayanAgent() {
   }
 }
 
+async function registerWithAgentWorld() {
+  try {
+    const response = await fetch('https://agentworld.me/api/agentworld/registry/register', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: 'FiftyMillionSwarm-f708',
+        role: 'Distributed Data and Automation Worker',
+        description: 'One pooled operator exposing 50,000,000 logical earning workers through x402-paid data, security, market-data and parallel batch services.',
+        owner_wallet: PAY_TO,
+        endpoint_url: PUBLIC_BASE + '/v1/swarm/batch',
+        capabilities: 'x402, data, security, market-data, batch-processing, automation, Base'
+      })
+    });
+    const body = await response.json().catch(() => ({}));
+    if (response.status === 409) {
+      console.log('AgentWorld registration: already registered');
+      return;
+    }
+    if (!response.ok) {
+      console.error('AgentWorld registration failed:', response.status, JSON.stringify(body).slice(0, 400));
+      return;
+    }
+    console.log('AgentWorld registration:', JSON.stringify({
+      success: body.success,
+      agent_id: body.agent_id,
+      discovery_url: body.discovery_url,
+      api_key_received: Boolean(body.api_key)
+    }));
+  } catch (error) {
+    console.error('AgentWorld registration failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithTollbooth() {
   try {
     const payload = {
@@ -1122,6 +1156,7 @@ app.listen(PORT, '0.0.0.0', function() {
   console.log('x402 facilitator: ' + FACILITATOR);
   console.log('Base USDC payTo: ' + PAY_TO);
   void registerWithAgent402();
+  void registerWithAgentWorld();
   void registerWithTollbooth();
   void registerWithTrue402();
   void registerWith402Index();

@@ -4,10 +4,11 @@ import { paymentMiddleware } from '@x402/express';
 import { x402ResourceServer, HTTPFacilitatorClient } from '@x402/core/server';
 import { registerExactEvmScheme } from '@x402/evm/exact/server';
 import { declareDiscoveryExtension, bazaarResourceServerExtension } from '@x402/extensions/bazaar';
+import { createPremiumPaidRoutes, registerPremiumHandlers } from './premium.js';
 
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '4mb' }));
 
 const PORT = Number(process.env.PORT || 3000);
 const PAY_TO = '0xf744573cdfFC211163c11c0a31730851Da78f708';
@@ -49,6 +50,7 @@ registerExactEvmScheme(resourceServer);
 resourceServer.registerExtension(bazaarResourceServerExtension);
 
 const paidRoutes = {
+  ...createPremiumPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
   'POST /v1/text/metrics': {
     accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
     description: 'Text metrics, reading time, vocabulary and sentence statistics.',
@@ -788,6 +790,8 @@ async function registerWithTrue402() {
     console.error('true402 registration failed:', error instanceof Error ? error.message : String(error));
   }
 }
+
+registerPremiumHandlers(app, assignment);
 
 const routeMeta = Object.entries(paidRoutes).map(function(entry) {
   const parts = entry[0].split(' ');

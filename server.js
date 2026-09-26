@@ -724,6 +724,33 @@ app.get('/.well-known/x402-service.json', function(_req, res) {
   });
 });
 
+
+async function registerWith402Index() {
+  try {
+    const response = await fetch('https://402index.io/api/v1/register', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        url: PUBLIC_BASE + '/v1/slot/run',
+        name: '50M Dollar Slot',
+        protocol: 'x402',
+        http_method: 'POST',
+        probe_body: JSON.stringify({ operation: 'hash', input: { text: 'verification' } }),
+        description: 'Universal deterministic agent work endpoint. Every successful execution costs exactly $1 USDC on Base and maps to one daily earning slot.',
+        price_usd: 1,
+        payment_asset: 'USDC',
+        payment_network: 'Base',
+        category: 'tools/data',
+        provider: '50M Agent Utility Gateway'
+      })
+    });
+    const body = await response.text();
+    console.log('402Index registration:', response.status, body.slice(0, 500));
+  } catch (error) {
+    console.error('402Index registration failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithTrue402() {
   try {
     const response = await fetch('https://true402.dev/api/v1/services', {
@@ -937,5 +964,6 @@ app.listen(PORT, '0.0.0.0', function() {
   console.log('Base USDC payTo: ' + PAY_TO);
   void registerWithAgent402();
   void registerWithTrue402();
+  void registerWith402Index();
   void registerWithPayanAgent();
 });

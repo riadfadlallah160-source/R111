@@ -40,6 +40,13 @@ export function createMarketPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }) {
       ['blockchain-data','network-status','base','rpc'],
       { includeGas: 'true' }, [],
       { chain: 'base', chainId: '0x2105', blockNumber: '0x...', gasPriceWei: '0x...', agentId: 2 }
+    ),
+    'GET /v1/base/network-status': route(
+      '$0.005', PAY_TO, NETWORK, PUBLIC_BASE, '/v1/base/network-status',
+      'GET-compatible low-cost Base mainnet block height, gas price and chain ID for autonomous agents and x402 crawlers.',
+      ['blockchain-data','network-status','base','rpc','crawler-friendly'],
+      {}, [],
+      { chain: 'base', chainId: '0x2105', blockNumber: '0x...', gasPriceWei: '0x...', agentId: 2 }
     )
   };
 }
@@ -78,7 +85,7 @@ export function registerMarketHandlers(app, assignment) {
     }
   });
 
-  app.post('/v1/base/network-status', async (_req, res) => {
+  const baseStatusHandler = async (_req, res) => {
     try {
       const [blockNumber, gasPrice, chainId] = await Promise.all([
         jsonRpc('eth_blockNumber'),
@@ -98,5 +105,8 @@ export function registerMarketHandlers(app, assignment) {
     } catch {
       res.status(502).json({ error: 'Base RPC unavailable.' });
     }
-  });
+  };
+
+  app.post('/v1/base/network-status', baseStatusHandler);
+  app.get('/v1/base/network-status', baseStatusHandler);
 }

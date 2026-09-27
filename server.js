@@ -1390,6 +1390,7 @@ async function inspectPayApiListing() {
       hasForm: html.toLowerCase().includes('<form'),
       interesting
     }).slice(0, 5000));
+    console.log('PayAPI listing source:', html.slice(0, 12000));
   } catch (error) {
     console.error('PayAPI listing inspection failed:', error instanceof Error ? error.message : String(error));
   }

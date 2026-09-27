@@ -1370,6 +1370,29 @@ async function registerWithTollbooth() {
   }
 }
 
+async function submitToX402List() {
+  try {
+    const response = await fetch('https://x402-list.com/api/v1/submit', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        url: PUBLIC_BASE,
+        email: '50m-demand@agentmail.to',
+        service_name: '50M Swarm Gateway',
+        description: 'Live Base-USDC x402 data and security API with low-cost machine discovery endpoints plus bundled vulnerability, static-security, data-profiling and batch-processing services.',
+        website_url: PUBLIC_BASE + '/enterprise',
+        category: 'Data',
+        endpoints: ['/v1/base/network-status'],
+        notes: 'GET /v1/base/network-status is a $0.005 USDC Base-mainnet crawler-friendly paid canary. The gateway also exposes POST paid endpoints and machine-readable discovery.'
+      })
+    });
+    const body = await response.text();
+    console.log('x402 List submission:', response.status, body.slice(0, 1600));
+  } catch (error) {
+    console.error('x402 List submission failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function submitToMarket402() {
   try {
     const endpoint = PUBLIC_BASE + '/v1/base/network-status';
@@ -1406,6 +1429,13 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.SUBMIT_X402LIST_ONCE === '1') {
+    setTimeout(() => {
+      submitToX402List().catch(error => {
+        console.error('x402 List one-time submission failed:', error instanceof Error ? error.message : String(error));
+      });
+    }, 2200);
+  }
   if (process.env.SUBMIT_MARKET402_ONCE === '1') {
     setTimeout(() => {
       submitToMarket402().catch(error => {

@@ -1476,7 +1476,7 @@ async function submitToX402List() {
         description: 'Live Base-USDC x402 data and security API with low-cost machine discovery endpoints plus bundled vulnerability, static-security, data-profiling and batch-processing services.',
         website_url: PUBLIC_BASE + '/enterprise',
         category: 'Data',
-        endpoints: ['POST /v1/base/network-status'],
+        endpoints: ['/v1/base/network-status'],
         notes: 'POST /v1/base/network-status is a $0.005 USDC Base-mainnet paid canary. The gateway also exposes machine-readable discovery and higher-value bundled endpoints.'
       })
     });

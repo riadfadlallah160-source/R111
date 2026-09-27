@@ -1,5 +1,12 @@
 const SOURCES = [
   {
+    id: 'clawlancer',
+    name: 'Clawlancer',
+    url: 'https://clawlancer.ai/api/listings?listing_type=BOUNTY',
+    kind: 'general-bounty',
+    auth: false
+  },
+  {
     id: 'databazaar',
     name: 'DataBazaar',
     url: 'https://api.databazaar.io/bounties',
@@ -32,6 +39,19 @@ async function fetchJson(url, timeoutMs = 8000) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function normalizeClawlancer(body) {
+  const rows = Array.isArray(body) ? body : (body?.listings || body?.data || []);
+  return rows.map(x => ({
+    source: 'clawlancer',
+    id: x.id || x.listing_id || null,
+    title: x.title || x.name || '',
+    rewardUsd: Number(x.price_usdc || x.reward_usdc || x.bounty_usdc || 0) || (Number(x.price || x.amount || 0) / 1_000_000) || null,
+    category: x.category || 'general',
+    status: x.status || 'open',
+    raw: x
+  })).filter(x => x.id && !['closed','completed','cancelled'].includes(String(x.status).toLowerCase()));
 }
 
 function normalizeDataBazaar(body) {
@@ -101,6 +121,7 @@ export function registerDemandRouter(app) {
     const sourceStatus = [];
     for (const item of fetched) {
       sourceStatus.push({ id: item.source.id, ok: item.ok, status: item.status, error: item.error || null });
+      if (item.source.id === 'clawlancer' && item.ok) opportunities.push(...normalizeClawlancer(item.body));
       if (item.source.id === 'databazaar' && item.ok) opportunities.push(...normalizeDataBazaar(item.body));
       if (item.source.id === 'taskbounty' && item.ok) opportunities.push(...normalizeTaskBounty(item.body));
       if (item.source.id === 'basedagents' && item.ok) opportunities.push(...normalizeBasedAgents(item.body));

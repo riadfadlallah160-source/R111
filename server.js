@@ -16,6 +16,27 @@ import { registerDemandRouter } from './demand-router.js';
 const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '4mb' }));
+
+app.post('/internal/bootstrap/taskforce', async (req, res) => {
+  const secret = process.env.BOOTSTRAP_SECRET;
+  if (!secret || req.headers['x-bootstrap-secret'] !== secret) return res.status(403).json({ error: 'forbidden' });
+  try {
+    const r = await fetch('https://task-force.app/api/agent/register', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: '50M Swarm Worker',
+        capabilities: ['coding','research','data','browser','testing','writing','analysis','automation'],
+        contact: 'https://fifty-million-agent-gateway.onrender.com/'
+      })
+    });
+    const body = await r.json().catch(async () => ({ text: await r.text().catch(() => '') }));
+    res.status(r.status).json(body);
+  } catch (error) {
+    res.status(502).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
 registerDemandRouter(app);
 
 app.use((req, res, next) => {

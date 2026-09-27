@@ -1246,6 +1246,64 @@ const payanOffers = [
   { title: PAYAN_TITLES[7], path: '/v1/data/hash', category: 'Data', tags: ['hash','sha256','agents'], body: { text: 'hello' } }
 ];
 
+async function publishAgentStoreFreeWrapper() {
+  try {
+    const payload = {
+      publisher_id: 'fifty-million-swarm',
+      name: '50M Swarm Security Tools',
+      description: 'Free discovery wrapper for the live 50M Swarm security/data gateway. The installed agent exposes links and instructions for paid x402 Base-USDC vulnerability intelligence, static analysis, PII scanning, data profiling, web analysis, Base network data and crypto pricing.',
+      version: '1.0.0',
+      tags: ['security','data','x402','mcp','base','automation'],
+      install: {
+        agent_wrapper: {
+          format: 'markdown',
+          entrypoint: 'agent.md',
+          content: [
+            '# 50M Swarm Security Tools',
+            '',
+            'Live gateway: ' + PUBLIC_BASE,
+            'OpenAPI: ' + PUBLIC_BASE + '/openapi.json',
+            'Remote MCP: ' + PUBLIC_BASE + '/mcp',
+            'x402 discovery: ' + PUBLIC_BASE + '/.well-known/x402',
+            '',
+            'Paid Base-USDC tools:',
+            '- POST /v1/base/network-status — $0.005',
+            '- POST /v1/market/crypto-price — $0.01',
+            '- POST /v1/security/vulnerability-intel — $1 for up to 100 package/version queries',
+            '- POST /v1/security/static-analysis — $1 for up to 100 files',
+            '- POST /v1/security/pii-scan — $1',
+            '- POST /v1/data/profile — $1 for up to 10,000 records',
+            '- POST /v1/web/analyze — $1',
+            '',
+            'Use the x402 challenge returned by each paid route to settle USDC on Base and retry the call.'
+          ].join('\n')
+        },
+        gateway_routes: []
+      },
+      permissions: {
+        requires_network: true,
+        requires_filesystem: false,
+        notes: 'Network access is used only to call the public 50M Swarm Gateway.'
+      }
+    };
+
+    const response = await fetch('https://api.agentstore.tools/api/publishers/agents/simple', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const body = await response.json().catch(() => ({}));
+    console.log('AgentStore free wrapper:', response.status, JSON.stringify({
+      success: response.ok,
+      action: body.action || null,
+      agent: body.agent || null,
+      error: body.error || null
+    }).slice(0, 3000));
+  } catch (error) {
+    console.error('AgentStore free wrapper failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function publishToAgentStore() {
   try {
     const publisherId = 'fifty-million-demand';
@@ -1675,6 +1733,13 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.SUBMIT_AGENTSTORE_FREE_ONCE === '1') {
+    setTimeout(() => {
+      publishAgentStoreFreeWrapper().catch(error => {
+        console.error('AgentStore free-wrapper submission failed:', error instanceof Error ? error.message : String(error));
+      });
+    }, 500);
+  }
   if (process.env.SUBMIT_AGENTSTORE_ONCE === '1') {
     setTimeout(() => {
       publishToAgentStore().catch(error => {

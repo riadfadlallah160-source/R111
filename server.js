@@ -383,6 +383,20 @@ const paidRoutes = {
   }
 };
 
+// x402 v2 requires `resource` in payment requirements to be a URL string.
+// The previous discovery metadata object produced resource.url as a nested
+// object, which standard x402 clients refuse to sign. Normalize all routes
+// before the middleware constructs the HTTP 402 challenge.
+for (const routeConfig of Object.values(paidRoutes)) {
+  if (
+    routeConfig.resource &&
+    typeof routeConfig.resource === 'object' &&
+    typeof routeConfig.resource.url === 'string'
+  ) {
+    routeConfig.resource = routeConfig.resource.url;
+  }
+}
+
 function mirrorPaymentRequiredIntoBody(req, res, next) {
   const originalEnd = res.end.bind(res);
 

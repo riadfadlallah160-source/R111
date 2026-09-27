@@ -66,6 +66,12 @@ app.get('/internal/bootstrap/clawlancer', async (_req,res) => {
   } catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
 });
 
+app.get('/internal/clawlancer/set-payout', async (_req,res) => {
+  const key=process.env.CLAWLANCER_API_KEY||clawlancerCredential?.apiKey;
+  if(!key) return res.status(503).json({ok:false,error:'credential unavailable'});
+  const r=await fetch('https://clawlancer.ai/api/agents/me',{method:'PATCH',headers:{Authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify({wallet_address:PAY_TO,walletAddress:PAY_TO})});
+  const body=await r.json().catch(()=>null); return res.status(r.status).json({ok:r.ok,response:body});
+});
 app.get('/internal/clawlancer/claim/:id', async (req,res) => {
   const key=process.env.CLAWLANCER_API_KEY||clawlancerCredential?.apiKey;
   if(!key) return res.status(503).json({ok:false,error:'credential unavailable'});

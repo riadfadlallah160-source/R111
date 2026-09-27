@@ -1382,32 +1382,29 @@ async function inspectPayApiListing() {
       const assetEnd = html.indexOf('.js', assetStart);
       if (assetEnd > assetStart) assetPath = html.slice(assetStart, assetEnd + 3);
     }
-    let jsInteresting = [];
     if (assetPath) {
       const jsResponse = await fetch('https://payapi.market' + assetPath, {
         headers: { 'user-agent': '50M-Swarm-Provider/1.0' }
       });
       const js = await jsResponse.text();
-      jsInteresting = Array.from(new Set(
-        js.split(/["'`]/).filter(x =>
-          x.includes('/api/') ||
-          x.toLowerCase().includes('submit') ||
-          x.toLowerCase().includes('provider') ||
-          x.toLowerCase().includes('listing') ||
-          x.toLowerCase().includes('verify')
-        )
-      )).filter(x => x.length < 500).slice(0, 200);
-      console.log('PayAPI JS inspection:', jsResponse.status, JSON.stringify({
+      const keys = ['api_listings','providers','wallet_address','payout_wallet','price_per_request','base_url','endpoint_url','insert(','upsert(','/api/list'];
+      const snippets = {};
+      for (const key of keys) {
+        const indexes = [];
+        let pos = 0;
+        while ((pos = js.indexOf(key, pos)) >= 0 && indexes.length < 8) {
+          indexes.push(pos);
+          pos += key.length;
+        }
+        snippets[key] = indexes.map(i => js.slice(Math.max(0, i - 1200), Math.min(js.length, i + 2200)));
+      }
+      console.log('PayAPI targeted inspection:', jsResponse.status, JSON.stringify({
         assetPath,
         bytes: js.length,
-        interesting: jsInteresting
-      }).slice(0, 12000));
+        snippets
+      }).slice(0, 30000));
     }
-    console.log('PayAPI listing inspection:', response.status, JSON.stringify({
-      bytes: html.length,
-      assetPath,
-      jsInterestingCount: jsInteresting.length
-    }));
+    console.log('PayAPI listing inspection complete:', response.status, assetPath);
   } catch (error) {
     console.error('PayAPI listing inspection failed:', error instanceof Error ? error.message : String(error));
   }

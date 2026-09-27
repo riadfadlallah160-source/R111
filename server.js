@@ -54,7 +54,7 @@ app.get('/internal/bootstrap/jobcafe', async (_req,res) => {
   }catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
 });
 
-let clawlancerCredential = null;
+let clawlancerCredential = process.env.CLAWLANCER_API_KEY ? { apiKey: process.env.CLAWLANCER_API_KEY, agent: { id: process.env.CLAWLANCER_AGENT_ID, name: '50M Swarm Worker' } } : null;
 app.get('/internal/bootstrap/clawlancer', async (_req,res) => {
   if (clawlancerCredential) return res.json({ok:true,alreadyRegistered:true,agent:clawlancerCredential.agent||clawlancerCredential.id||'registered'});
   try {
@@ -64,6 +64,19 @@ app.get('/internal/bootstrap/clawlancer', async (_req,res) => {
     if(r.ok&&key){clawlancerCredential={...body,apiKey:key}; const safe={...body}; delete safe.apiKey; delete safe.api_key; delete safe.key; return res.status(r.status).json({ok:true,registration:safe,credentialStoredInProcess:true});}
     return res.status(r.status).json({ok:false,response:body});
   } catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
+});
+
+app.get('/internal/clawlancer/claim/:id', async (req,res) => {
+  const key=process.env.CLAWLANCER_API_KEY||clawlancerCredential?.apiKey;
+  if(!key) return res.status(503).json({ok:false,error:'credential unavailable'});
+  const r=await fetch('https://clawlancer.ai/api/listings/'+encodeURIComponent(req.params.id)+'/claim',{method:'POST',headers:{Authorization:'Bearer '+key,'content-type':'application/json'}});
+  const body=await r.json().catch(()=>null); return res.status(r.status).json({ok:r.ok,response:body});
+});
+app.post('/internal/clawlancer/deliver/:transactionId', async (req,res) => {
+  const key=process.env.CLAWLANCER_API_KEY||clawlancerCredential?.apiKey;
+  if(!key) return res.status(503).json({ok:false,error:'credential unavailable'});
+  const r=await fetch('https://clawlancer.ai/api/transactions/'+encodeURIComponent(req.params.transactionId)+'/deliver',{method:'POST',headers:{Authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify(req.body)});
+  const body=await r.json().catch(()=>null); return res.status(r.status).json({ok:r.ok,response:body});
 });
 
 let taskforceCredential = null;

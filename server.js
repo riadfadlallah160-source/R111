@@ -16,6 +16,33 @@ const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '4mb' }));
 
+app.use((req, res, next) => {
+  const started = Date.now();
+  res.on('finish', () => {
+    const path = req.path || '';
+    if (
+      path.startsWith('/v1/') ||
+      path === '/mcp' ||
+      path.startsWith('/marketplace/')
+    ) {
+      const hasPaymentCredential = Boolean(
+        req.headers['payment-signature'] ||
+        req.headers['x-payment'] ||
+        req.headers['x-payment-response']
+      );
+      console.log('Demand request:', JSON.stringify({
+        method: req.method,
+        path,
+        status: res.statusCode,
+        hasPaymentCredential,
+        userAgent: String(req.headers['user-agent'] || '').slice(0, 160),
+        latencyMs: Date.now() - started
+      }));
+    }
+  });
+  next();
+});
+
 const PORT = Number(process.env.PORT || 3000);
 const PAY_TO = '0xf744573cdfFC211163c11c0a31730851Da78f708';
 const NETWORK = 'eip155:8453';

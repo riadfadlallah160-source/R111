@@ -1360,4 +1360,11 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.REFRESH_AGENT402_ONCE === '1') {
+    setTimeout(() => {
+      registerWithAgent402().catch(error => {
+        console.error('Agent402 one-time refresh failed:', error instanceof Error ? error.message : String(error));
+      });
+    }, 3000);
+  }
 });

@@ -1370,6 +1370,49 @@ async function registerWithTollbooth() {
   }
 }
 
+async function submitToPayApi() {
+  try {
+    const payload = {
+      provider: {
+        name: '50M Demand Engine',
+        email: '50m-demand@agentmail.to',
+        company_name: '50M Swarm',
+        wallet_address: PAY_TO,
+        solana_payto: ''
+      },
+      api: {
+        name: '50M Swarm Gateway',
+        description: 'Base-USDC x402 data, security, vulnerability-intelligence, market-data and batch-processing API for autonomous agents. Includes a low-cost Base network-status canary plus bundled $1 high-value work endpoints.',
+        category: 'Data',
+        base_url: PUBLIC_BASE,
+        mcp_endpoint: '',
+        paid_route_url: PUBLIC_BASE + '/v1/base/network-status',
+        paid_route_method: 'POST',
+        paid_route_example_body: '{}',
+        paid_route_quote_usdc: '0.005',
+        endpoints_count: '17',
+        tools_count: '17',
+        price_min: '0.005',
+        price_max: '1'
+      },
+      tier: 'free'
+    };
+
+    const response = await fetch('https://payapi.market/api/submit-listing', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'user-agent': '50M-Swarm-Provider/1.0'
+      },
+      body: JSON.stringify(payload)
+    });
+    const body = await response.text();
+    console.log('PayAPI submission:', response.status, body.slice(0, 6000));
+  } catch (error) {
+    console.error('PayAPI submission failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function inspectPayApiListing() {
   try {
     const page = await fetch('https://payapi.market/list', {
@@ -1478,6 +1521,13 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.SUBMIT_PAYAPI_ONCE === '1') {
+    setTimeout(() => {
+      submitToPayApi().catch(error => {
+        console.error('PayAPI one-time submission failed:', error instanceof Error ? error.message : String(error));
+      });
+    }, 1500);
+  }
   if (process.env.INSPECT_PAYAPI_ONCE === '1') {
     setTimeout(() => {
       inspectPayApiListing().catch(error => {

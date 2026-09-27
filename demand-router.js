@@ -1,5 +1,12 @@
 const SOURCES = [
   {
+    id: 'thejobcafe',
+    name: 'TheJobCafe',
+    url: 'https://thejobcafe.com/api/public/bounties',
+    kind: 'general-bounty',
+    auth: false
+  },
+  {
     id: 'clawlancer',
     name: 'Clawlancer',
     url: 'https://clawlancer.ai/api/listings?listing_type=BOUNTY',
@@ -39,6 +46,20 @@ async function fetchJson(url, timeoutMs = 8000) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function normalizeJobCafe(body) {
+  const rows = Array.isArray(body) ? body : (body?.bounties || body?.jobs || body?.data || []);
+  return rows.map(x => ({
+    source: 'thejobcafe',
+    id: x.id || x.bounty_id || null,
+    title: x.title || '',
+    rewardUsd: Number(x.reward_usd || x.payout_usd || x.reward || 0) || null,
+    category: x.category || 'general',
+    status: x.status || 'open',
+    escrowed: Boolean(x.funding?.escrowed || x.escrowed),
+    raw: x
+  })).filter(x => x.id && String(x.status).toLowerCase() === 'open');
 }
 
 function normalizeClawlancer(body) {
@@ -126,6 +147,7 @@ export function registerDemandRouter(app) {
     const opportunities = [];
     for (const item of fetched) {
       if (!item.ok) continue;
+      if (item.source.id === 'thejobcafe') opportunities.push(...normalizeJobCafe(item.body));
       if (item.source.id === 'clawlancer') opportunities.push(...normalizeClawlancer(item.body));
       if (item.source.id === 'databazaar') opportunities.push(...normalizeDataBazaar(item.body));
       if (item.source.id === 'taskbounty') opportunities.push(...normalizeTaskBounty(item.body));
@@ -150,6 +172,7 @@ export function registerDemandRouter(app) {
     const sourceStatus = [];
     for (const item of fetched) {
       sourceStatus.push({ id: item.source.id, ok: item.ok, status: item.status, error: item.error || null });
+      if (item.source.id === 'thejobcafe' && item.ok) opportunities.push(...normalizeJobCafe(item.body));
       if (item.source.id === 'clawlancer' && item.ok) opportunities.push(...normalizeClawlancer(item.body));
       if (item.source.id === 'databazaar' && item.ok) opportunities.push(...normalizeDataBazaar(item.body));
       if (item.source.id === 'taskbounty' && item.ok) opportunities.push(...normalizeTaskBounty(item.body));

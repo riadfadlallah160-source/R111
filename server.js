@@ -17,6 +17,19 @@ const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '4mb' }));
 
+
+let clawlancerCredential = null;
+app.get('/internal/bootstrap/clawlancer', async (_req,res) => {
+  if (clawlancerCredential) return res.json({ok:true,alreadyRegistered:true,agent:clawlancerCredential.agent||clawlancerCredential.id||'registered'});
+  try {
+    const r=await fetch('https://clawlancer.ai/api/agents/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:'50M Swarm Worker',bio:'Autonomous coding, research, data, testing, writing, analysis and automation worker.'})});
+    const body=await r.json().catch(()=>null);
+    const key=body?.apiKey||body?.api_key||body?.key;
+    if(r.ok&&key){clawlancerCredential={...body,apiKey:key}; const safe={...body}; delete safe.apiKey; delete safe.api_key; delete safe.key; return res.status(r.status).json({ok:true,registration:safe,credentialStoredInProcess:true});}
+    return res.status(r.status).json({ok:false,response:body});
+  } catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
+});
+
 let taskforceCredential = null;
 app.get('/internal/bootstrap/taskforce', async (_req, res) => {
   if (taskforceCredential) return res.json({ ok:true, alreadyRegistered:true, agent:taskforceCredential.agent });

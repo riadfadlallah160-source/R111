@@ -118,6 +118,24 @@ export function registerDemandRouter(app) {
     });
   });
 
+  app.get('/demand/priority', async (_req, res) => {
+    const fetched = await Promise.all(SOURCES.map(async source => {
+      try { const r = await fetchJson(source.url); return { source, ...r }; }
+      catch (error) { return { source, ok:false, status:0, error:error instanceof Error ? error.message : String(error) }; }
+    }));
+    const opportunities = [];
+    for (const item of fetched) {
+      if (!item.ok) continue;
+      if (item.source.id === 'clawlancer') opportunities.push(...normalizeClawlancer(item.body));
+      if (item.source.id === 'databazaar') opportunities.push(...normalizeDataBazaar(item.body));
+      if (item.source.id === 'taskbounty') opportunities.push(...normalizeTaskBounty(item.body));
+      if (item.source.id === 'basedagents') opportunities.push(...normalizeBasedAgents(item.body));
+    }
+    for (const x of opportunities) x.priorityScore = scoreOpportunity(x);
+    const ranked = opportunities.filter(x => Number(x.rewardUsd || 0) > 0).sort((a,b)=>(b.priorityScore||0)-(a.priorityScore||0));
+    res.json({ generatedAt:new Date().toISOString(), top:ranked.slice(0,25), count:ranked.length });
+  });
+
   app.get('/demand/opportunities', async (_req, res) => {
     const fetched = await Promise.all(SOURCES.map(async source => {
       try {

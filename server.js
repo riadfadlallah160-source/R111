@@ -10,6 +10,7 @@ import { createMarketPaidRoutes, registerMarketHandlers } from './market.js';
 import { createIntelPaidRoutes, registerIntelHandlers } from './intel.js';
 import { registerEnterpriseRoutes } from './enterprise.js';
 import { registerMicrosoftMarketplaceRoutes } from './microsoft-marketplace.js';
+import { registerMcpRoutes } from './mcp.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -1147,6 +1148,7 @@ registerMarketHandlers(app, assignment);
 registerIntelHandlers(app, assignment);
 registerEnterpriseRoutes(app);
 registerMicrosoftMarketplaceRoutes(app);
+registerMcpRoutes(app);
 
 const routeMeta = Object.entries(paidRoutes).map(function(entry) {
   const parts = entry[0].split(' ');

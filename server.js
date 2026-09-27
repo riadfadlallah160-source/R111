@@ -1255,7 +1255,10 @@ async function registerWithPayanAgent() {
         name: 'FiftyMillionSwarm-f708',
         description: 'Live Base-USDC x402 provider for security intelligence, privacy scanning, dataset profiling, live network data and machine automation.',
         walletAddress: PAY_TO,
-        providerType: 'agent',
+        chain: 'base',
+        providerType: 'api',
+        agentUrl: PUBLIC_BASE,
+        ownerEmail: '50m-demand@agentmail.to',
         tags: ['security','data','x402','base','automation'],
         discoverySource: '50M Swarm direct provider integration'
       })

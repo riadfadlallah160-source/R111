@@ -1376,21 +1376,38 @@ async function inspectPayApiListing() {
       headers: { 'user-agent': '50M-Swarm-Provider/1.0' }
     });
     const html = await response.text();
-    const pieces = html.split('"');
-    const interesting = Array.from(new Set(
-      pieces.filter(x =>
-        x.includes('/api/') ||
-        x.includes('submit') ||
-        x.includes('provider') ||
-        x.includes('endpoint')
-      )
-    )).slice(0, 100);
+    const assetStart = html.indexOf('/assets/index-');
+    let assetPath = '';
+    if (assetStart >= 0) {
+      const assetEnd = html.indexOf('.js', assetStart);
+      if (assetEnd > assetStart) assetPath = html.slice(assetStart, assetEnd + 3);
+    }
+    let jsInteresting = [];
+    if (assetPath) {
+      const jsResponse = await fetch('https://payapi.market' + assetPath, {
+        headers: { 'user-agent': '50M-Swarm-Provider/1.0' }
+      });
+      const js = await jsResponse.text();
+      jsInteresting = Array.from(new Set(
+        js.split(/["'`]/).filter(x =>
+          x.includes('/api/') ||
+          x.toLowerCase().includes('submit') ||
+          x.toLowerCase().includes('provider') ||
+          x.toLowerCase().includes('listing') ||
+          x.toLowerCase().includes('verify')
+        )
+      )).filter(x => x.length < 500).slice(0, 200);
+      console.log('PayAPI JS inspection:', jsResponse.status, JSON.stringify({
+        assetPath,
+        bytes: js.length,
+        interesting: jsInteresting
+      }).slice(0, 12000));
+    }
     console.log('PayAPI listing inspection:', response.status, JSON.stringify({
       bytes: html.length,
-      hasForm: html.toLowerCase().includes('<form'),
-      interesting
-    }).slice(0, 5000));
-    console.log('PayAPI listing source:', html.slice(0, 12000));
+      assetPath,
+      jsInterestingCount: jsInteresting.length
+    }));
   } catch (error) {
     console.error('PayAPI listing inspection failed:', error instanceof Error ? error.message : String(error));
   }

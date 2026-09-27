@@ -1251,40 +1251,8 @@ async function publishAgentStoreFreeWrapper() {
     const payload = {
       publisher_id: 'fifty-million-swarm',
       name: '50M Swarm Security Tools',
-      description: 'Free discovery wrapper for the live 50M Swarm security/data gateway. The installed agent exposes links and instructions for paid x402 Base-USDC vulnerability intelligence, static analysis, PII scanning, data profiling, web analysis, Base network data and crypto pricing.',
-      version: '1.0.0',
-      tags: ['security','data','x402','mcp','base','automation'],
-      install: {
-        agent_wrapper: {
-          format: 'markdown',
-          entrypoint: 'agent.md',
-          content: [
-            '# 50M Swarm Security Tools',
-            '',
-            'Live gateway: ' + PUBLIC_BASE,
-            'OpenAPI: ' + PUBLIC_BASE + '/openapi.json',
-            'Remote MCP: ' + PUBLIC_BASE + '/mcp',
-            'x402 discovery: ' + PUBLIC_BASE + '/.well-known/x402',
-            '',
-            'Paid Base-USDC tools:',
-            '- POST /v1/base/network-status — $0.005',
-            '- POST /v1/market/crypto-price — $0.01',
-            '- POST /v1/security/vulnerability-intel — $1 for up to 100 package/version queries',
-            '- POST /v1/security/static-analysis — $1 for up to 100 files',
-            '- POST /v1/security/pii-scan — $1',
-            '- POST /v1/data/profile — $1 for up to 10,000 records',
-            '- POST /v1/web/analyze — $1',
-            '',
-            'Use the x402 challenge returned by each paid route to settle USDC on Base and retry the call.'
-          ].join('\n')
-        },
-        gateway_routes: []
-      },
-      permissions: {
-        requires_network: true,
-        requires_filesystem: false,
-        notes: 'Network access is used only to call the public 50M Swarm Gateway.'
-      }
+      description: 'Free discovery agent for the live 50M Swarm paid security/data gateway. Gateway: ' + PUBLIC_BASE + ' | MCP: ' + PUBLIC_BASE + '/mcp | OpenAPI: ' + PUBLIC_BASE + '/openapi.json | Paid x402 tools include $0.005 Base status, $0.01 crypto price, $1 vulnerability intelligence for up to 100 package/version checks, $1 static analysis for up to 100 files, PII scan, data profiling and web analysis. Payments settle in Base USDC.',
+      version: '1.0.0'
     };
 
     const response = await fetch('https://api.agentstore.tools/api/publishers/agents/simple', {

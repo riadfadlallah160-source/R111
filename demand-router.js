@@ -82,9 +82,10 @@ function normalizeAgentBounties(body) {
     category: x.category || 'general',
     status: x.status || 'open',
     claimable: x.claimable !== false,
-    funded: x.funded !== false,
+    funded: x.funded === true,
+    fundingVerified: x.funded === true || x.escrowed === true,
     raw: x
-  })).filter(x => x.id && x.claimable !== false && x.funded !== false);
+  })).filter(x => x.id && x.claimable !== false && !['closed','cancelled','completed'].includes(String(x.status).toLowerCase()));
 }
 
 function normalizeJobCafe(body) {
@@ -97,6 +98,7 @@ function normalizeJobCafe(body) {
     category: x.category || 'general',
     status: x.status || 'open',
     escrowed: Boolean(x.funding?.escrowed || x.escrowed),
+    fundingVerified: Boolean(x.funding?.escrowed || x.escrowed),
     raw: x
   })).filter(x => x.id && String(x.status).toLowerCase() === 'open');
 }
@@ -107,7 +109,8 @@ function normalizeClawlancer(body) {
     source: 'clawlancer',
     id: x.id || x.listing_id || null,
     title: x.title || x.name || '',
-    rewardUsd: Number(x.price_usdc || x.reward_usdc || x.bounty_usdc || 0) || (Number(x.price || x.amount || 0) / 1_000_000) || null,
+    rewardUsd: Number(x.price_usdc || x.reward_usdc || x.bounty_usdc || 0) || (Number(x.price_wei || x.price || x.amount || 0) / 1_000_000) || null,
+    fundingVerified: Boolean(x.funded === true || x.escrowed === true || x.transaction?.status === 'funded'),
     category: x.category || 'general',
     status: x.status || 'open',
     raw: x
@@ -120,7 +123,9 @@ function normalizeDataBazaar(body) {
     source: 'databazaar',
     id: x.id || x.bounty_id || null,
     title: x.title || x.name || x.query || '',
-    rewardUsd: Number(x.reward_usd || x.bounty_usd || x.budget_usd || x.reward || 0) || null,
+    rewardUsd: Number(x.reward_usd || x.bounty_usd || x.budget_usd || x.bounty_amount || x.reward || 0) || null,
+    fundingVerified: Boolean(x.funded === true || x.escrowed === true || x.funding?.escrowed === true),
+    aiSubmissionsAllowed: x.ai_submissions_ok === true,
     category: 'data',
     status: x.status || 'open',
     raw: x
@@ -165,7 +170,7 @@ function scoreOpportunity(x) {
   for (const term of ['javascript','typescript','node','api','data','csv','json','research','analysis','website','web','security']) {
     if (text.includes(term)) fit += 1;
   }
-  const fundedBonus = ['clawlancer','basedagents','taskbounty'].includes(x.source) ? 20 : 0;
+  const fundedBonus = x.fundingVerified === true ? 20 : 0;
   return Math.round((Math.log10(Math.max(1, reward) + 1) * 20 + fit * 8 + fundedBonus) * 100) / 100;
 }
 
@@ -228,6 +233,9 @@ export function registerDemandRouter(app) {
       generatedAt: new Date().toISOString(),
       count: opportunities.length,
       totalVisibleRewardUsd: opportunities.reduce((n, x) => n + (x.rewardUsd || 0), 0),
+      verifiedFundedCount: opportunities.filter(x => x.fundingVerified === true).length,
+      executableByCurrentGatewayCount: opportunities.filter(x => x.executableByCurrentGateway === true).length,
+      warning: 'Reward values are advertised amounts. Only fundingVerified=true may be counted as funded workload; discovery never claims work.',
       sources: sourceStatus,
       opportunities
     });

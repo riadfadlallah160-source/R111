@@ -11,10 +11,12 @@ import { createIntelPaidRoutes, registerIntelHandlers } from './intel.js';
 import { registerEnterpriseRoutes } from './enterprise.js';
 import { registerMicrosoftMarketplaceRoutes } from './microsoft-marketplace.js';
 import { registerMcpRoutes } from './mcp.js';
+import { registerDemandRouter } from './demand-router.js';
 
 const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '4mb' }));
+registerDemandRouter(app);
 
 app.use((req, res, next) => {
   const started = Date.now();

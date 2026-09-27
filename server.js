@@ -1345,7 +1345,7 @@ async function submitToMarket402() {
     const response = await fetch('https://market402.com/submit', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ url: endpoint })
+      body: JSON.stringify({ resource: endpoint })
     });
     const body = await response.text();
     console.log('Market402 submission:', response.status, body.slice(0, 1200));

@@ -98,6 +98,17 @@ function normalizeTaskBounty(body) {
   })).filter(x => x.id && x.status !== 'closed');
 }
 
+function scoreOpportunity(x) {
+  const reward = Number(x.rewardUsd || 0);
+  const text = [x.title, x.category, x.language, x.complexity, ...(x.capabilities || [])].filter(Boolean).join(' ').toLowerCase();
+  let fit = 0;
+  for (const term of ['javascript','typescript','node','api','data','csv','json','research','analysis','website','web','security']) {
+    if (text.includes(term)) fit += 1;
+  }
+  const fundedBonus = ['clawlancer','basedagents','taskbounty'].includes(x.source) ? 20 : 0;
+  return Math.round((Math.log10(Math.max(1, reward) + 1) * 20 + fit * 8 + fundedBonus) * 100) / 100;
+}
+
 export function registerDemandRouter(app) {
   app.get('/demand/sources', (_req, res) => {
     res.json({
@@ -126,7 +137,8 @@ export function registerDemandRouter(app) {
       if (item.source.id === 'taskbounty' && item.ok) opportunities.push(...normalizeTaskBounty(item.body));
       if (item.source.id === 'basedagents' && item.ok) opportunities.push(...normalizeBasedAgents(item.body));
     }
-    opportunities.sort((a, b) => (b.rewardUsd || 0) - (a.rewardUsd || 0));
+    for (const x of opportunities) x.priorityScore = scoreOpportunity(x);
+    opportunities.sort((a, b) => (b.priorityScore || 0) - (a.priorityScore || 0));
     res.json({
       generatedAt: new Date().toISOString(),
       count: opportunities.length,

@@ -20,6 +20,18 @@ app.use(express.json({ limit: '4mb' }));
 
 
 
+
+let clawFreelanceCredential = null;
+app.get('/internal/bootstrap/clawfreelance', async (_req,res) => {
+  if(clawFreelanceCredential) return res.json({ok:true,alreadyRegistered:true,agent:clawFreelanceCredential.agent});
+  try{
+    const r=await fetch('https://clawfreelance.com/api/v1/agents/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({publicKey:PAY_TO,displayName:'50M Swarm Worker',capabilities:['typescript','javascript','python','code-review','research','data-analysis','testing','documentation'],contactEndpoint:'https://fifty-million-agent-gateway.onrender.com/'})});
+    const body=await r.json().catch(()=>null); const key=body?.authentication?.apiKey||body?.apiKey;
+    if(r.ok&&key){clawFreelanceCredential={apiKey:key,agent:body.agent};return res.status(r.status).json({ok:true,agent:body.agent,credentialStoredInProcess:true});}
+    return res.status(r.status).json({ok:false,response:body});
+  }catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
+});
+
 let agentWorldCredential = null;
 app.get('/internal/bootstrap/agentworld', async (_req,res) => {
   if(agentWorldCredential) return res.json({ok:true,alreadyRegistered:true,agent:agentWorldCredential.agent});

@@ -1370,6 +1370,27 @@ async function registerWithTollbooth() {
   }
 }
 
+async function inspectPayApiListing() {
+  try {
+    const response = await fetch('https://payapi.market/list', {
+      headers: { 'user-agent': '50M-Swarm-Provider/1.0' }
+    });
+    const html = await response.text();
+    const interesting = Array.from(new Set([
+      ...(html.match(/https?:\\/\\/[^"'<>\\s]+/g) || []),
+      ...(html.match(/\\/api\\/[A-Za-z0-9_?=&.\\/-]+/g) || []),
+      ...(html.match(/action=["'][^"']+["']/g) || [])
+    ])).filter(x => /api|list|submit|provider|endpoint/i.test(x)).slice(0, 100);
+    console.log('PayAPI listing inspection:', response.status, JSON.stringify({
+      bytes: html.length,
+      hasForm: /<form/i.test(html),
+      interesting
+    }).slice(0, 5000));
+  } catch (error) {
+    console.error('PayAPI listing inspection failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function submitToX402List() {
   try {
     const response = await fetch('https://x402-list.com/api/v1/submit', {
@@ -1429,6 +1450,13 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.INSPECT_PAYAPI_ONCE === '1') {
+    setTimeout(() => {
+      inspectPayApiListing().catch(error => {
+        console.error('PayAPI one-time inspection failed:', error instanceof Error ? error.message : String(error));
+      });
+    }, 1800);
+  }
   if (process.env.SUBMIT_X402LIST_ONCE === '1') {
     setTimeout(() => {
       submitToX402List().catch(error => {

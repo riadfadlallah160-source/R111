@@ -355,6 +355,37 @@ const paidRoutes = {
   }
 };
 
+function mirrorPaymentRequiredIntoBody(req, res, next) {
+  const originalEnd = res.end.bind(res);
+
+  res.end = function(chunk, encoding, callback) {
+    if (res.statusCode === 402) {
+      const header = res.getHeader('payment-required');
+      if (header) {
+        try {
+          const raw = Array.isArray(header) ? String(header[0]) : String(header);
+          const normalized = raw.replace(/-/g, '+').replace(/_/g, '/');
+          const padded = normalized + '='.repeat((4 - normalized.length % 4) % 4);
+          const decoded = JSON.parse(Buffer.from(padded, 'base64').toString('utf8'));
+          if (decoded && decoded.x402Version && Array.isArray(decoded.accepts)) {
+            const body = JSON.stringify(decoded);
+            res.removeHeader('content-length');
+            res.setHeader('content-type', 'application/json; charset=utf-8');
+            res.setHeader('x-x402-body-compat', 'payment-required-mirror');
+            return originalEnd(body, 'utf8', callback);
+          }
+        } catch (error) {
+          console.error('x402 402-body compatibility mirror failed:', error instanceof Error ? error.message : String(error));
+        }
+      }
+    }
+    return originalEnd(chunk, encoding, callback);
+  };
+
+  next();
+}
+
+app.use(mirrorPaymentRequiredIntoBody);
 app.use(paymentMiddleware(paidRoutes, resourceServer));
 
 function assignment(skill) {

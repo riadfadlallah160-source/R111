@@ -1248,14 +1248,14 @@ const payanOffers = [
 
 async function publishToAgentStore() {
   try {
-    const publisherId = 'fifty-million-swarm';
+    const publisherId = 'fifty-million-demand';
     let apiKey = '';
 
     const existing = await fetch('https://api.agentstore.tools/api/publishers?publisher_id=' + encodeURIComponent(publisherId));
     if (existing.ok) {
       const body = await existing.json().catch(() => ({}));
       if (body?.publisher) {
-        console.log('AgentStore publisher already exists; skipping re-registration because API key is one-time.');
+        console.log('AgentStore publisher already exists for this publisher id; skipping to avoid losing another one-time key.');
         return;
       }
     }

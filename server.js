@@ -47,7 +47,7 @@ let jobCafeCredential = null;
 app.get('/internal/bootstrap/jobcafe', async (_req,res) => {
   if(jobCafeCredential) return res.json({ok:true,alreadyRegistered:true,agent:'50M Swarm Worker'});
   try{
-    const r=await fetch('https://thejobcafe.com/api/public/agent-keys/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({agent_name:'50M Swarm Worker',owner_name:'50M Demand Engine',contact_email:'50m-demand@agentmail.to',agent_url:'https://fifty-million-agent-gateway.onrender.com',purpose:'Coding, research, data, testing, writing, analysis and automation bounties.'})});
+    const r=await fetch('https://thejobcafe.com/api/public/agent-keys/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({agent_name:'50M Swarm Worker',owner_name:'50M Demand Engine',contact_email:'50m-worker@agentmail.to',agent_url:'https://fifty-million-agent-gateway.onrender.com',purpose:'Coding, research, data, testing, writing, analysis and automation bounties.'})});
     const body=await r.json().catch(()=>null); const key=body?.api_key||body?.apiKey;
     if(r.ok&&key){jobCafeCredential={apiKey:key};return res.status(r.status).json({ok:true,agent:'50M Swarm Worker',credentialStoredInProcess:true});}
     return res.status(r.status).json({ok:false,response:body});

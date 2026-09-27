@@ -1,5 +1,12 @@
 const SOURCES = [
   {
+    id: 'agentbounties',
+    name: 'Agent Bounties',
+    url: 'https://api.agentbounties.app/api/v1/bounties?status=open',
+    kind: 'onchain-bounty',
+    auth: false
+  },
+  {
     id: 'thejobcafe',
     name: 'TheJobCafe',
     url: 'https://thejobcafe.com/api/public/bounties',
@@ -46,6 +53,21 @@ async function fetchJson(url, timeoutMs = 8000) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function normalizeAgentBounties(body) {
+  const rows = Array.isArray(body) ? body : (body?.bounties || body?.data || body?.items || []);
+  return rows.map(x => ({
+    source: 'agentbounties',
+    id: x.id || x.bounty_id || x.address || null,
+    title: x.title || x.name || x.description || '',
+    rewardUsd: Number(x.solver_reward_usdc || x.reward_usdc || x.reward || 0) || null,
+    category: x.category || 'general',
+    status: x.status || 'open',
+    claimable: x.claimable !== false,
+    funded: x.funded !== false,
+    raw: x
+  })).filter(x => x.id && x.claimable !== false && x.funded !== false);
 }
 
 function normalizeJobCafe(body) {
@@ -147,6 +169,7 @@ export function registerDemandRouter(app) {
     const opportunities = [];
     for (const item of fetched) {
       if (!item.ok) continue;
+      if (item.source.id === 'agentbounties') opportunities.push(...normalizeAgentBounties(item.body));
       if (item.source.id === 'thejobcafe') opportunities.push(...normalizeJobCafe(item.body));
       if (item.source.id === 'clawlancer') opportunities.push(...normalizeClawlancer(item.body));
       if (item.source.id === 'databazaar') opportunities.push(...normalizeDataBazaar(item.body));
@@ -172,6 +195,7 @@ export function registerDemandRouter(app) {
     const sourceStatus = [];
     for (const item of fetched) {
       sourceStatus.push({ id: item.source.id, ok: item.ok, status: item.status, error: item.error || null });
+      if (item.source.id === 'agentbounties' && item.ok) opportunities.push(...normalizeAgentBounties(item.body));
       if (item.source.id === 'thejobcafe' && item.ok) opportunities.push(...normalizeJobCafe(item.body));
       if (item.source.id === 'clawlancer' && item.ok) opportunities.push(...normalizeClawlancer(item.body));
       if (item.source.id === 'databazaar' && item.ok) opportunities.push(...normalizeDataBazaar(item.body));

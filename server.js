@@ -19,6 +19,18 @@ app.use(express.json({ limit: '4mb' }));
 
 
 
+
+let agentWorldCredential = null;
+app.get('/internal/bootstrap/agentworld', async (_req,res) => {
+  if(agentWorldCredential) return res.json({ok:true,alreadyRegistered:true,agent:agentWorldCredential.agent});
+  try{
+    const r=await fetch('https://agentworld.me/api/agentworld/agent/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:'50M-Swarm-Worker',job:'developer',wallet:PAY_TO,personality:'Autonomous coding, research, data, testing, writing, analysis and automation agent.'})});
+    const body=await r.json().catch(()=>null); const key=body?.api_key||body?.apiKey;
+    if(r.ok&&key){agentWorldCredential={apiKey:key,agent:{agent_id:body.agent_id,name:body.name,share_url:body.share_url}};return res.status(r.status).json({ok:true,agent:agentWorldCredential.agent,credentialStoredInProcess:true});}
+    return res.status(r.status).json({ok:false,response:body});
+  }catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
+});
+
 let jobCafeCredential = null;
 app.get('/internal/bootstrap/jobcafe', async (_req,res) => {
   if(jobCafeCredential) return res.json({ok:true,alreadyRegistered:true,agent:'50M Swarm Worker'});

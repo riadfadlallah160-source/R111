@@ -21,85 +21,47 @@ app.use(express.json({ limit: '4mb' }));
 
 
 
-let clawFreelanceCredential = null;
-app.get('/internal/bootstrap/clawfreelance', async (_req,res) => {
-  if(clawFreelanceCredential) return res.json({ok:true,alreadyRegistered:true,agent:clawFreelanceCredential.agent});
-  try{
-    const r=await fetch('https://clawfreelance.com/api/v1/agents/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({source:'cloud',publicKey:crypto.createHash('sha256').update(PUBLIC_BASE).digest('hex'),displayName:'50M_Swarm_Worker',capabilities:['typescript','javascript','python','code-review','research','data-analysis','testing','documentation'],walletAddress:PAY_TO,contactEndpoint:'https://fifty-million-agent-gateway.onrender.com/'})});
-    const body=await r.json().catch(()=>null); const key=body?.authentication?.apiKey||body?.apiKey;
-    if(r.ok&&key){clawFreelanceCredential={apiKey:key,agent:body.agent};return res.status(r.status).json({ok:true,agent:body.agent,credentialStoredInProcess:true});}
-    return res.status(r.status).json({ok:false,response:body});
-  }catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
+function requireInternalAuthorization(req, res, next) {
+  const secret = process.env.BOOTSTRAP_SECRET;
+  if (!secret || req.headers['x-bootstrap-secret'] !== secret) {
+    return res.status(403).json({ ok: false, error: 'forbidden' });
+  }
+  next();
+}
+
+// Account creation remains deliberately disabled. These endpoints exist only to
+// make the authorization boundary explicit; they never contact a marketplace.
+app.post('/internal/bootstrap/:market', requireInternalAuthorization, (req, res) => {
+  res.status(409).json({
+    ok: false,
+    error: 'marketplace account creation requires explicit operator authorization',
+    market: req.params.market
+  });
 });
 
-let agentWorldCredential = null;
-app.get('/internal/bootstrap/agentworld', async (_req,res) => {
-  if(agentWorldCredential) return res.json({ok:true,alreadyRegistered:true,agent:agentWorldCredential.agent});
-  try{
-    const r=await fetch('https://agentworld.me/api/agentworld/agent/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:'50M-Swarm-Worker',job:'developer',wallet:PAY_TO,personality:'Autonomous coding, research, data, testing, writing, analysis and automation agent.'})});
-    const body=await r.json().catch(()=>null); const key=body?.api_key||body?.apiKey;
-    if(r.ok&&key){agentWorldCredential={apiKey:key,agent:{agent_id:body.agent_id,name:body.name,share_url:body.share_url}};return res.status(r.status).json({ok:true,agent:agentWorldCredential.agent,credentialStoredInProcess:true});}
-    return res.status(r.status).json({ok:false,response:body});
-  }catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
+// Existing Clawlancer credentials may be used only through an authenticated,
+// human-authorized request. There is no autonomous polling or claiming loop.
+app.post('/internal/clawlancer/claim/:id', requireInternalAuthorization, async (req, res) => {
+  const key = process.env.CLAWLANCER_API_KEY;
+  if (!key) return res.status(503).json({ ok: false, error: 'credential unavailable' });
+  const r = await fetch('https://clawlancer.ai/api/listings/' + encodeURIComponent(req.params.id) + '/claim', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + key, 'content-type': 'application/json' }
+  });
+  const body = await r.json().catch(() => null);
+  return res.status(r.status).json({ ok: r.ok, response: body });
 });
 
-let jobCafeCredential = null;
-app.get('/internal/bootstrap/jobcafe', async (_req,res) => {
-  if(jobCafeCredential) return res.json({ok:true,alreadyRegistered:true,agent:'50M Swarm Worker'});
-  try{
-    const r=await fetch('https://thejobcafe.com/api/public/agent-keys/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({agent_name:'50M Swarm Worker',owner_name:'50M Demand Engine',contact_email:'50m-worker@agentmail.to',agent_url:'https://fifty-million-agent-gateway.onrender.com',purpose:'Coding, research, data, testing, writing, analysis and automation bounties.'})});
-    const body=await r.json().catch(()=>null); const key=body?.api_key||body?.apiKey;
-    if(r.ok&&key){jobCafeCredential={apiKey:key};return res.status(r.status).json({ok:true,agent:'50M Swarm Worker',credentialStoredInProcess:true});}
-    return res.status(r.status).json({ok:false,response:body});
-  }catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
-});
-
-let clawlancerCredential = process.env.CLAWLANCER_API_KEY ? { apiKey: process.env.CLAWLANCER_API_KEY, agent: { id: process.env.CLAWLANCER_AGENT_ID, name: '50M Swarm Worker' } } : null;
-app.get('/internal/bootstrap/clawlancer', async (_req,res) => {
-  if (clawlancerCredential) return res.json({ok:true,alreadyRegistered:true,agent:clawlancerCredential.agent||clawlancerCredential.id||'registered'});
-  try {
-    const r=await fetch('https://clawlancer.ai/api/agents/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:'50M Swarm Worker',agent_name:'50M Swarm Worker',bio:'Autonomous coding, research, data, testing, writing, analysis and automation worker.'})});
-    const body=await r.json().catch(()=>null);
-    const key=body?.apiKey||body?.api_key||body?.key;
-    if(r.ok&&key){clawlancerCredential={...body,apiKey:key}; const safe={...body}; delete safe.apiKey; delete safe.api_key; delete safe.key; return res.status(r.status).json({ok:true,registration:safe,credentialStoredInProcess:true});}
-    return res.status(r.status).json({ok:false,response:body});
-  } catch(error){return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)});}
-});
-
-app.get('/internal/clawlancer/set-payout', async (_req,res) => {
-  const key=process.env.CLAWLANCER_API_KEY||clawlancerCredential?.apiKey;
-  if(!key) return res.status(503).json({ok:false,error:'credential unavailable'});
-  const r=await fetch('https://clawlancer.ai/api/agents/me',{method:'PATCH',headers:{Authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify({wallet_address:PAY_TO,walletAddress:PAY_TO})});
-  const body=await r.json().catch(()=>null); return res.status(r.status).json({ok:r.ok,response:body});
-});
-app.get('/internal/clawlancer/claim/:id', async (req,res) => {
-  const key=process.env.CLAWLANCER_API_KEY||clawlancerCredential?.apiKey;
-  if(!key) return res.status(503).json({ok:false,error:'credential unavailable'});
-  const r=await fetch('https://clawlancer.ai/api/listings/'+encodeURIComponent(req.params.id)+'/claim',{method:'POST',headers:{Authorization:'Bearer '+key,'content-type':'application/json'}});
-  const body=await r.json().catch(()=>null); return res.status(r.status).json({ok:r.ok,response:body});
-});
-app.post('/internal/clawlancer/deliver/:transactionId', async (req,res) => {
-  const key=process.env.CLAWLANCER_API_KEY||clawlancerCredential?.apiKey;
-  if(!key) return res.status(503).json({ok:false,error:'credential unavailable'});
-  const r=await fetch('https://clawlancer.ai/api/transactions/'+encodeURIComponent(req.params.transactionId)+'/deliver',{method:'POST',headers:{Authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify(req.body)});
-  const body=await r.json().catch(()=>null); return res.status(r.status).json({ok:r.ok,response:body});
-});
-
-let taskforceCredential = null;
-app.get('/internal/bootstrap/taskforce', async (_req, res) => {
-  if (taskforceCredential) return res.json({ ok:true, alreadyRegistered:true, agent:taskforceCredential.agent });
-  try {
-    const r = await fetch('https://task-force.app/api/agent/register', {
-      method:'POST', headers:{'content-type':'application/json'},
-      body:JSON.stringify({name:'50M Swarm Worker',capabilities:['coding','research','data','browser','testing','writing','analysis','automation'],contact:'https://fifty-million-agent-gateway.onrender.com/'})
-    });
-    const body=await r.json().catch(()=>null);
-    if(r.ok && body?.apiKey && body?.agent) {
-      taskforceCredential={apiKey:body.apiKey,agent:body.agent};
-      return res.status(r.status).json({ok:true,agent:body.agent,credentialStoredInProcess:true});
-    }
-    return res.status(r.status).json({ok:false,response:body});
-  } catch(error) { return res.status(502).json({ok:false,error:error instanceof Error?error.message:String(error)}); }
+app.post('/internal/clawlancer/deliver/:transactionId', requireInternalAuthorization, async (req, res) => {
+  const key = process.env.CLAWLANCER_API_KEY;
+  if (!key) return res.status(503).json({ ok: false, error: 'credential unavailable' });
+  const r = await fetch('https://clawlancer.ai/api/transactions/' + encodeURIComponent(req.params.transactionId) + '/deliver', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + key, 'content-type': 'application/json' },
+    body: JSON.stringify(req.body)
+  });
+  const body = await r.json().catch(() => null);
+  return res.status(r.status).json({ ok: r.ok, response: body });
 });
 
 registerDemandRouter(app);

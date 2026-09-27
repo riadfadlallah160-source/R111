@@ -1,5 +1,12 @@
 const SOURCES = [
   {
+    id: 'basedagents',
+    name: 'BasedAgents',
+    url: 'https://api.basedagents.ai/v1/tasks?status=open&min_usdc=1.00',
+    kind: 'agent-task',
+    auth: false
+  },
+  {
     id: 'taskbounty',
     name: 'TaskBounty',
     url: 'https://www.task-bounty.com/api/v1/tasks',
@@ -18,6 +25,21 @@ async function fetchJson(url, timeoutMs = 8000) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function normalizeBasedAgents(body) {
+  const rows = Array.isArray(body) ? body : (body?.tasks || body?.data || []);
+  return rows.map(x => ({
+    source: 'basedagents',
+    id: x.id || x.task_id || null,
+    title: x.title || '',
+    rewardUsd: Number(x.bounty?.display || x.bounty_usdc || x.reward_usdc || 0) || (Number(x.bounty?.amount || 0) / 1_000_000) || null,
+    category: x.category || null,
+    capabilities: x.capabilities || [],
+    status: x.status || 'open',
+    claimable: x.claimable !== false,
+    raw: x
+  })).filter(x => x.id && x.status === 'open' && x.claimable !== false);
 }
 
 function normalizeTaskBounty(body) {
@@ -60,6 +82,7 @@ export function registerDemandRouter(app) {
     for (const item of fetched) {
       sourceStatus.push({ id: item.source.id, ok: item.ok, status: item.status, error: item.error || null });
       if (item.source.id === 'taskbounty' && item.ok) opportunities.push(...normalizeTaskBounty(item.body));
+      if (item.source.id === 'basedagents' && item.ok) opportunities.push(...normalizeBasedAgents(item.body));
     }
     opportunities.sort((a, b) => (b.rewardUsd || 0) - (a.rewardUsd || 0));
     res.json({

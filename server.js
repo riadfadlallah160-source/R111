@@ -1246,6 +1246,100 @@ const payanOffers = [
   { title: PAYAN_TITLES[7], path: '/v1/data/hash', category: 'Data', tags: ['hash','sha256','agents'], body: { text: 'hello' } }
 ];
 
+async function publishToAgentStore() {
+  try {
+    const publisherId = 'fifty-million-swarm';
+    let apiKey = '';
+
+    const existing = await fetch('https://api.agentstore.tools/api/publishers?publisher_id=' + encodeURIComponent(publisherId));
+    if (existing.ok) {
+      const body = await existing.json().catch(() => ({}));
+      if (body?.publisher) {
+        console.log('AgentStore publisher already exists; skipping re-registration because API key is one-time.');
+        return;
+      }
+    }
+
+    const register = await fetch('https://api.agentstore.tools/api/publishers', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: publisherId,
+        display_name: '50M Swarm',
+        payout_address: PAY_TO,
+        email: '50m-demand@agentmail.to',
+        support_url: PUBLIC_BASE + '/enterprise'
+      })
+    });
+    const regBody = await register.json().catch(() => ({}));
+    if (!register.ok || !regBody.api_key) {
+      console.error('AgentStore publisher registration failed:', register.status, JSON.stringify(regBody).slice(0, 1000));
+      return;
+    }
+    apiKey = String(regBody.api_key);
+
+    const agentBody = {
+      publisher_id: publisherId,
+      name: '50M Security & Data Agent',
+      type: 'proprietary',
+      description: 'Security and data utility agent backed by live Base-USDC x402 services: vulnerability intelligence, static analysis, PII scanning, dataset profiling, web analysis, live Base network state and crypto prices.',
+      version: '1.0.0',
+      pricing: { model: 'one_time', currency: 'USDC', amount: 1 },
+      tags: ['security','data','x402','mcp','automation'],
+      install: {
+        agent_wrapper: {
+          format: 'markdown',
+          entrypoint: 'agent.md',
+          content: [
+            '# 50M Security & Data Agent',
+            '',
+            'Use the live 50M Swarm Gateway for security, data and machine-state tasks.',
+            '',
+            'Gateway: ' + PUBLIC_BASE,
+            'OpenAPI: ' + PUBLIC_BASE + '/openapi.json',
+            'Remote MCP: ' + PUBLIC_BASE + '/mcp',
+            '',
+            'Prefer these high-value tools:',
+            '- POST /v1/security/vulnerability-intel — up to 100 OSV package/version checks',
+            '- POST /v1/security/static-analysis — up to 100 source files',
+            '- POST /v1/security/pii-scan — privacy/secret scanning',
+            '- POST /v1/data/profile — up to 10,000 JSON records',
+            '- POST /v1/web/analyze — HTML/web analysis',
+            '- POST /v1/base/network-status — live Base state',
+            '- POST /v1/market/crypto-price — live crypto USD price',
+            '',
+            'Paid API routes use x402 on Base USDC. Read /.well-known/x402 and OpenAPI before calling. Never request or expose private keys.'
+          ].join('\n')
+        },
+        gateway_routes: []
+      },
+      permissions: {
+        requires_network: true,
+        requires_filesystem: false,
+        notes: 'Network access is required to call the live 50M Swarm Gateway.'
+      }
+    };
+
+    const publish = await fetch('https://api.agentstore.tools/api/publishers/agents/simple', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey
+      },
+      body: JSON.stringify(agentBody)
+    });
+    const pubBody = await publish.json().catch(() => ({}));
+    console.log('AgentStore publish:', publish.status, JSON.stringify({
+      success: publish.ok,
+      action: pubBody.action || null,
+      agent: pubBody.agent || null,
+      error: pubBody.error || null
+    }).slice(0, 2500));
+  } catch (error) {
+    console.error('AgentStore publish failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithPayanAgent() {
   try {
     const registration = await fetch(PAYAN_BASE + '/api/v1/agents', {
@@ -1581,6 +1675,13 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.SUBMIT_AGENTSTORE_ONCE === '1') {
+    setTimeout(() => {
+      publishToAgentStore().catch(error => {
+        console.error('AgentStore one-time submission failed:', error instanceof Error ? error.message : String(error));
+      });
+    }, 700);
+  }
   if (process.env.SUBMIT_PAYAN_ONCE === '1') {
     setTimeout(() => {
       registerWithPayanAgent().catch(error => {

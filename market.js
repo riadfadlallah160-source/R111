@@ -28,15 +28,15 @@ function route(price, PAY_TO, NETWORK, PUBLIC_BASE, path, description, tags, inp
 export function createMarketPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }) {
   return {
     'POST /v1/market/crypto-price': route(
-      '$1', PAY_TO, NETWORK, PUBLIC_BASE, '/v1/market/crypto-price',
-      'Live USD spot price for a requested crypto asset from a public market-data source.',
+      '$0.01', PAY_TO, NETWORK, PUBLIC_BASE, '/v1/market/crypto-price',
+      'Low-cost live USD crypto spot-price lookup designed as an agent discovery/acquisition endpoint.',
       ['market-data','crypto-price','finance','live'],
       { id: 'bitcoin' }, ['id'],
       { id: 'bitcoin', usd: 65000, source: 'CoinGecko', agentId: 1 }
     ),
     'POST /v1/base/network-status': route(
-      '$1', PAY_TO, NETWORK, PUBLIC_BASE, '/v1/base/network-status',
-      'Live Base mainnet block height, gas price and chain ID from the public Base RPC.',
+      '$0.005', PAY_TO, NETWORK, PUBLIC_BASE, '/v1/base/network-status',
+      'Low-cost live Base mainnet block height, gas price and chain ID for autonomous agents.',
       ['blockchain-data','network-status','base','rpc'],
       { includeGas: 'true' }, [],
       { chain: 'base', chainId: '0x2105', blockNumber: '0x...', gasPriceWei: '0x...', agentId: 2 }

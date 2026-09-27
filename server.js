@@ -1339,6 +1339,21 @@ async function registerWithTollbooth() {
   }
 }
 
+async function submitToMarket402() {
+  try {
+    const endpoint = PUBLIC_BASE + '/v1/base/network-status';
+    const response = await fetch('https://market402.com/submit', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url: endpoint })
+    });
+    const body = await response.text();
+    console.log('Market402 submission:', response.status, body.slice(0, 1200));
+  } catch (error) {
+    console.error('Market402 submission failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithAgent402() {
   try {
     const response = await fetch('https://agent402.tools/api/index/register', {
@@ -1360,6 +1375,13 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.SUBMIT_MARKET402_ONCE === '1') {
+    setTimeout(() => {
+      submitToMarket402().catch(error => {
+        console.error('Market402 one-time submission failed:', error instanceof Error ? error.message : String(error));
+      });
+    }, 2500);
+  }
   if (process.env.REFRESH_AGENT402_ONCE === '1') {
     setTimeout(() => {
       registerWithAgent402().catch(error => {

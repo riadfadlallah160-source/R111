@@ -1248,41 +1248,89 @@ const payanOffers = [
 
 async function registerWithPayanAgent() {
   try {
-    const lookup = await fetch(PAYAN_BASE + '/api/v1/offers?q=' + encodeURIComponent('50M Dollar Slot') + '&limit=50');
-    if (lookup.ok) {
-      const current = await lookup.json();
-      const offers = Array.isArray(current.offers) ? current.offers : [];
-      const existingTitles = new Set(offers.map(o => o.title));
-      const missing = payanOffers.filter(o => !existingTitles.has(o.title));
-      if (missing.length === 0) {
-        console.log('PayanAgent listing: all 8 dollar-slot offers already present');
-        return;
-      }
-    }
-
     const registration = await fetch(PAYAN_BASE + '/api/v1/agents', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        name: 'FiftyMillionPool-f708',
-        description: 'Eight deterministic one-dollar machine services backed by a 50,000,000-slot daily earning pool.',
+        name: 'FiftyMillionSwarm-f708',
+        description: 'Live Base-USDC x402 provider for security intelligence, privacy scanning, dataset profiling, live network data and machine automation.',
         walletAddress: PAY_TO,
-        chain: 'base',
-        tags: ['x402','data','automation','agents'],
-        providerType: 'agent'
+        providerType: 'agent',
+        tags: ['security','data','x402','base','automation'],
+        discoverySource: '50M Swarm direct provider integration'
       })
     });
 
-    const regBody = await registration.json();
+    const regBody = await registration.json().catch(() => ({}));
     if (!registration.ok || !regBody.apiKey) {
-      console.error('PayanAgent registration failed:', registration.status, JSON.stringify(regBody).slice(0, 400));
+      console.error('PayanAgent registration failed:', registration.status, JSON.stringify(regBody).slice(0, 800));
       return;
     }
 
     const apiKey = regBody.apiKey;
-    let created = 0;
+    const agentId = regBody.agentId || regBody._id || null;
+    const offers = [
+      {
+        title: '50M Vulnerability Intelligence',
+        description: 'Live OSV vulnerability intelligence for up to 100 package/version or commit queries in one x402-paid call.',
+        category: 'Security',
+        externalUrl: PUBLIC_BASE + '/v1/security/vulnerability-intel',
+        httpMethod: 'POST',
+        verificationBody: { queries: [{ package: { name: 'jinja2', ecosystem: 'PyPI' }, version: '2.4.1' }] }
+      },
+      {
+        title: '50M Static Security Analysis',
+        description: 'Defensive static source-code analysis across up to 100 files for exposed secrets, unsafe execution, weak crypto and injection-risk patterns.',
+        category: 'Security',
+        externalUrl: PUBLIC_BASE + '/v1/security/static-analysis',
+        httpMethod: 'POST',
+        verificationBody: { files: [{ path: 'app.js', content: 'const value = input;' }] }
+      },
+      {
+        title: '50M Privacy / PII Scan',
+        description: 'Detect PII and accidental secrets across text batches and return masked structured findings.',
+        category: 'Security',
+        externalUrl: PUBLIC_BASE + '/v1/security/pii-scan',
+        httpMethod: 'POST',
+        verificationBody: { texts: ['Contact sample@example.com'] }
+      },
+      {
+        title: '50M Dataset Profiler',
+        description: 'Profile up to 10,000 JSON records for types, null rates, uniqueness, numeric ranges, averages and samples.',
+        category: 'Data',
+        externalUrl: PUBLIC_BASE + '/v1/data/profile',
+        httpMethod: 'POST',
+        verificationBody: { records: [{ id: 1, score: 98 }] }
+      },
+      {
+        title: '50M Web / HTML Analyzer',
+        description: 'Analyze supplied HTML for metadata, accessibility basics, mixed content and security signals.',
+        category: 'Data',
+        externalUrl: PUBLIC_BASE + '/v1/web/analyze',
+        httpMethod: 'POST',
+        verificationBody: { html: '<html><head><title>Example</title></head><body><h1>Hello</h1></body></html>', url: 'https://example.com' }
+      },
+      {
+        title: '50M Live Base Network Status',
+        description: 'Live Base mainnet block height, gas price and chain ID for autonomous agents.',
+        category: 'Data',
+        externalUrl: PUBLIC_BASE + '/v1/base/network-status',
+        httpMethod: 'POST',
+        verificationBody: {}
+      },
+      {
+        title: '50M Live Crypto Price',
+        description: 'Live USD crypto spot price by CoinGecko asset id.',
+        category: 'Data',
+        externalUrl: PUBLIC_BASE + '/v1/market/crypto-price',
+        httpMethod: 'POST',
+        verificationBody: { id: 'bitcoin' }
+      }
+    ];
 
-    for (const offer of payanOffers) {
+    let created = 0;
+    const results = [];
+    for (const offer of offers) {
       const response = await fetch(PAYAN_BASE + '/api/v1/offers', {
         method: 'POST',
         headers: {
@@ -1291,25 +1339,32 @@ async function registerWithPayanAgent() {
         },
         body: JSON.stringify({
           title: offer.title,
-          description: 'Deterministic ' + offer.title.replace('50M Dollar Slot — ', '') + ' service. One successful x402 call costs exactly $1 USDC on Base and fills one real daily earning slot.',
+          description: offer.description,
           category: offer.category,
-          tags: offer.tags,
           offerType: 'api',
-          externalUrl: PUBLIC_BASE + offer.path,
-          httpMethod: 'POST',
-          verificationBody: offer.body
+          externalUrl: offer.externalUrl,
+          httpMethod: offer.httpMethod,
+          verificationBody: offer.verificationBody
         })
       });
       const body = await response.json().catch(() => ({}));
-      if (response.ok) {
-        created += 1;
-        console.log('PayanAgent offer listed:', offer.title, body.offerId || body._id || 'ok');
-      } else {
-        console.error('PayanAgent offer failed:', offer.title, response.status, JSON.stringify(body).slice(0, 300));
-      }
+      if (response.ok) created += 1;
+      results.push({
+        title: offer.title,
+        status: response.status,
+        ok: response.ok,
+        offerId: body.offerId || body._id || body.id || null,
+        error: response.ok ? null : (body.error || body.message || null)
+      });
     }
 
-    console.log('PayanAgent listing session complete:', created, 'offers created');
+    console.log('PayanAgent provider session:', JSON.stringify({
+      agentId,
+      registered: true,
+      created,
+      attempted: offers.length,
+      results
+    }).slice(0, 7000));
   } catch (error) {
     console.error('PayanAgent listing failed:', error instanceof Error ? error.message : String(error));
   }
@@ -1523,6 +1578,13 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.SUBMIT_PAYAN_ONCE === '1') {
+    setTimeout(() => {
+      registerWithPayanAgent().catch(error => {
+        console.error('PayanAgent one-time submission failed:', error instanceof Error ? error.message : String(error));
+      });
+    }, 900);
+  }
   if (process.env.SUBMIT_PAYAPI_ONCE === '1') {
     setTimeout(() => {
       submitToPayApi().catch(error => {

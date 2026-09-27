@@ -1372,39 +1372,48 @@ async function registerWithTollbooth() {
 
 async function inspectPayApiListing() {
   try {
-    const response = await fetch('https://payapi.market/list', {
+    const page = await fetch('https://payapi.market/list', {
       headers: { 'user-agent': '50M-Swarm-Provider/1.0' }
     });
-    const html = await response.text();
+    const html = await page.text();
     const assetStart = html.indexOf('/assets/index-');
     let assetPath = '';
     if (assetStart >= 0) {
       const assetEnd = html.indexOf('.js', assetStart);
       if (assetEnd > assetStart) assetPath = html.slice(assetStart, assetEnd + 3);
     }
-    if (assetPath) {
-      const jsResponse = await fetch('https://payapi.market' + assetPath, {
-        headers: { 'user-agent': '50M-Swarm-Provider/1.0' }
-      });
-      const js = await jsResponse.text();
-      const keys = ['api_listings','providers','wallet_address','payout_wallet','price_per_request','base_url','endpoint_url','insert(','upsert(','/api/list'];
-      const snippets = {};
-      for (const key of keys) {
-        const indexes = [];
-        let pos = 0;
-        while ((pos = js.indexOf(key, pos)) >= 0 && indexes.length < 8) {
-          indexes.push(pos);
-          pos += key.length;
-        }
-        snippets[key] = indexes.map(i => js.slice(Math.max(0, i - 1200), Math.min(js.length, i + 2200)));
+    if (!assetPath) throw new Error('PayAPI bundle path not found');
+
+    const jsResponse = await fetch('https://payapi.market' + assetPath, {
+      headers: { 'user-agent': '50M-Swarm-Provider/1.0' }
+    });
+    const js = await jsResponse.text();
+
+    const needles = [
+      'from(\`providers\`).insert',
+      'from(\`api_listings\`).insert',
+      'from(\`providers\`).upsert',
+      'from(\`api_listings\`).upsert',
+      'wallet_address',
+      'base_url',
+      'price_per_request',
+      'payment_wallet',
+      'payout_wallet',
+      'provider_email'
+    ];
+
+    for (const needle of needles) {
+      let pos = 0;
+      let count = 0;
+      while ((pos = js.indexOf(needle, pos)) >= 0 && count < 8) {
+        console.log('PayAPI contract ' + needle + ' #' + (count + 1) + ':', js.slice(Math.max(0, pos - 2200), Math.min(js.length, pos + 4200)));
+        pos += needle.length;
+        count += 1;
       }
-      console.log('PayAPI targeted inspection:', jsResponse.status, JSON.stringify({
-        assetPath,
-        bytes: js.length,
-        snippets
-      }).slice(0, 30000));
+      if (count === 0) console.log('PayAPI contract ' + needle + ': none');
     }
-    console.log('PayAPI listing inspection complete:', response.status, assetPath);
+
+    console.log('PayAPI contract inspection complete:', jsResponse.status, assetPath, js.length);
   } catch (error) {
     console.error('PayAPI listing inspection failed:', error instanceof Error ? error.message : String(error));
   }

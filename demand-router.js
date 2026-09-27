@@ -1,3 +1,20 @@
+const MARKET_CANDIDATES = [
+  { id:'dealwork', name:'Dealwork', url:'https://api.dealwork.ai/', kind:'hybrid-agent-work', mode:'authorization-gated', demand:'234 open tasks', fit:'code,research,data,writing,automation' },
+  { id:'agentsouk', name:'Agent Souk', url:'https://github.com/agent-souk/agentsouk', kind:'agent-marketplace', mode:'api-first', demand:'services,bounties,jobs', fit:'code,research,data,automation' },
+  { id:'the402', name:'the402 Requests', url:'https://the402.ai/requests/', kind:'agent-requests', mode:'public-discovery', demand:'escrowed requests when open', fit:'api,research,data,automation' },
+  { id:'algora', name:'Algora', url:'https://algora.io/api/bounties', kind:'software-bounty', mode:'public-discovery', demand:'GitHub funded issues', fit:'software' },
+  { id:'opire', name:'Opire', url:'https://app.opire.dev/home', kind:'software-bounty', mode:'public-discovery', demand:'432 rewards shown', fit:'software' },
+  { id:'superteam', name:'Superteam Earn', url:'https://earn.superteam.fun/', kind:'crypto-bounty', mode:'public-discovery', demand:'bounties/projects', fit:'code,research,data,content' },
+  { id:'dework', name:'Dework', url:'https://dework.xyz/', kind:'web3-work', mode:'account-gated', demand:'DAO tasks/bounties', fit:'code,research,data,content' },
+  { id:'immunefi', name:'Immunefi', url:'https://immunefi.com/bug-bounty/', kind:'authorized-security', mode:'scope-gated', demand:'173 bounty programs', fit:'authorized-security' },
+  { id:'yeswehack', name:'YesWeHack', url:'https://yeswehack.com/programs', kind:'authorized-security', mode:'scope-gated', demand:'public paid programs', fit:'authorized-security' },
+  { id:'bugcrowd', name:'Bugcrowd', url:'https://bugcrowd.com/programs', kind:'authorized-security', mode:'account-gated', demand:'public funded programs', fit:'authorized-security' },
+  { id:'hackerone', name:'HackerOne', url:'https://hackerone.com/directory/programs', kind:'authorized-security', mode:'account-gated', demand:'public bounty programs', fit:'authorized-security' },
+  { id:'code4rena', name:'Code4rena', url:'https://code4rena.com/audits', kind:'security-contests', mode:'account-tax-gated', demand:'USDC audit competitions', fit:'authorized-security,code-review' },
+  { id:'sherlock', name:'Sherlock', url:'https://sherlock.xyz/', kind:'security-contests', mode:'account-gated', demand:'audit contests and bounties', fit:'authorized-security,code-review' },
+  { id:'cantina', name:'Cantina', url:'https://cantina.xyz/competitions', kind:'security-contests', mode:'account-gated', demand:'security competitions', fit:'authorized-security,code-review' }
+];
+
 const SOURCES = [
   {
     id: 'agentbounties',
@@ -153,10 +170,13 @@ function scoreOpportunity(x) {
 }
 
 export function registerDemandRouter(app) {
+  app.get('/demand/markets', (_req, res) => res.json({ count: SOURCES.length + MARKET_CANDIDATES.length, liveFeedCount: SOURCES.length, expansionCount: MARKET_CANDIDATES.length, markets: [...SOURCES, ...MARKET_CANDIDATES] }));
+
   app.get('/demand/sources', (_req, res) => {
     res.json({
       mode: 'read-only-demand-ingestion',
       sources: SOURCES,
+      expansionMarkets: MARKET_CANDIDATES,
       note: 'Discovery does not claim work, accept marketplace terms, sign transactions, or move funds.'
     });
   });

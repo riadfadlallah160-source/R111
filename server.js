@@ -1376,14 +1376,18 @@ async function inspectPayApiListing() {
       headers: { 'user-agent': '50M-Swarm-Provider/1.0' }
     });
     const html = await response.text();
-    const interesting = Array.from(new Set([
-      ...(html.match(/https?:\\/\\/[^"'<>\\s]+/g) || []),
-      ...(html.match(/\\/api\\/[A-Za-z0-9_?=&.\\/-]+/g) || []),
-      ...(html.match(/action=["'][^"']+["']/g) || [])
-    ])).filter(x => /api|list|submit|provider|endpoint/i.test(x)).slice(0, 100);
+    const pieces = html.split('"');
+    const interesting = Array.from(new Set(
+      pieces.filter(x =>
+        x.includes('/api/') ||
+        x.includes('submit') ||
+        x.includes('provider') ||
+        x.includes('endpoint')
+      )
+    )).slice(0, 100);
     console.log('PayAPI listing inspection:', response.status, JSON.stringify({
       bytes: html.length,
-      hasForm: /<form/i.test(html),
+      hasForm: html.toLowerCase().includes('<form'),
       interesting
     }).slice(0, 5000));
   } catch (error) {

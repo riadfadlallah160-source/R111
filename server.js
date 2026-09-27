@@ -1274,7 +1274,7 @@ async function publishAgentStoreFreeWrapper() {
 
 async function publishToAgentStore() {
   try {
-    const publisherId = 'fifty-million-demand';
+    const publisherId = 'fifty-million-swarm';
     let apiKey = '';
 
     const existing = await fetch('https://api.agentstore.tools/api/publishers?publisher_id=' + encodeURIComponent(publisherId));

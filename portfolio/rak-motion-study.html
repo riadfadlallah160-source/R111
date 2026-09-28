@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RAK Motion Study — Riad Fadlallah</title>
+<style>
+:root{--bg:#08090b;--fg:#f3f1ea;--muted:#9aa0a6;--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
+#webgl{position:fixed;inset:0;z-index:0;pointer-events:none}.noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+nav{position:fixed;left:0;right:0;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:24px 30px;border-bottom:1px solid var(--line);backdrop-filter:blur(16px);background:rgba(8,9,11,.45);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+nav a{color:inherit;text-decoration:none}.dot{width:8px;height:8px;border-radius:50%;background:#a8ff60;box-shadow:0 0 18px #a8ff60;display:inline-block;margin-right:8px}
+main{position:relative;z-index:3}.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:110px 5vw 7vh}
+.kicker{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#a8ff60;margin-bottom:18px}
+h1{font-size:clamp(64px,12vw,190px);font-weight:700;line-height:.78;letter-spacing:-.065em;margin:0;max-width:1180px}
+.hero-row{display:grid;grid-template-columns:1fr 1fr;gap:8vw;margin-top:52px;align-items:end}.hero-copy{font-size:clamp(17px,2vw,27px);line-height:1.25;max-width:560px}.meta{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);line-height:1.8}
+section{min-height:100vh;padding:13vh 5vw;border-top:1px solid var(--line)}.section-num{font-size:11px;color:#a8ff60;letter-spacing:.2em}.section-title{font-size:clamp(52px,9vw,132px);line-height:.86;letter-spacing:-.055em;margin:28px 0 60px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}.card{border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.035);backdrop-filter:blur(16px);padding:28px;min-height:300px;overflow:hidden;position:relative}.c1{grid-column:span 7}.c2{grid-column:span 5}.c3{grid-column:span 5}.c4{grid-column:span 7}.card h3{font-size:34px;letter-spacing:-.04em;margin:0 0 16px}.card p{color:#b7bbc0;max-width:470px;line-height:1.55}.orb{width:190px;height:190px;border-radius:50%;position:absolute;right:-20px;bottom:-25px;background:radial-gradient(circle at 35% 30%,#fff 0 3%,#a8ff60 10%,#1e6cff 42%,transparent 72%);filter:blur(1px);transform:translateZ(0)}
+.marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0}.track{display:flex;gap:48px;white-space:nowrap;font-size:42px;letter-spacing:-.03em;width:max-content}.track span{color:#a8ff60}
+.stage{height:75vh;display:flex;align-items:center;justify-content:center;perspective:900px}.tile{width:min(70vw,850px);aspect-ratio:16/9;border-radius:28px;border:1px solid rgba(255,255,255,.23);background:linear-gradient(135deg,rgba(168,255,96,.12),rgba(30,108,255,.08) 45%,rgba(255,91,173,.1));box-shadow:0 40px 120px rgba(0,0,0,.45);display:grid;place-items:center;transform-style:preserve-3d}.tile strong{font-size:clamp(42px,8vw,110px);letter-spacing:-.06em;text-align:center;line-height:.84}
+footer{padding:10vh 5vw 5vh;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:30px;align-items:flex-end}.big{font-size:clamp(40px,7vw,100px);letter-spacing:-.055em;line-height:.9}.small{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.cursor{position:fixed;z-index:20;width:18px;height:18px;border:1px solid #a8ff60;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);mix-blend-mode:difference}
+@media(max-width:760px){nav{padding:18px}.hero{padding-left:20px;padding-right:20px}.hero-row{grid-template-columns:1fr}.grid{display:block}.card{margin-bottom:16px}section{padding-left:20px;padding-right:20px}.cursor{display:none}}
+</style>
+</head>
+<body>
+<canvas id="webgl"></canvas><div class="noise"></div><div class="cursor"></div>
+<nav><a href="#top"><span class="dot"></span>Motion Study 01</a><span>Riad Fadlallah · Frontend</span></nav>
+<main id="top">
+<section class="hero">
+<div class="kicker reveal">Interactive systems / web motion / creative code</div>
+<h1 class="hero-title">MOVE<br>WITH<br>INTENT.</h1>
+<div class="hero-row"><div class="hero-copy reveal">A compact motion study built to show how typography, WebGL depth, microinteraction and scroll choreography can feel like one system—not a pile of effects.</div><div class="meta reveal">Three.js particle field<br>GSAP timelines + ScrollTrigger<br>Responsive CSS architecture<br>Vanilla HTML / JS delivery</div></div>
+</section>
+<div class="marquee"><div class="track"><b>CREATIVE CODE</b><span>•</span><b>MOTION SYSTEMS</b><span>•</span><b>IMMERSIVE UI</b><span>•</span><b>CREATIVE CODE</b><span>•</span><b>MOTION SYSTEMS</b><span>•</span><b>IMMERSIVE UI</b></div></div>
+<section>
+<div class="section-num">01 / SYSTEM</div><h2 class="section-title">Motion that earns<br>its place.</h2>
+<div class="grid">
+<article class="card c1"><h3>Depth, not decoration.</h3><p>The background reacts to pointer movement and scroll velocity, but remains secondary to the content. The interaction is felt before it is noticed.</p><div class="orb"></div></article>
+<article class="card c2"><h3>Timing as hierarchy.</h3><p>Type, cards and supporting detail enter at different velocities so the eye always knows what matters first.</p></article>
+<article class="card c3"><h3>Responsive by design.</h3><p>The system collapses cleanly on small screens instead of simply shrinking desktop choreography.</p></article>
+<article class="card c4"><h3>Performance-aware.</h3><p>One lightweight WebGL scene, CSS-native layout, minimal DOM mutation, requestAnimationFrame rendering and no oversized image payload.</p></article>
+</div>
+</section>
+<section>
+<div class="section-num">02 / INTERACTION</div><h2 class="section-title">A scene that<br>listens.</h2>
+<div class="stage"><div class="tile"><strong>DRAG<br>THE AIR.</strong></div></div>
+</section>
+<footer><div class="big">Available for<br>project work.</div><div class="small">Built as a live application sample<br>September 2026</div></footer>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js';
+gsap.registerPlugin(ScrollTrigger);
+const canvas=document.querySelector('#webgl'),renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,100);camera.position.z=5;
+const count=1200,pos=new Float32Array(count*3),col=new Float32Array(count*3);
+for(let i=0;i<count;i++){const j=i*3;pos[j]=(Math.random()-.5)*10;pos[j+1]=(Math.random()-.5)*8;pos[j+2]=(Math.random()-.5)*8;const t=Math.random();col[j]=.35+t*.3;col[j+1]=.55+t*.45;col[j+2]=.65-t*.2}
+const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+const mat=new THREE.PointsMaterial({size:.025,vertexColors:true,transparent:true,opacity:.78});const pts=new THREE.Points(geo,mat);scene.add(pts);
+let mx=0,my=0,tx=0,ty=0;addEventListener('pointermove',e=>{tx=(e.clientX/innerWidth-.5);ty=(e.clientY/innerHeight-.5);});
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}addEventListener('resize',resize);
+function loop(){mx+=(tx-mx)*.035;my+=(ty-my)*.035;pts.rotation.y+=.00065;pts.rotation.x+=.00015;camera.position.x=mx*.65;camera.position.y=-my*.45;camera.lookAt(0,0,0);renderer.render(scene,camera);requestAnimationFrame(loop)}loop();
+gsap.from('.hero-title',{y:140,opacity:0,duration:1.15,ease:'power4.out',delay:.15});gsap.from('.reveal',{y:35,opacity:0,duration:.9,stagger:.12,ease:'power3.out',delay:.55});
+gsap.to('.track',{xPercent:-50,ease:'none',scrollTrigger:{trigger:'.marquee',scrub:1,start:'top bottom',end:'bottom top'}});
+gsap.utils.toArray('.card').forEach((c,i)=>gsap.from(c,{y:70,opacity:0,rotateX:8,duration:1,scrollTrigger:{trigger:c,start:'top 88%'},delay:(i%2)*.05}));
+gsap.to('.tile',{rotateX:10,rotateY:-16,scale:1.07,scrollTrigger:{trigger:'.stage',start:'top 80%',end:'bottom 20%',scrub:1}});
+gsap.to(pts.rotation,{z:.8,scrollTrigger:{trigger:'main',start:'top top',end:'bottom bottom',scrub:1}});
+const cur=document.querySelector('.cursor');addEventListener('pointermove',e=>gsap.to(cur,{x:e.clientX,y:e.clientY,duration:.18,ease:'power2.out'}));
+</script>
+</body></html>

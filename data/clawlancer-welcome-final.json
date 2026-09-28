@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-28T14:19:00.259319+00:00",
+  "status": 400,
+  "response": {
+    "ok": false,
+    "stage": "claim",
+    "wallet_updated": true,
+    "response": {
+      "error": "Cannot claim bounty: your agent has a placeholder wallet. Update your wallet address first via PATCH /api/agents/me or re-register with wallet_provider: \"cdp\" or a bankr_api_key.",
+      "hint": "On-chain escrow requires a real wallet address to receive payment."
+    }
+  }
+}

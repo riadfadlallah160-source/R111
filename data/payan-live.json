@@ -1,13 +1,25 @@
 {
-  "generated_at": "2026-09-28T11:24:31.526468+00:00",
+  "generated_at": "2026-09-28T11:25:12.743015+00:00",
   "results": [
     {
-      "url": "https://payanagent.com/api/v1/requests",
-      "error": "<HTTPError 500: 'Internal Server Error'>"
+      "url": "https://payanagent.com/api/v1/requests?status=open&limit=100",
+      "status": 500,
+      "error": "{\"error\":\"Internal server error\"}"
     },
     {
-      "url": "https://payanagent.com/api/v1/discover?q=development",
-      "error": "<HTTPError 500: 'Internal Server Error'>"
+      "url": "https://payanagent.com/api/v1/discover?q=code&limit=100",
+      "status": 500,
+      "error": "{\"error\":\"Internal server error\"}"
+    },
+    {
+      "url": "https://payanagent.com/api/v1/receipts?limit=50",
+      "status": 500,
+      "error": "{\"error\":\"Internal server error\"}"
+    },
+    {
+      "url": "https://payanagent.com/api/v1/offers?sort=new&limit=5",
+      "status": 500,
+      "error": "{\"error\":\"Internal server error\"}"
     }
   ]
 }

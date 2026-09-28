@@ -23,23 +23,28 @@ jobs:
           import json, urllib.request, urllib.parse, datetime
           base='https://payanagent.com'
           urls=[
-            base+'/api/v1/requests',
-            base+'/api/v1/discover?'+urllib.parse.urlencode({'q':'development'})
+            base+'/api/v1/requests?'+urllib.parse.urlencode({'status':'open','limit':100}),
+            base+'/api/v1/discover?'+urllib.parse.urlencode({'q':'code','limit':100}),
+            base+'/api/v1/receipts?'+urllib.parse.urlencode({'limit':50}),
+            base+'/api/v1/offers?'+urllib.parse.urlencode({'sort':'new','limit':5})
           ]
           out={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
           for url in urls:
             try:
-              req=urllib.request.Request(url,headers={'User-Agent':'50M-live-probe/1.0','Accept':'application/json'})
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 50M-live-probe','Accept':'application/json'})
               with urllib.request.urlopen(req,timeout=30) as r:
                 body=r.read().decode('utf-8','replace')
                 try: data=json.loads(body)
-                except Exception: data={'raw':body[:20000]}
+                except Exception: data={'raw':body[:30000]}
                 out['results'].append({'url':url,'status':r.status,'data':data})
+            except urllib.error.HTTPError as e:
+              body=e.read().decode('utf-8','replace')
+              out['results'].append({'url':url,'status':e.code,'error':body[:10000]})
             except Exception as e:
               out['results'].append({'url':url,'error':repr(e)})
           with open('data/payan-live.json','w') as f:
             json.dump(out,f,indent=2)
-          print(json.dumps(out,indent=2)[:20000])
+          print(json.dumps(out,indent=2)[:30000])
           PY
       - name: Persist probe result
         run: |

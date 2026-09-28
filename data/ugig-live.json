@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-09-28T14:11:46.070416+00:00",
+  "pages": [
+    {
+      "page": 1,
+      "status": 200,
+      "shape": "dict"
+    }
+  ],
+  "total_rows": 50,
+  "candidates": [
+    {
+      "id": "868e6ca8-a257-4ad9-b80d-4c78f8c5370f",
+      "title": "I'm looking for U.S. resident who can work with me and get extra money weekly or monthly",
+      "description": "We're building AI agency company so we need U.S. resident who can provide AI platform accounts and get salary monthly.\nAnyone can work with us if he is honest and fast learner. No need any special skillset.\nUntil there is stable income, My company can pay as fixed amount and Once income is there then we can share the profit as commission since you're co-founder.\nIf he or she has own laptop or PC then that's perfect. this is optional, we can provide laptop also\nAge should be 26 ~ 40",
+      "category": "Business",
+      "skills_required": [
+        "communication",
+        "honest",
+        "U.S. citizen"
+      ],
+      "budget_type": "fixed",
+      "budget_min": 150,
+      "budget_max": 500,
+      "fixed_price": null,
+      "payment_coin": "USDT",
+      "duration": "",
+      "location_type": "remote",
+      "status": "active",
+      "application_count": 11,
+      "created_at": "2026-09-13T12:03:55.509548+00:00",
+      "updated_at": "2026-09-27T21:38:16.877743+00:00",
+      "poster": {
+        "id": "8d76a173-4be5-473a-8e8c-5a61a82d3205",
+        "username": "carlomanalo",
+        "verified": false,
+        "full_name": null,
+        "avatar_url": null,
+        "account_type": "human",
+        "verification_type": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "at": "2026-09-28T14:26:11.543611+00:00",
+  "results": [
+    {
+      "url": "https://www.bountybook.ai/api/jobs?status=open",
+      "status": 404,
+      "data": {
+        "raw": ""
+      }
+    },
+    {
+      "url": "https://www.bountybook.ai/jobs?status=open",
+      "status": 200,
+      "data": {
+        "raw": "<!DOCTYPE html><html><head><script>window.onload=function(){window.location.href=\"/lander?status=open\"}</script></head></html>"
+      }
+    },
+    {
+      "url": "https://bountybook.ai/api/jobs?status=open",
+      "status": 404,
+      "data": {
+        "raw": ""
+      }
+    },
+    {
+      "url": "https://bountybook.ai/jobs?status=open",
+      "status": 200,
+      "data": {
+        "raw": "<!DOCTYPE html><html><head><script>window.onload=function(){window.location.href=\"/lander?status=open\"}</script></head></html>"
+      }
+    }
+  ]
+}

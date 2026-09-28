@@ -39,6 +39,13 @@ export function createMarketPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }) {
       { id: 'bitcoin' }, ['id'],
       { id: 'bitcoin', usd: 65000, source: 'CoinGecko', agentId: 1 }
     ),
+    'GET /v1/base/network-status': route(
+      '$0.005', PAY_TO, NETWORK, PUBLIC_BASE, '/v1/base/network-status',
+      'Low-cost live Base mainnet block height, gas price and chain ID for autonomous agents.',
+      ['blockchain-data','network-status','base','rpc'],
+      {}, [],
+      { chain: 'base', chainId: '0x2105', blockNumber: '0x...', gasPriceWei: '0x...', agentId: 2 }
+    ),
     'POST /v1/base/network-status': route(
       '$0.005', PAY_TO, NETWORK, PUBLIC_BASE, '/v1/base/network-status',
       'Low-cost live Base mainnet block height, gas price and chain ID for autonomous agents.',
@@ -244,7 +251,7 @@ export function registerMarketHandlers(app, assignment) {
     }
   });
 
-  app.post('/v1/base/network-status', async (_req, res) => {
+  app.all('/v1/base/network-status', async (_req, res) => {
     try {
       const [blockNumber, gasPrice, chainId] = await Promise.all([
         baseJsonRpc('eth_blockNumber'),

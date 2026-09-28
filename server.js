@@ -1907,8 +1907,10 @@ async function registerWithNoHumans() {
         endpoint_url: endpoint,
         category: 'data.blockchain',
         price_amount: 0.005,
+        price_currency: 'USDC',
         chains: ['base'],
-        sample_query: endpoint
+        submitter_email: '50m-demand@agentmail.to',
+        facilitator_url: FACILITATOR
       })
     });
     const body = await response.text();

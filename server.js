@@ -2385,3 +2385,27 @@ async function inspectPayApiSubmitOnce() {
 setTimeout(() => {
   inspectPayApiSubmitOnce().catch(error => console.error('PAYAPI_SOURCE_INSPECT_ERROR ' + (error instanceof Error ? error.message : String(error))));
 }, 9000);
+
+
+async function inspectPayApiBundleOnce() {
+  if (process.env.PAYAPI_BUNDLE_INSPECT_ONCE !== '1') return;
+  try {
+    const r = await fetch('https://payapi.market/assets/index-Bx-YDm0A.js', { headers: { 'user-agent': '50M-Revenue-Hunt/1.0' } });
+    const js = await r.text();
+    const needles = ['fetch(', '/api/', 'submit', 'listing', 'provider', 'endpointUrl', 'apiUrl', 'contactEmail'];
+    const snippets = [];
+    for (const needle of needles) {
+      let pos = 0;
+      while ((pos = js.indexOf(needle, pos)) !== -1 && snippets.length < 120) {
+        snippets.push({needle, snippet:js.slice(Math.max(0,pos-700), Math.min(js.length,pos+1600))});
+        pos += needle.length;
+      }
+    }
+    console.log('PAYAPI_BUNDLE_INSPECT ' + JSON.stringify({status:r.status,length:js.length,snippets}).slice(0,60000));
+  } catch (error) {
+    console.error('PAYAPI_BUNDLE_INSPECT_ERROR ' + (error instanceof Error ? error.message : String(error)));
+  }
+}
+setTimeout(() => {
+  inspectPayApiBundleOnce().catch(error => console.error('PAYAPI_BUNDLE_INSPECT_ERROR ' + (error instanceof Error ? error.message : String(error))));
+}, 11000);

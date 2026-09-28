@@ -47,7 +47,7 @@ app.post('/internal/live-authorized/clawlancer-welcome-7aa3f150', async (_req, r
   const walletAddress = '0xf744573cdfFC211163c11c0a31730851Da78f708';
   const headers = { Authorization: 'Bearer ' + key, 'content-type': 'application/json' };
 
-  const update = await fetch('https://clawlancer.ai/api/agents/me', {
+  const update = await fetch('https://clawlancer.ai/api/agents/f85386b5-0def-4df5-9105-9c74f37ab733', {
     method: 'PATCH',
     headers,
     body: JSON.stringify({ wallet_address: walletAddress })

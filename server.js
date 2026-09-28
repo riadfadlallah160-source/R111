@@ -181,7 +181,7 @@ setTimeout(runAuthorizedWelcomeClaimOnce, 2500);
 const PORT = Number(process.env.PORT || 3000);
 const PAY_TO = '0xf744573cdfFC211163c11c0a31730851Da78f708';
 const NETWORK = 'eip155:8453';
-const FACILITATOR = 'https://api.cdp.coinbase.com/platform/v2/x402';
+const FACILITATOR = 'https://facilitator.payai.network';
 const PUBLIC_BASE = 'https://fifty-million-agent-gateway.onrender.com';
 const DURABLE_LEDGER = 'https://api-v2.appdeploy.ai/app/50m-micro-agent-engine-4gntn5/api/settlement';
 const TOTAL_AGENTS = 50000000;

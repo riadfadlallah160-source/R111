@@ -23,6 +23,11 @@ jobs:
               try: payload=json.loads(body)
               except: payload={'raw':body}
               out={'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':r.status,'response':payload}
+          except urllib.error.HTTPError as e:
+            body=e.read().decode('utf-8','replace')
+            try: payload=json.loads(body)
+            except: payload={'raw':body[:10000]}
+            out={'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':e.code,'response':payload}
           except Exception as e:
             out={'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'error':repr(e)}
           open('data/welcome-invoke.json','w').write(json.dumps(out,indent=2))

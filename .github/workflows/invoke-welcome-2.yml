@@ -1,0 +1,35 @@
+name: Capture welcome claim rejection
+on:
+  push:
+    branches: [clawlancer-live-run]
+    paths: ['.github/workflows/invoke-welcome-2.yml']
+permissions:
+  contents: write
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: clawlancer-live-run}
+      - run: |
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request, urllib.error, json, datetime
+          url='https://fifty-million-agent-gateway.onrender.com/internal/live-authorized/clawlancer-welcome-7aa3f150'
+          try:
+            with urllib.request.urlopen(url, timeout=30) as r:
+              body=r.read().decode(); status=r.status
+          except urllib.error.HTTPError as e:
+            body=e.read().decode('utf-8','replace'); status=e.code
+          try: payload=json.loads(body)
+          except: payload={'raw':body[:10000]}
+          out={'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':status,'response':payload}
+          open('data/welcome-invoke-2.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2))
+          PY
+      - run: |
+          git config user.name "50M live worker"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/welcome-invoke-2.json
+          git commit -m "chore: capture exact claim response" || exit 0
+          git push origin HEAD:clawlancer-live-run

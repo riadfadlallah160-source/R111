@@ -1,0 +1,48 @@
+name: Turso 1K corruption bounty audit
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/turso-corruption-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout Turso current main
+        uses: actions/checkout@v4
+        with:
+          repository: tursodatabase/turso
+          path: turso
+          fetch-depth: 1
+      - name: Record basis and run bounded differential simulations
+        shell: bash
+        run: |
+          set +e
+          mkdir -p data
+          cd turso
+          BASIS=$(git rev-parse HEAD)
+          echo "basis=$BASIS" > ../data/turso-audit.txt
+          cargo build --bin limbo_sim >> ../data/turso-audit.txt 2>&1
+          BUILD=$?
+          echo "build_exit=$BUILD" >> ../data/turso-audit.txt
+          if [ "$BUILD" -eq 0 ]; then
+            for seed in 91001 91002 91003 91004 91005 91006 91007 91008; do
+              echo "=== seed $seed ===" >> ../data/turso-audit.txt
+              timeout 90s cargo run --bin limbo_sim -- --seed "$seed" --differential >> ../data/turso-audit.txt 2>&1
+              echo "seed_exit=$?" >> ../data/turso-audit.txt
+            done
+          fi
+          cd ..
+          tail -n 5000 data/turso-audit.txt > data/turso-audit-tail.txt
+      - name: Persist audit evidence
+        run: |
+          git config user.name "50M bounty auditor"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/turso-audit-tail.txt
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Turso corruption bounty audit"
+          git push origin HEAD:main

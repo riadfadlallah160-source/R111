@@ -1,0 +1,43 @@
+name: Jishie signature reverse check
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-signature-reverse.yml']
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: jishie-demand-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          cat > /tmp/reverse.mjs <<'JS'
+          import crypto from 'node:crypto'; import fs from 'node:fs';
+          const r=await fetch('https://jishie.com/.well-known/demand.json'); const doc=await r.json();
+          const sort=v=>Array.isArray(v)?v.map(sort):(v&&typeof v==='object')?Object.fromEntries(Object.keys(v).sort().map(k=>[k,sort(v[k])])):v;
+          const x=doc.signature.keys_inline.x; const pub=crypto.createPublicKey({key:{kty:'OKP',crv:'Ed25519',x},format:'jwk'});
+          const sig=Buffer.from(doc.signature.sig,'base64');
+          const meta={alg:doc.signature.alg,keys:doc.signature.keys,keys_inline:doc.signature.keys_inline,signed_at:doc.signature.signed_at};
+          const variants={
+            'stable-demands':JSON.stringify(sort(doc.demands)),
+            'plain-demands':JSON.stringify(doc.demands),
+            'stable-set-no-sig':JSON.stringify(sort({demand_set:doc.demand_set,publisher:doc.publisher,signature:meta,demands:doc.demands})),
+            'stable-core-set':JSON.stringify(sort({demand_set:doc.demand_set,publisher:doc.publisher,demands:doc.demands})),
+            'plain-core-set':JSON.stringify({demand_set:doc.demand_set,publisher:doc.publisher,demands:doc.demands})
+          };
+          const checks={};
+          for(const [k,v] of Object.entries(variants)) checks[k]=crypto.verify(null,Buffer.from(v),pub,sig);
+          fs.writeFileSync('data/jishie-signature-reverse.json',JSON.stringify({checks,signature_length:sig.length,x},null,2)); console.log(JSON.stringify({checks,signature_length:sig.length},null,2));
+          JS
+          node /tmp/reverse.mjs
+      - run: |
+          git config user.name "50M demand probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-signature-reverse.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: reverse-check Jishie signing canonicalization"
+          git push origin HEAD:jishie-demand-probe

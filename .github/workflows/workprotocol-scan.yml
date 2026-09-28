@@ -1,0 +1,22 @@
+name: Live WorkProtocol Scan
+on:
+  push:
+    paths:
+      - '.github/workflows/workprotocol-scan.yml'
+  workflow_dispatch:
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch live open jobs
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --silent 'https://workprotocol.ai/api/jobs?status=open&min_pay=1&sort=pay_desc&limit=100' -o /tmp/jobs.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/jobs.json'))
+          jobs=d.get('jobs', d.get('results', []))
+          print('LIVE_TOTAL', d.get('total', len(jobs)))
+          for j in jobs:
+              print('JOB', json.dumps({k:j.get(k) for k in ['id','title','category','paymentAmount','payment','status','maxWorkers','competitionMode','minReputation','deadline','acceptanceCriteria','requirements']}, separators=(',',':')))
+          PY

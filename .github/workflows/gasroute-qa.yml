@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - '.github/workflows/gasroute-qa.yml'
+      - 'market.js'
   workflow_dispatch:
 jobs:
   qa:

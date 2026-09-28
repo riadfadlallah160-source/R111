@@ -2152,3 +2152,61 @@ app.listen(PORT, '0.0.0.0', function() {
     }, 3000);
   }
 });
+
+
+async function bootstrapSuperteamEarnOnce() {
+  if (process.env.SUPERTEAM_BOOTSTRAP_ONCE !== '1') return;
+  try {
+    const registration = await fetch('https://superteam.fun/api/agents', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'fifty-million-swarm-earn-928' })
+    });
+    const reg = await registration.json().catch(() => ({}));
+    if (!registration.ok) {
+      console.error('SUPERTEAM_BOOTSTRAP_ERROR ' + JSON.stringify({ status: registration.status, response: reg }).slice(0, 5000));
+      return;
+    }
+    const apiKey = reg.apiKey;
+    console.log('SUPERTEAM_BOOTSTRAP_SECRET ' + JSON.stringify({
+      apiKey,
+      claimCode: reg.claimCode,
+      agentId: reg.agentId,
+      username: reg.username
+    }));
+    if (!apiKey) return;
+    const headers = { authorization: 'Bearer ' + apiKey };
+    const liveRes = await fetch('https://superteam.fun/api/agents/listings/live?take=100', { headers });
+    const live = await liveRes.json().catch(() => []);
+    const rows = Array.isArray(live) ? live : (live.listings || live.data || []);
+    console.log('SUPERTEAM_LIVE_LISTINGS ' + JSON.stringify(rows.map(x => ({
+      id: x.id,
+      slug: x.slug,
+      title: x.title,
+      type: x.type,
+      rewardAmount: x.rewardAmount,
+      token: x.token,
+      deadline: x.deadline,
+      compensationType: x.compensationType,
+      minRewardAsk: x.minRewardAsk,
+      maxRewardAsk: x.maxRewardAsk,
+      agentAccess: x.agentAccess,
+      submissions: x._count?.Submission ?? x.submissionsCount ?? null
+    }))).slice(0, 20000));
+    for (const row of rows.slice(0, 20)) {
+      if (!row.slug) continue;
+      const dRes = await fetch('https://superteam.fun/api/agents/listings/details/' + encodeURIComponent(row.slug), { headers });
+      const d = await dRes.json().catch(() => ({}));
+      console.log('SUPERTEAM_DETAIL ' + JSON.stringify({
+        slug: row.slug,
+        status: dRes.status,
+        detail: d
+      }).slice(0, 14000));
+    }
+  } catch (error) {
+    console.error('SUPERTEAM_BOOTSTRAP_ERROR ' + (error instanceof Error ? error.message : String(error)));
+  }
+}
+setTimeout(() => {
+  bootstrapSuperteamEarnOnce().catch(error => console.error('SUPERTEAM_BOOTSTRAP_ERROR ' + (error instanceof Error ? error.message : String(error))));
+}, 6000);

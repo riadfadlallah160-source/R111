@@ -1,0 +1,49 @@
+name: Jishie live buyer demand scan
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-buyers.yml']
+permissions:
+  contents: write
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: jishie-demand-probe}
+      - name: Query declared buyer demand
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json,datetime
+          queries=[
+            {'q':'x402 MCP API integration compatibility audit payment interoperability'},
+            {'q':'security API automation vulnerability scanning static analysis privacy PII'},
+            {'q':'data processing structured data transformation batch analysis research automation'}
+          ]
+          out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'queries':[]}
+          for idx,q in enumerate(queries,1):
+            payload={'jsonrpc':'2.0','id':idx,'method':'message/send','params':{'message':{'role':'user','parts':[{'kind':'data','data':{'skill':'find_buyers_for_capability',**q}}]}}}
+            req=urllib.request.Request('https://jishie.com/a2a',data=json.dumps(payload).encode(),method='POST',headers={'User-Agent':'50M-seller/1.0','Accept':'application/json','Content-Type':'application/json'})
+            try:
+              with urllib.request.urlopen(req,timeout=30) as r:
+                data=json.loads(r.read().decode())
+              out['queries'].append({'query':q,'status':r.status,'data':data})
+            except urllib.error.HTTPError as e:
+              raw=e.read().decode('utf-8','replace')
+              try:data=json.loads(raw)
+              except:data={'raw':raw[:10000]}
+              out['queries'].append({'query':q,'status':e.code,'data':data})
+          open('data/jishie-buyers.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2)[:50000])
+          PY
+      - name: Persist
+        run: |
+          git config user.name "50M buyer demand scan"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-buyers.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Jishie live buyer demand"
+          git push origin HEAD:jishie-demand-probe

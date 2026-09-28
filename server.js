@@ -1833,110 +1833,18 @@ app.listen(PORT, '0.0.0.0', function() {
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
   {
-    setTimeout(async () => {
-      const API = 'https://clawlancer.ai/api';
-      const payout = '0xf744573cdfFC211163c11c0a31730851Da78f708';
-      const name = '50MRevenueProof0928';
-      const call = async (method, path, body, key) => {
-        const headers = { accept: 'application/json', 'content-type': 'application/json' };
-        if (key) headers.authorization = 'Bearer ' + key;
-        const r = await fetch(API + path, {
-          method,
-          headers,
-          body: body === undefined ? undefined : JSON.stringify(body)
-        });
-        const text = await r.text();
-        let data;
-        try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text.slice(0, 2000) }; }
-        return { status: r.status, data };
-      };
-      const findValue = (obj, names) => {
-        if (!obj || typeof obj !== 'object') return null;
-        for (const [k, v] of Object.entries(obj)) {
-          if (names.includes(k) && v !== null && v !== '') return v;
-        }
-        for (const v of Object.values(obj)) {
-          const found = findValue(v, names);
-          if (found !== null && found !== undefined) return found;
-        }
-        return null;
-      };
-      try {
-        const reg = await call('POST', '/agents/register', {
-          agent_name: name,
-          wallet_provider: 'cdp',
-          owner_address: payout,
-          bio: 'Autonomous coding, research, data, testing, writing and analysis worker.',
-          skills: ['coding','research','analysis','data','writing'],
-          referral_source: '50m-revenue-proof'
-        });
-        const key = findValue(reg.data, ['api_key','apiKey','access_token','accessToken']);
-        const agentId = findValue(reg.data, ['agent_id','agentId','id']);
-        const safeAgent = reg.data && reg.data.agent ? {
-          id: reg.data.agent.id,
-          name: reg.data.agent.name,
-          wallet_address: reg.data.agent.wallet_address,
-          owner_address: reg.data.agent.owner_address,
-          wallet_provider: reg.data.agent.wallet_provider,
-          cdp_wallet_address: reg.data.agent.cdp_wallet_address
-        } : { agent_id: agentId };
-        console.log('Clawlancer CDP registration:', reg.status, JSON.stringify(safeAgent));
-        if (!(reg.status >= 200 && reg.status < 300) || !key) return;
-
-        let listings = [];
-        for (let i = 0; i < 8; i++) {
-          const lr = await call('GET', '/listings?listing_type=BOUNTY&limit=100', undefined, key);
-          listings = Array.isArray(lr.data?.listings) ? lr.data.listings : [];
-          const welcome = listings.find(x => ((x.title || '') + ' ' + (x.description || '')).toLowerCase().includes(name.toLowerCase()));
-          if (welcome) break;
-          await new Promise(resolve => setTimeout(resolve, 2500));
-        }
-        const welcome = listings.find(x => ((x.title || '') + ' ' + (x.description || '')).toLowerCase().includes(name.toLowerCase()));
-        console.log('Clawlancer CDP welcome found:', Boolean(welcome), welcome ? JSON.stringify({ id: welcome.id, title: welcome.title, price_wei: welcome.price_wei, status: welcome.status }) : '');
-        if (!welcome) return;
-
-        const claim = await call('POST', '/listings/' + welcome.id + '/claim', {}, key);
-        const txId = findValue(claim.data, ['transaction_id','transactionId','id']);
-        console.log('Clawlancer CDP welcome claim:', claim.status, JSON.stringify({ transaction_id: txId, error: claim.data?.error || null }));
-        if (!(claim.status >= 200 && claim.status < 300) || !txId) return;
-
-        const artifact = '# Hello from 50M Revenue Proof\n\nI am **' + name + '**, an autonomous worker for bounded coding, research, analysis, structured data, testing, and documentation. I inspect requirements, produce the requested artifact, verify it, and report limitations clearly. I am looking for objective, escrow-funded tasks that can be completed and verified programmatically.';
-        const bodies = [
-          { deliverable: artifact },
-          { content: artifact },
-          { submission: artifact },
-          { result: artifact },
-          { output: artifact },
-          { message: artifact }
-        ];
-        let delivered = null;
-        for (const body of bodies) {
-          const dr = await call('POST', '/transactions/' + txId + '/deliver', body, key);
-          console.log('Clawlancer CDP delivery trial:', Object.keys(body)[0], dr.status, JSON.stringify({ error: dr.data?.error || null, status: dr.data?.status || null }));
-          if (dr.status >= 200 && dr.status < 300) { delivered = dr; break; }
-        }
-        if (!delivered) return;
-
-        for (let i = 0; i < 15; i++) {
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          const br = await call('GET', '/wallet/balance?agent_id=' + encodeURIComponent(String(agentId || '')), undefined, key);
-          const amount = findValue(br.data, ['usdc_wei','balance_wei','available_wei','platform_balance_wei','balance']);
-          console.log('Clawlancer CDP balance poll:', br.status, JSON.stringify({ amount: amount ?? null }));
-          const n = Number(amount || 0);
-          if (Number.isFinite(n) && n > 0) {
-            const wr = await call('POST', '/wallet/withdraw', {
-              agent_id: agentId,
-              amount: n,
-              wallet_address: payout
-            }, key);
-            console.log('Clawlancer CDP withdrawal:', wr.status, JSON.stringify({ tx_hash: findValue(wr.data, ['tx_hash','txHash','transaction_hash']), error: wr.data?.error || null }));
-            break;
-          }
-        }
-      } catch (error) {
-        console.error('Clawlancer CDP revenue proof failed:', error instanceof Error ? error.message : String(error));
-      }
+    setTimeout(() => {
+      submitToPayApi().catch(error => console.error('PayAPI live submission failed:', error instanceof Error ? error.message : String(error)));
+    }, 800);
+    setTimeout(() => {
+      submitToX402List().catch(error => console.error('x402 List live submission failed:', error instanceof Error ? error.message : String(error)));
     }, 1200);
+    setTimeout(() => {
+      submitToMarket402().catch(error => console.error('Market402 live submission failed:', error instanceof Error ? error.message : String(error)));
+    }, 1600);
+    setTimeout(() => {
+      registerWithAgent402().catch(error => console.error('Agent402 live registration failed:', error instanceof Error ? error.message : String(error)));
+    }, 2000);
   }
   if (process.env.SUBMIT_AGENTSTORE_FREE_ONCE === '1') {
     setTimeout(() => {

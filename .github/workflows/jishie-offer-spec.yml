@@ -1,0 +1,40 @@
+name: Jishie offer spec probe
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-offer-spec.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: jishie-demand-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json,datetime
+          urls=['https://jishie.com/spec/demand-json-spec.md','https://jishie.com/openapi.json','https://jishie.com/docs.html']
+          out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
+          for url in urls:
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'50M-demand-probe/1.0','Accept':'*/*'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                raw=r.read().decode('utf-8','replace')
+                try:data=json.loads(raw)
+                except:data={'text':raw[:100000]}
+                out['results'].append({'url':url,'status':r.status,'data':data})
+            except Exception as e: out['results'].append({'url':url,'error':repr(e)})
+          open('data/jishie-offer-spec.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2)[:100000])
+          PY
+      - run: |
+          git config user.name "50M demand probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-offer-spec.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Jishie offer schema"
+          git push origin HEAD:jishie-demand-probe

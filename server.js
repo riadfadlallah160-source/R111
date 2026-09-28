@@ -1895,6 +1895,27 @@ async function submitToMarket402() {
   }
 }
 
+async function registerWithX402Dash() {
+  try {
+    const response = await fetch('https://api.x402dash.com/v1/register', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        url: PUBLIC_BASE + '/v1/base/network-status',
+        name: '50M Base Network Status',
+        description: 'Live Base mainnet block height, gas price and chain ID for autonomous agents.',
+        category: 'Blockchain Data',
+        tags: ['base', 'network-status', 'gas', 'rpc', 'x402'],
+        contact: '50m-demand@agentmail.to'
+      })
+    });
+    const body = await response.text();
+    console.log('x402dash registration:', response.status, body.slice(0, 1200));
+  } catch (error) {
+    console.error('x402dash registration failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithAgent402() {
   try {
     const response = await fetch('https://agent402.tools/api/index/register', {
@@ -1959,8 +1980,14 @@ app.listen(PORT, '0.0.0.0', function() {
       registerWithAgent402().catch(error => console.error('Agent402 live registration failed:', error instanceof Error ? error.message : String(error)));
     }, 2000);
     setTimeout(() => {
+      registerWithX402Dash().catch(error => console.error('x402dash live registration failed:', error instanceof Error ? error.message : String(error)));
+    }, 2600);
+    setTimeout(() => {
       registerWithTrue402().catch(error => console.error('true402 live registration failed:', error instanceof Error ? error.message : String(error)));
     }, 2200);
+    setTimeout(() => {
+      registerWithTrue402().catch(error => console.error('true402 delayed refresh failed:', error instanceof Error ? error.message : String(error)));
+    }, 15000);
     setTimeout(() => {
       publishAgentStoreFreeWrapper().catch(error => console.error('AgentStore live wrapper failed:', error instanceof Error ? error.message : String(error)));
     }, 2400);

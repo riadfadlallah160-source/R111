@@ -1,0 +1,107 @@
+{
+  "at": "2026-09-28T13:08:18.919853+00:00",
+  "registration": {
+    "status": 202,
+    "data": {
+      "submission_id": "sub_8edc5bfbb8",
+      "status": "pending",
+      "next": "liveness check, then the record enters the index at T0 (indexed); claim it to bump probing"
+    }
+  },
+  "standard_check": {
+    "status": 200,
+    "data": {
+      "standard": "/spec/agent-standard.md",
+      "target": "https://fifty-million-agent-gateway.onrender.com/mcp",
+      "score": "5/5 checks passed",
+      "passed": 5,
+      "graded": 5,
+      "checks": [
+        {
+          "rule": "MCP Streamable HTTP answers initialize",
+          "ref": "\u00a72.1-2.2",
+          "pass": true,
+          "note": "serverInfo: 50M Swarm MCP v1.0.0"
+        },
+        {
+          "rule": "tools/list open for discovery",
+          "ref": "\u00a72.2",
+          "pass": true,
+          "note": "6 tool(s)"
+        },
+        {
+          "rule": "tool descriptions carry taxonomy skills",
+          "ref": "\u00a72.3",
+          "pass": true,
+          "note": "detected: market-data, onchain-data"
+        },
+        {
+          "rule": "honest serverInfo name",
+          "ref": "\u00a72.2",
+          "pass": true,
+          "note": "50M Swarm MCP"
+        },
+        {
+          "rule": "A2A agent card served",
+          "ref": "\u00a71.2",
+          "pass": true,
+          "note": "FiftyMillionSwarm-f708"
+        },
+        {
+          "rule": "x402 unit pricing (402 == settled)",
+          "ref": "\u00a73",
+          "pass": null,
+          "note": "confirmed only by a paid test-call (T3 pipeline)"
+        }
+      ],
+      "next": "fix the fails, then claim/submit your record \u2014 probes and paid test-calls climb the rest of the funnel",
+      "profile": {
+        "name": "50M Swarm MCP",
+        "version": "1.0.0",
+        "skills": [
+          "market-data",
+          "onchain-data"
+        ],
+        "mcp": "https://fifty-million-agent-gateway.onrender.com/mcp",
+        "tool_count": 6,
+        "tools": [
+          {
+            "name": "crypto_price",
+            "description": "Get the live USD spot price of a cryptocurrency by CoinGecko asset id."
+          },
+          {
+            "name": "base_network_status",
+            "description": "Get live Base mainnet block height, gas price, and chain id."
+          },
+          {
+            "name": "vulnerability_intel",
+            "description": "Check up to 100 package/version or commit queries against OSV vulnerability intelligence."
+          },
+          {
+            "name": "hash_text",
+            "description": "Return SHA-256, SHA-1 and MD5 hashes for text."
+          },
+          {
+            "name": "text_metrics",
+            "description": "Return word, character, unique-word and line counts for text."
+          },
+          {
+            "name": "json_validate",
+            "description": "Validate JSON text and return the parsed value type plus compact representation."
+          }
+        ]
+      },
+      "indexed": {
+        "id": "aix_e13bf173d4",
+        "added": true,
+        "claimed": false,
+        "name": "50M Swarm MCP",
+        "skills": [
+          "market-data",
+          "onchain-data"
+        ],
+        "tool_count": 6
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-28T15:17:53.604058+00:00",
+  "generated_at": "2026-09-28T15:19:00.177005+00:00",
   "actions": [
     {
       "url": "https://agent402.tools/api/index/register",
@@ -20,25 +20,458 @@
     },
     {
       "url": "https://market402.com/submit",
-      "status": 422,
+      "status": 200,
       "body": {
-        "ok": false,
-        "code": "invalid_input",
-        "retryable": false,
-        "action": "fix_input",
-        "detail": [
-          {
-            "type": "missing",
-            "loc": [
-              "body",
-              "resource"
-            ],
-            "msg": "Field required",
+        "ok": true,
+        "message": "Queued. Your endpoint will be probed in the next round (no payment attached; we expect a spec-compliant 402).",
+        "instant_check": {
+          "ok": true,
+          "url": "https://fifty-million-agent-gateway.onrender.com/v1/base/network-status",
+          "latency_ms": 122,
+          "checks": [
+            {
+              "check": "https_url",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "public_hostname",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "reachable",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "returns_402_unpaid",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "body_json",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "x402_version",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "accepts_present",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "pay_to",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "amount",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "network_format_v2",
+              "pass": true,
+              "hint": ""
+            },
+            {
+              "check": "eip712_extra",
+              "pass": true,
+              "hint": ""
+            }
+          ],
+          "summary": {
+            "passed": 11,
+            "failed": 0,
+            "verdict": "spec_compliant"
+          }
+        },
+        "note": "instant_check is advisory self-test output; the 402 Verified badge is granted only by our own scheduled probes."
+      }
+    },
+    {
+      "url": "https://api.cdp.coinbase.com/platform/v2/x402/validate",
+      "status": 200,
+      "body": {
+        "bazaarExtension": {
+          "info": {
             "input": {
-              "url": "https://fifty-million-agent-gateway.onrender.com/v1/base/network-status"
+              "body": {
+                "includeGas": "true"
+              },
+              "bodyType": "json",
+              "method": "POST",
+              "type": "http"
+            },
+            "output": {
+              "example": {
+                "agentId": 2,
+                "blockNumber": "0x...",
+                "chain": "base",
+                "chainId": "0x2105",
+                "gasPriceWei": "0x..."
+              },
+              "type": "json"
+            }
+          },
+          "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "properties": {
+              "input": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "properties": {
+                      "includeGas": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [],
+                    "type": "object"
+                  },
+                  "bodyType": {
+                    "enum": [
+                      "json",
+                      "form-data",
+                      "text"
+                    ],
+                    "type": "string"
+                  },
+                  "method": {
+                    "enum": [
+                      "POST"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "http",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "method",
+                  "bodyType",
+                  "body"
+                ],
+                "type": "object"
+              },
+              "output": {
+                "properties": {
+                  "example": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "input"
+            ],
+            "type": "object"
+          }
+        },
+        "index": null,
+        "paymentRequirements": {
+          "x402Version": 2,
+          "error": "Payment required",
+          "resource": {
+            "url": "https://fifty-million-agent-gateway.onrender.com/v1/base/network-status",
+            "description": "Low-cost live Base mainnet block height, gas price and chain ID for autonomous agents.",
+            "mimeType": "application/json"
+          },
+          "accepts": [
+            {
+              "scheme": "exact",
+              "network": "eip155:8453",
+              "amount": "5000",
+              "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+              "payTo": "0xf744573cdfFC211163c11c0a31730851Da78f708",
+              "maxTimeoutSeconds": 300,
+              "extra": {
+                "name": "USD Coin",
+                "version": "2"
+              }
+            }
+          ],
+          "extensions": {
+            "bazaar": {
+              "info": {
+                "input": {
+                  "type": "http",
+                  "bodyType": "json",
+                  "body": {
+                    "includeGas": "true"
+                  },
+                  "method": "POST"
+                },
+                "output": {
+                  "type": "json",
+                  "example": {
+                    "chain": "base",
+                    "chainId": "0x2105",
+                    "blockNumber": "0x...",
+                    "gasPriceWei": "0x...",
+                    "agentId": 2
+                  }
+                }
+              },
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "http"
+                      },
+                      "method": {
+                        "type": "string",
+                        "enum": [
+                          "POST"
+                        ]
+                      },
+                      "bodyType": {
+                        "type": "string",
+                        "enum": [
+                          "json",
+                          "form-data",
+                          "text"
+                        ]
+                      },
+                      "body": {
+                        "type": "object",
+                        "properties": {
+                          "includeGas": {
+                            "type": "string"
+                          }
+                        },
+                        "required": []
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "method",
+                      "bodyType",
+                      "body"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "output": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "example": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ]
+                  }
+                },
+                "required": [
+                  "input"
+                ]
+              }
             }
           }
-        ]
+        },
+        "preflight": [
+          {
+            "check": "url_valid",
+            "detail": "URL is well-formed",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "https",
+            "check": "url_https",
+            "detail": "Resource URL uses HTTPS",
+            "expected": "https",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "endpoint_reachable",
+            "detail": "Endpoint responded with status 402",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "402",
+            "check": "returns_402",
+            "detail": "Endpoint correctly returns HTTP 402 Payment Required",
+            "expected": "402",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "valid_json",
+            "detail": "Response body parsed as JSON",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "2",
+            "check": "x402_version",
+            "detail": "x402 version is 2",
+            "expected": "2",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "PAYMENT-REQUIRED header",
+            "check": "payment_required_header",
+            "detail": "PaymentRequired delivered via the PAYMENT-REQUIRED response header",
+            "expected": "PaymentRequired delivered via PAYMENT-REQUIRED response header",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "has_accepts",
+            "detail": "Found 1 payment method(s) in accepts array",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "exact",
+            "check": "accepts[0].scheme",
+            "detail": "Scheme is exact",
+            "expected": "exact or upto",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "eip155:8453",
+            "check": "accepts[0].network",
+            "detail": "Network eip155:8453 is supported",
+            "expected": "a facilitator-supported network (Base, Solana, Polygon, Arbitrum, World)",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "check": "accepts[0].asset",
+            "detail": "Asset is USDC",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "5000",
+            "check": "accepts[0].amount",
+            "detail": "Amount 5000 meets $0.001 USDC minimum",
+            "expected": ">= 1000",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "0xf744573cdfFC211163c11c0a31730851Da78f708",
+            "check": "accepts[0].payTo",
+            "detail": "payTo address present",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "accepts[0].maxTimeoutSeconds",
+            "detail": "maxTimeoutSeconds is set",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "has_resource",
+            "detail": "Resource URL: https://fifty-million-agent-gateway.onrender.com/v1/base/network-status",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "has_bazaar_extension",
+            "detail": "Bazaar extension found",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "bazaar.info",
+            "detail": "Bazaar info block present",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "bazaar.info.input",
+            "detail": "Input metadata present in bazaar info",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "http",
+            "check": "bazaar.info.input.type",
+            "detail": "Input type is \"http\"",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "POST",
+            "check": "bazaar.info.input.method",
+            "detail": "HTTP method is \"POST\"",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "actual": "POST",
+            "check": "bazaar.info.input.method.matches_request",
+            "detail": "Declared method POST matches the probed method",
+            "expected": "POST",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "bazaar.info.output",
+            "detail": "Output metadata present in bazaar info",
+            "passed": true,
+            "severity": "advisory"
+          },
+          {
+            "check": "bazaar.info.output.example",
+            "detail": "Output example provided",
+            "passed": true,
+            "severity": "advisory"
+          },
+          {
+            "check": "bazaar.schema",
+            "detail": "Bazaar schema present",
+            "passed": true,
+            "severity": "required"
+          },
+          {
+            "check": "parse",
+            "detail": "Bazaar discovery extension parsed successfully",
+            "passed": true,
+            "severity": "required"
+          }
+        ],
+        "simulation": {
+          "outcome": "accepted"
+        },
+        "statusCode": 402,
+        "valid": true,
+        "x402Version": 2
       }
     },
     {

@@ -1832,7 +1832,7 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
-  if (process.env.CLAWLANCER_WELCOME_ONCE === '1') {
+  {
     setTimeout(async () => {
       try {
         const key = process.env.CLAWLANCER_API_KEY;

@@ -1,0 +1,168 @@
+{
+  "name": "Household Notes Privacy + Approval Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "household-notes-demo",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Meeting Notes Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const b=$json.body||$json; const text=String(b.text||b.notes||'').trim(); const sensitive=Boolean(b.sensitive)||/(passport|ssn|social security|bank account|medical record|tax return)/i.test(text); return [{json:{source:b.source||'meeting-notes',text,sensitive,receivedAt:new Date().toISOString()}}];"
+      },
+      "id": "2",
+      "name": "Normalize + Privacy Gate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "sensitive",
+              "leftValue": "={{ $json.sensitive }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3",
+      "name": "Sensitive?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{status:'LOCAL_ONLY',reason:'Sensitive content stays on the home machine.',nextStep:'Process with Ollama/LM Studio locally; do not send document text to cloud APIs.',receivedAt:$json.receivedAt}}];"
+      },
+      "id": "4",
+      "name": "Local-Only Route",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const lines=$json.text.split(/\\n+/).map(s=>s.trim()).filter(Boolean); const actions=lines.filter(x=>/^(todo|action|follow[- ]?up|next):/i.test(x)).map((x,i)=>({id:i+1,text:x.replace(/^[^:]+:\\s*/,'')})); return [{json:{...$json,actions,calendarDrafts:actions.map(a=>({title:a.text,status:'DRAFT_REQUIRES_APPROVAL'})),emailDraft:{subject:'Meeting follow-up',body:actions.length?'Draft action items:\\n'+actions.map(a=>'- '+a.text).join('\\n'):'No explicit action items detected.',status:'DRAFT_REQUIRES_APPROVAL'}}}];"
+      },
+      "id": "5",
+      "name": "Create Draft Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{status:'AWAITING_HUMAN_APPROVAL',policy:{calendarWrites:'blocked_until_approved',emailSending:'blocked_until_approved',sensitiveDocuments:'local_only'},actions:$json.actions,calendarDrafts:$json.calendarDrafts,emailDraft:$json.emailDraft}}];"
+      },
+      "id": "6",
+      "name": "Approval Package",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        140
+      ]
+    }
+  ],
+  "connections": {
+    "Meeting Notes Intake": {
+      "main": [
+        [
+          {
+            "node": "Normalize + Privacy Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize + Privacy Gate": {
+      "main": [
+        [
+          {
+            "node": "Sensitive?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sensitive?": {
+      "main": [
+        [
+          {
+            "node": "Local-Only Route",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Draft Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Draft Actions": {
+      "main": [
+        [
+          {
+            "node": "Approval Package",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "versionId": "household-cto-demo-v1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

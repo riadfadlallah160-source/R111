@@ -1,0 +1,30 @@
+name: Jishie A2A card probe
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-a2a-card.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: jishie-demand-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json
+          req=urllib.request.Request('https://jishie.com/.well-known/agent-card.json',headers={'User-Agent':'50M-seller/1.0','Accept':'application/json'})
+          with urllib.request.urlopen(req,timeout=30) as r: card=json.loads(r.read())
+          open('data/jishie-a2a-card.json','w').write(json.dumps(card,indent=2)); print(json.dumps(card,indent=2)[:30000])
+          PY
+      - run: |
+          git config user.name "50M demand probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-a2a-card.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Jishie A2A card"
+          git push origin HEAD:jishie-demand-probe

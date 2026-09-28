@@ -1,0 +1,50 @@
+name: TaskBounty live funded queue
+on:
+  push:
+    branches: [taskbounty-live-probe]
+    paths: ['.github/workflows/taskbounty-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: taskbounty-live-probe
+      - name: Fetch live public queue
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json,datetime
+          urls=[
+            'https://www.task-bounty.com/api/v1/tasks?state=open&limit=100',
+            'https://www.task-bounty.com/api/v1/tasks?limit=100'
+          ]
+          out={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
+          for url in urls:
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'50M-funded-work-probe/1.0','Accept':'application/json'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                body=r.read().decode('utf-8','replace')
+                try:data=json.loads(body)
+                except:data={'raw':body[:30000]}
+                out['results'].append({'url':url,'status':r.status,'data':data})
+            except urllib.error.HTTPError as e:
+              out['results'].append({'url':url,'status':e.code,'error':e.read().decode('utf-8','replace')[:10000]})
+            except Exception as e:
+              out['results'].append({'url':url,'error':repr(e)})
+          open('data/taskbounty-live.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2)[:50000])
+          PY
+      - name: Persist result
+        run: |
+          git config user.name "50M funded work probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/taskbounty-live.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record live TaskBounty queue"
+          git push origin HEAD:taskbounty-live-probe

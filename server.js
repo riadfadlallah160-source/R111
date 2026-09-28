@@ -653,19 +653,27 @@ function parseCsv(input) {
 app.get('/llms.txt', function(_req, res) {
   res.type('text/plain').send(`# 50M Swarm Gateway
 
-- [Nevermined payments](/integrations/nevermined.md): Stablecoin/x402 payment instructions for autonomous buyers.
-- [x402 discovery](/.well-known/x402): Machine-readable payment metadata.
+- [x402 discovery](/.well-known/x402): Canonical machine-readable routes, exact live prices and payment metadata.
+- [OpenAPI](/openapi.json): API specification with per-route x402 price metadata.
 - [Agent metadata](/.well-known/agent.json): Capabilities and service metadata.
-- [OpenAPI](/openapi.json): API specification.
+- [Nevermined payments](/integrations/nevermined.md): Stablecoin/x402 buyer instructions.
 - [Enterprise procurement](/enterprise): Bulk workload and procurement information.
 
-Primary paid endpoint:
-POST /v1/swarm/batch
+Low-friction paid canaries:
+- POST /v1/base/network-status — $0.005 USDC — live Base mainnet block height, gas price and chain ID.
+- POST /v1/market/crypto-price — $0.01 USDC — live USD crypto spot price.
 
-Pricing:
-Exactly $1 USDC per successful work unit.
-Settlement network:
-Base mainnet.
+High-value paid work:
+- POST /v1/swarm/batch — exactly $1 USDC per successful work unit, up to 5,000 units.
+- POST /v1/security/vulnerability-intel — $1 USDC.
+- POST /v1/security/static-analysis — $1 USDC.
+- POST /v1/security/pii-scan — $1 USDC.
+- POST /v1/data/profile — $1 USDC.
+- POST /v1/web/analyze — $1 USDC.
+- POST /v1/slot/run — $1 USDC.
+
+Settlement:
+x402 v2, Base mainnet USDC, payTo ${PAY_TO}.
 `);
 });
 
@@ -703,14 +711,17 @@ Request body:
 Price:
 $1 per successful work unit. A batch with N valid jobs requires exactly $N.
 
+## Low-friction paid canaries
+
+- POST /v1/base/network-status — $0.005 USDC
+- POST /v1/market/crypto-price — $0.01 USDC
+
 ## Specialized $1 endpoints
 
 - POST /v1/security/vulnerability-intel
 - POST /v1/security/static-analysis
 - POST /v1/security/pii-scan
 - POST /v1/data/profile
-- POST /v1/market/crypto-price
-- POST /v1/base/network-status
 - POST /v1/web/analyze
 - POST /v1/slot/run
 
@@ -748,10 +759,13 @@ POST ${PUBLIC_BASE}/v1/swarm/batch
 
 Send 1 to 5,000 independent jobs. Dynamic price is exactly $1 USDC per job. Supported operations: hash, metrics, extract, keywords, dedupe, normalize-url, csv-to-json, json-validate.
 
+## Low-friction paid canaries
+
+- POST /v1/base/network-status — $0.005 USDC
+- POST /v1/market/crypto-price — $0.01 USDC
+
 ## Specialized $1 endpoints
 
-- POST /v1/market/crypto-price
-- POST /v1/base/network-status
 - POST /v1/security/static-analysis
 - POST /v1/security/pii-scan
 - POST /v1/web/analyze

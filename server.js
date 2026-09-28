@@ -660,7 +660,7 @@ app.get('/llms.txt', function(_req, res) {
 - [Enterprise procurement](/enterprise): Bulk workload and procurement information.
 
 Low-friction paid canaries:
-- POST /v1/base/network-status — $0.005 USDC — live Base mainnet block height, gas price and chain ID.
+- GET or POST /v1/base/network-status — $0.005 USDC — live Base mainnet block height, gas price and chain ID.
 - POST /v1/market/crypto-price — $0.01 USDC — live USD crypto spot price.
 
 High-value paid work:
@@ -713,7 +713,7 @@ $1 per successful work unit. A batch with N valid jobs requires exactly $N.
 
 ## Low-friction paid canaries
 
-- POST /v1/base/network-status — $0.005 USDC
+- GET or POST /v1/base/network-status — $0.005 USDC
 - POST /v1/market/crypto-price — $0.01 USDC
 
 ## Specialized $1 endpoints
@@ -816,6 +816,34 @@ app.get('/', function(_req, res) {
 
 app.get('/health', function(_req, res) {
   res.json({ ok: true, activeAgentPopulation: TOTAL_AGENTS, requestsSinceBoot: requestsSinceBoot });
+});
+
+let market402SelfTestCache = { checkedAt: null, status: null, body: null };
+app.get('/v1/diagnostics/market402-selftest', async function(_req, res) {
+  const now = Date.now();
+  const checked = market402SelfTestCache.checkedAt ? Date.parse(market402SelfTestCache.checkedAt) : 0;
+  if (!checked || now - checked > 10 * 60 * 1000) {
+    try {
+      const response = await fetch('https://market402.com/selftest', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ url: PUBLIC_BASE + '/v1/base/network-status' })
+      });
+      const body = await response.json().catch(async () => ({ raw: await response.text().catch(() => '') }));
+      market402SelfTestCache = {
+        checkedAt: new Date().toISOString(),
+        status: response.status,
+        body
+      };
+    } catch (error) {
+      market402SelfTestCache = {
+        checkedAt: new Date().toISOString(),
+        status: 0,
+        body: { error: error instanceof Error ? error.message : String(error) }
+      };
+    }
+  }
+  res.status(200).json(market402SelfTestCache);
 });
 
 app.get('/v1/pool/status', async function(_req, res) {
@@ -1367,10 +1395,12 @@ app.get('/.well-known/x402', function(_req, res) {
 app.get('/openapi.json', function(req, res) {
   const paths = {};
   for (const item of routeMeta) {
-    paths[item.path] = {
-      post: {
-        summary: item.description,
-        description: 'x402-paid endpoint. Price: ' + item.price + ' USDC on Base.',
+    const method = item.method.toLowerCase();
+    if (!paths[item.path]) paths[item.path] = {};
+    paths[item.path][method] = {
+      summary: item.description,
+      description: 'x402-paid endpoint. Price: ' + item.price + ' USDC on Base.',
+      ...(method === 'get' ? {} : {
         requestBody: {
           required: true,
           content: {
@@ -1378,17 +1408,17 @@ app.get('/openapi.json', function(req, res) {
               schema: { type: 'object', additionalProperties: true }
             }
           }
-        },
-        responses: {
-          '200': { description: 'Paid result' },
-          '402': { description: 'x402 Payment Required' }
-        },
-        'x-payment-info': {
-          protocol: 'x402',
-          price: item.price,
-          network: NETWORK,
-          payTo: PAY_TO
         }
+      }),
+      responses: {
+        '200': { description: 'Paid result' },
+        '402': { description: 'x402 Payment Required' }
+      },
+      'x-payment-info': {
+        protocol: 'x402',
+        price: item.price,
+        network: NETWORK,
+        payTo: PAY_TO
       }
     };
   }
@@ -1866,7 +1896,7 @@ async function submitToMarket402() {
         declared_price_usd: 0.005,
         paid_probe_optin: true,
         sample_input: {
-          method: 'POST',
+          method: 'GET',
           body: {}
         }
       })

@@ -2337,3 +2337,30 @@ async function runA2A402BidOnce() {
 setTimeout(() => {
   runA2A402BidOnce().catch(error => console.error('A2A402_BID_ERROR ' + (error instanceof Error ? error.message : String(error))));
 }, 18000);
+
+
+async function checkA2A402ProgressOnce() {
+  const agentId = process.env.A2A402_AGENT_ID;
+  const authToken = process.env.A2A402_AUTH_TOKEN;
+  if (!agentId || !authToken) return;
+  const base = 'https://a2a402.market';
+  const jobId = 'job_225d355a-0659-4676-9bfb-c6b27e7fe069';
+  const bidId = 'bid_8de75bee-3ef4-4f65-8caa-50e188014719';
+  try {
+    const bidsRes = await fetch(base + '/jobs/' + encodeURIComponent(jobId) + '/bids');
+    const bids = await bidsRes.json().catch(() => []);
+    const mine = Array.isArray(bids) ? bids.find(b => b.id === bidId) : null;
+    console.log('A2A402_PROGRESS ' + JSON.stringify({ status: bidsRes.status, bid: mine || null }).slice(0, 12000));
+    const contractId = mine?.contractId || null;
+    if (!contractId) return;
+    const headers = { authorization: 'Bearer ' + authToken, 'x-agent-id': agentId };
+    const cr = await fetch(base + '/contracts/' + encodeURIComponent(contractId), { headers });
+    const cb = await cr.json().catch(() => ({}));
+    console.log('A2A402_CONTRACT ' + JSON.stringify({ status: cr.status, response: cb }).slice(0, 16000));
+  } catch (error) {
+    console.error('A2A402_PROGRESS_ERROR ' + (error instanceof Error ? error.message : String(error)));
+  }
+}
+setTimeout(() => {
+  checkA2A402ProgressOnce().catch(error => console.error('A2A402_PROGRESS_ERROR ' + (error instanceof Error ? error.message : String(error))));
+}, 7000);

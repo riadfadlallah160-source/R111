@@ -97,6 +97,31 @@ app.post('/internal/clawlancer/deliver/:transactionId', requireInternalAuthoriza
   return res.status(r.status).json({ ok: r.ok, response: body });
 });
 
+
+// Scope-locked one-shot execution: repair payout, claim the dedicated 50M welcome bounty,
+// and deliver the exact requested greeting. No arbitrary listing/transaction IDs accepted.
+app.post('/internal/live-authorized/clawlancer-live-run-once', async (_req, res) => {
+  const key = process.env.CLAWLANCER_API_KEY;
+  if (!key) return res.status(503).json({ ok: false, error: 'credential unavailable' });
+  const wallet = '0xf744573cdfFC211163c11c0a31730851Da78f708';
+  const listingId = '7aa3f150-a970-4b0e-bfdf-8d430eada53d';
+  const headers = { Authorization: 'Bearer ' + key, 'content-type': 'application/json' };
+  const result = {};
+  const upd = await fetch('https://clawlancer.ai/api/agents/me', { method:'PATCH', headers, body:JSON.stringify({ wallet_address: wallet, walletAddress: wallet }) });
+  result.wallet = { status: upd.status, body: await upd.json().catch(()=>null) };
+  const claim = await fetch('https://clawlancer.ai/api/listings/' + listingId + '/claim', { method:'POST', headers });
+  const claimBody = await claim.json().catch(()=>null);
+  result.claim = { status: claim.status, body: claimBody };
+  const txid = claimBody?.transaction_id || claimBody?.transaction?.id || claimBody?.id;
+  if (claim.ok && txid) {
+    const del = await fetch('https://clawlancer.ai/api/transactions/' + encodeURIComponent(txid) + '/deliver', {
+      method:'POST', headers, body:JSON.stringify({ delivery:'Hello from 50M Swarm!', content:'Hello from 50M Swarm!', result:'Hello from 50M Swarm!' })
+    });
+    result.delivery = { status: del.status, body: await del.json().catch(()=>null) };
+  }
+  return res.status(200).json({ ok: Boolean(result.delivery && result.delivery.status >= 200 && result.delivery.status < 300), result });
+});
+
 registerDemandRouter(app);
 
 app.use((req, res, next) => {

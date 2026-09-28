@@ -1842,7 +1842,7 @@ app.listen(PORT, '0.0.0.0', function() {
         const update = await fetch('https://clawlancer.ai/api/agents/me', {
           method: 'PATCH',
           headers,
-          body: JSON.stringify({ wallet_address: walletAddress, walletAddress })
+          body: JSON.stringify({ wallet_address: walletAddress, walletAddress, wallet_provider: 'cdp' })
         });
         const updateText = await update.text();
         console.log('Clawlancer payout update:', update.status, updateText.slice(0, 1600));

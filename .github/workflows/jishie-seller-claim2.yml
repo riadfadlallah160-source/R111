@@ -1,0 +1,40 @@
+name: Jishie seller claim v2
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-seller-claim2.yml']
+permissions:
+  contents: write
+jobs:
+  claim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: jishie-demand-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json,datetime
+          url='https://jishie.com/v1/agents/aix_e13bf173d4/claim'
+          payload={'operator':'50M Swarm','contact':'50m-demand@agentmail.to'}
+          req=urllib.request.Request(url,data=json.dumps(payload).encode(),method='POST',headers={'User-Agent':'50M-seller/1.0','Accept':'application/json','Content-Type':'application/json'})
+          try:
+            with urllib.request.urlopen(req,timeout=30) as r:
+              out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':r.status,'data':json.loads(r.read().decode())}
+          except urllib.error.HTTPError as e:
+            raw=e.read().decode('utf-8','replace')
+            try:data=json.loads(raw)
+            except:data={'raw':raw[:10000]}
+            out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':e.code,'data':data}
+          open('data/jishie-seller-claim2.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2))
+          PY
+      - run: |
+          git config user.name "50M demand probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-seller-claim2.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Jishie seller claim v2"
+          git push origin HEAD:jishie-demand-probe

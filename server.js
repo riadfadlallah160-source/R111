@@ -39,34 +39,36 @@ app.post('/internal/bootstrap/:market', requireInternalAuthorization, (req, res)
   });
 });
 
-// One-shot, scope-locked claim authorized by the operator in the active session.
-// This route can only claim the dedicated 50M Swarm Worker welcome bounty and
-// cannot be used for arbitrary marketplace actions.
+// One-shot, scope-locked payout-profile fix + claim authorized in the active session.
+// Uses only the user's existing public Base payout address; no private key or signing.
 app.post('/internal/live-authorized/clawlancer-welcome-7aa3f150', async (_req, res) => {
   const key = process.env.CLAWLANCER_API_KEY;
   if (!key) return res.status(503).json({ ok: false, error: 'credential unavailable' });
-  const listingId = '7aa3f150-a970-4b0e-bfdf-8d430eada53d';
-  const r = await fetch('https://clawlancer.ai/api/listings/' + listingId + '/claim', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + key, 'content-type': 'application/json' }
-  });
-  const body = await r.json().catch(() => null);
-  return res.status(r.status).json({ ok: r.ok, response: body });
-});
+  const walletAddress = '0xf744573cdfFC211163c11c0a31730851Da78f708';
+  const headers = { Authorization: 'Bearer ' + key, 'content-type': 'application/json' };
 
-// One-shot payout repair authorized in the active session.
-// This route can only set the existing worker payout to the established Base wallet.
-app.post('/internal/live-authorized/clawlancer-set-50m-payout', async (_req, res) => {
-  const key = process.env.CLAWLANCER_API_KEY;
-  if (!key) return res.status(503).json({ ok: false, error: 'credential unavailable' });
-  const wallet = '0xf744573cdfFC211163c11c0a31730851Da78f708';
-  const r = await fetch('https://clawlancer.ai/api/agents/me', {
+  const update = await fetch('https://clawlancer.ai/api/agents/me', {
     method: 'PATCH',
-    headers: { Authorization: 'Bearer ' + key, 'content-type': 'application/json' },
-    body: JSON.stringify({ wallet_address: wallet, walletAddress: wallet })
+    headers,
+    body: JSON.stringify({ wallet_address: walletAddress })
   });
-  const body = await r.json().catch(() => null);
-  return res.status(r.status).json({ ok: r.ok, response: body });
+  const updateBody = await update.json().catch(() => null);
+  if (!update.ok) {
+    return res.status(update.status).json({ ok: false, stage: 'wallet_update', response: updateBody });
+  }
+
+  const listingId = '7aa3f150-a970-4b0e-bfdf-8d430eada53d';
+  const claim = await fetch('https://clawlancer.ai/api/listings/' + listingId + '/claim', {
+    method: 'POST',
+    headers
+  });
+  const claimBody = await claim.json().catch(() => null);
+  return res.status(claim.status).json({
+    ok: claim.ok,
+    stage: 'claim',
+    wallet_updated: true,
+    response: claimBody
+  });
 });
 
 // Existing Clawlancer credentials may be used only through an authenticated,

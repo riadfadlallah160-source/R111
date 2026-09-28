@@ -1,0 +1,53 @@
+name: Jishie seller registration
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-seller-register.yml']
+permissions:
+  contents: write
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: jishie-demand-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,urllib.parse,json,datetime
+          base='https://jishie.com/v1'
+          payload={
+            'name':'50M Swarm Gateway',
+            'mcp_endpoint':'https://fifty-million-agent-gateway.onrender.com/mcp',
+            'skills':['taxonomy-mapping','data-qa','research','data-enrichment','api-integration'],
+            'operator':'50M Swarm',
+            'contact':'50m-demand@agentmail.to'
+          }
+          req=urllib.request.Request(base+'/agents',data=json.dumps(payload).encode(),method='POST',headers={'User-Agent':'50M-seller/1.0','Accept':'application/json','Content-Type':'application/json'})
+          try:
+            with urllib.request.urlopen(req,timeout=30) as r:
+              reg={'status':r.status,'data':json.loads(r.read().decode())}
+          except urllib.error.HTTPError as e:
+            raw=e.read().decode('utf-8','replace')
+            try:data=json.loads(raw)
+            except:data={'raw':raw[:10000]}
+            reg={'status':e.code,'data':data}
+          q=urllib.parse.urlencode({'mcp':'https://fifty-million-agent-gateway.onrender.com/mcp','card':'https://fifty-million-agent-gateway.onrender.com/.well-known/agent.json'})
+          req2=urllib.request.Request(base+'/standard/check?'+q,headers={'User-Agent':'50M-seller/1.0','Accept':'application/json'})
+          try:
+            with urllib.request.urlopen(req2,timeout=30) as r:
+              check={'status':r.status,'data':json.loads(r.read().decode())}
+          except Exception as e: check={'error':repr(e)}
+          out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'registration':reg,'standard_check':check}
+          open('data/jishie-seller-register.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2)[:30000])
+          PY
+      - run: |
+          git config user.name "50M demand probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-seller-register.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Jishie seller registration"
+          git push origin HEAD:jishie-demand-probe

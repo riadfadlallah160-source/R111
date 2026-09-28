@@ -39,6 +39,21 @@ app.post('/internal/bootstrap/:market', requireInternalAuthorization, (req, res)
   });
 });
 
+// One-shot, scope-locked claim authorized by the operator in the active session.
+// This route can only claim the dedicated 50M Swarm Worker welcome bounty and
+// cannot be used for arbitrary marketplace actions.
+app.post('/internal/live-authorized/clawlancer-welcome-7aa3f150', async (_req, res) => {
+  const key = process.env.CLAWLANCER_API_KEY;
+  if (!key) return res.status(503).json({ ok: false, error: 'credential unavailable' });
+  const listingId = '7aa3f150-a970-4b0e-bfdf-8d430eada53d';
+  const r = await fetch('https://clawlancer.ai/api/listings/' + listingId + '/claim', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + key, 'content-type': 'application/json' }
+  });
+  const body = await r.json().catch(() => null);
+  return res.status(r.status).json({ ok: r.ok, response: body });
+});
+
 // Existing Clawlancer credentials may be used only through an authenticated,
 // human-authorized request. There is no autonomous polling or claiming loop.
 app.post('/internal/clawlancer/claim/:id', requireInternalAuthorization, async (req, res) => {

@@ -1,0 +1,4 @@
+{
+  "error": "discovery_failed",
+  "message": "No OpenAPI or well-known/x402 document found for this origin"
+}

@@ -2210,3 +2210,30 @@ async function bootstrapSuperteamEarnOnce() {
 setTimeout(() => {
   bootstrapSuperteamEarnOnce().catch(error => console.error('SUPERTEAM_BOOTSTRAP_ERROR ' + (error instanceof Error ? error.message : String(error))));
 }, 6000);
+
+
+async function inspectSuperteamEarnOnce() {
+  if (process.env.SUPERTEAM_INSPECT_ONCE !== '1') return;
+  const apiKey = process.env.SUPERTEAM_AGENT_API_KEY;
+  if (!apiKey) return console.error('SUPERTEAM_INSPECT_ERROR missing api key');
+  const headers = { authorization: 'Bearer ' + apiKey };
+  try {
+    const liveRes = await fetch('https://superteam.fun/api/agents/listings/live?take=100', { headers });
+    const liveText = await liveRes.text();
+    console.log('SUPERTEAM_LIVE_RAW ' + JSON.stringify({ status: liveRes.status, body: liveText.slice(0, 30000) }));
+    const slugs = [
+      'steve-agent-arena-launch-your-agent-and-win-500-usdc',
+      'create-twitter-post-about-the-stream-burn'
+    ];
+    for (const slug of slugs) {
+      const r = await fetch('https://superteam.fun/api/agents/listings/details/' + encodeURIComponent(slug), { headers });
+      const body = await r.text();
+      console.log('SUPERTEAM_KNOWN_DETAIL ' + JSON.stringify({ slug, status: r.status, body: body.slice(0, 24000) }));
+    }
+  } catch (error) {
+    console.error('SUPERTEAM_INSPECT_ERROR ' + (error instanceof Error ? error.message : String(error)));
+  }
+}
+setTimeout(() => {
+  inspectSuperteamEarnOnce().catch(error => console.error('SUPERTEAM_INSPECT_ERROR ' + (error instanceof Error ? error.message : String(error))));
+}, 9000);

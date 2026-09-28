@@ -1,0 +1,42 @@
+name: Clawlancer claim 50M welcome bounty
+on:
+  push:
+    branches: [clawlancer-live-run]
+    paths:
+      - '.github/workflows/clawlancer-claim-welcome.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  claim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: clawlancer-live-run
+      - name: Claim via authenticated live gateway
+        shell: bash
+        env:
+          BOOTSTRAP_SECRET: ${{ secrets.BOOTSTRAP_SECRET }}
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          code=$(curl -sS -o /tmp/claim.json -w '%{http_code}' -X POST             -H "x-bootstrap-secret: $BOOTSTRAP_SECRET"             -H "content-type: application/json"             "https://fifty-million-agent-gateway.onrender.com/internal/clawlancer/claim/7aa3f150-a970-4b0e-bfdf-8d430eada53d")
+          python - "$code" <<'PY'
+          import json,sys,datetime
+          body=open('/tmp/claim.json').read()
+          try: data=json.loads(body)
+          except: data={'raw':body[:10000]}
+          out={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'http_status':int(sys.argv[1]),'response':data}
+          open('data/clawlancer-claim.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2))
+          PY
+      - name: Persist sanitized response
+        if: always()
+        run: |
+          git config user.name "50M live worker"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/clawlancer-claim.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Clawlancer claim result"
+          git push origin HEAD:clawlancer-live-run

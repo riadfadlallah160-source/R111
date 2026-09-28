@@ -1,0 +1,62 @@
+name: Revenue distribution live
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/revenue-distribution-live.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Register seller and audit Base USDC
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import json, urllib.request, datetime
+          origin='https://fifty-million-agent-gateway.onrender.com'
+          out={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'actions':[]}
+          def post(url,obj):
+            data=json.dumps(obj).encode()
+            req=urllib.request.Request(url,data=data,method='POST',headers={'content-type':'application/json','user-agent':'50M-Revenue-Distribution/1.0'})
+            try:
+              with urllib.request.urlopen(req,timeout=30) as r:
+                body=r.read().decode('utf-8','replace')
+                try: body=json.loads(body)
+                except: pass
+                return {'url':url,'status':r.status,'body':body}
+            except urllib.error.HTTPError as e:
+              body=e.read().decode('utf-8','replace')
+              try: body=json.loads(body)
+              except: pass
+              return {'url':url,'status':e.code,'body':body}
+            except Exception as e:
+              return {'url':url,'error':repr(e)}
+          out['actions'].append(post('https://agent402.tools/api/index/register',{'origin':origin}))
+          out['actions'].append(post('https://market402.com/submit',{'url':origin+'/v1/base/network-status'}))
+          # Read Base USDC balance via public JSON-RPC eth_call balanceOf(address)
+          wallet='f744573cdffc211163c11c0a31730851da78f708'
+          selector='70a08231'
+          data='0x'+selector+('0'*24)+wallet
+          rpc=post('https://mainnet.base.org',{'jsonrpc':'2.0','id':1,'method':'eth_call','params':[{'to':'0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913','data':data},'latest']})
+          if isinstance(rpc.get('body'),dict) and rpc['body'].get('result'):
+            try: rpc['usdc_balance']=int(rpc['body']['result'],16)/1_000_000
+            except: pass
+          out['actions'].append(rpc)
+          open('data/revenue-distribution-live.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2))
+          PY
+      - name: Persist evidence
+        run: |
+          git config user.name "50M revenue worker"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/revenue-distribution-live.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record live seller registration and wallet audit"
+          git push origin HEAD:main

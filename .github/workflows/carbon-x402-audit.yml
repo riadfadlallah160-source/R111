@@ -1,0 +1,38 @@
+name: Carbon x402 compatibility audit
+on:
+  push:
+    branches: [carbon-x402-audit]
+    paths: ['.github/workflows/carbon-x402-audit.yml']
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: carbon-x402-audit
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run public non-paying OpenDexter audition
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p data
+          timeout 600 npx -y @dexterai/opendexter audition https://api.carbon-cashmere.de --json > data/carbon-audit.json 2> data/carbon-audit.stderr || true
+          echo "stdout bytes: $(wc -c < data/carbon-audit.json)"
+          echo "stderr bytes: $(wc -c < data/carbon-audit.stderr)"
+          head -c 40000 data/carbon-audit.json || true
+          echo
+          head -c 10000 data/carbon-audit.stderr || true
+      - name: Persist
+        if: always()
+        run: |
+          git config user.name "50M x402 audit"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/carbon-audit.json data/carbon-audit.stderr
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Carbon x402 compatibility audit"
+          git push origin HEAD:carbon-x402-audit

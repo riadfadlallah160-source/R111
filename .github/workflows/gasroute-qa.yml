@@ -13,7 +13,7 @@ jobs:
       - name: Verify live preview
         run: |
           set -euo pipefail
-          curl --fail --show-error --silent --retry 5 --retry-delay 5 'https://fifty-million-agent-gateway.onrender.com/v1/market/gasroute-oracle-preview?chain_set=ethereum%2Cbsc%2Cpolygon&calldata_size_bytes=128&gas_units_est=100000' | tee /tmp/preview.json
+          curl --show-error --silent --retry 2 --retry-delay 2 'https://fifty-million-agent-gateway.onrender.com/v1/market/gasroute-oracle-preview?chain_set=ethereum%2Cbsc%2Cpolygon&calldata_size_bytes=128&gas_units_est=100000' | tee /tmp/preview.json
           python -c "import json; d=json.load(open('/tmp/preview.json')); assert d['preview'] is True; assert d['chain'] in {'ethereum','bsc','polygon'}; assert isinstance(d['fee_usd'],(int,float)) and d['fee_usd']>=0; assert len(d['quotes'])>=2; assert all(q['gas_price_wei'] for q in d['quotes']); print('PREVIEW_OK',json.dumps(d,separators=(',',':')))"
       - name: Verify x402 challenge
         run: |

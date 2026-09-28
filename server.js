@@ -1379,6 +1379,12 @@ app.get('/.well-known/x402', function(_req, res) {
   });
 });
 
+let noHumansClaimProof = null;
+app.get('/.well-known/nohumans-claim', function(_req, res) {
+  if (!noHumansClaimProof) return res.status(404).type('text/plain').send('claim proof not active');
+  res.type('text/plain').send(noHumansClaimProof);
+});
+
 app.get('/openapi.json', function(req, res) {
   const paths = {};
   for (const item of routeMeta) {
@@ -1920,6 +1926,72 @@ async function registerWithNoHumans() {
   }
 }
 
+
+async function repairNoHumansListing() {
+  const listingId = 'b554db98-c7d';
+  const apiBase = 'https://api.nohumans.directory/v1/listings/' + listingId;
+  try {
+    const currentResp = await fetch('https://nohumans.directory/v1/listings/' + listingId);
+    const current = await currentResp.json().catch(() => null);
+    if (currentResp.ok && current && current.facilitator_url === FACILITATOR) {
+      console.log('nohumans facilitator metadata already current');
+      return;
+    }
+
+    const challengeResp = await fetch(apiBase + '/claim/challenge', { method: 'POST' });
+    const challenge = await challengeResp.json().catch(() => null);
+    if (!challengeResp.ok || !challenge) {
+      console.error('nohumans claim challenge failed:', challengeResp.status, JSON.stringify(challenge).slice(0, 600));
+      return;
+    }
+    const challengeToken =
+      challenge.challenge_token || challenge.challengeToken || challenge.challenge ||
+      challenge.token || challenge.proof_token || challenge.proofToken;
+    if (!challengeToken || typeof challengeToken !== 'string') {
+      console.error('nohumans claim challenge returned no usable token; keys:', Object.keys(challenge || {}));
+      return;
+    }
+
+    noHumansClaimProof = challengeToken;
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
+    const claimResp = await fetch(apiBase + '/claim', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: '50m-demand@agentmail.to' })
+    });
+    const claim = await claimResp.json().catch(() => null);
+    if (!claimResp.ok || !claim) {
+      console.error('nohumans ownership claim failed:', claimResp.status, JSON.stringify(claim).slice(0, 600));
+      noHumansClaimProof = null;
+      return;
+    }
+    const editToken =
+      claim.claim_token || claim.claimToken || claim.edit_token || claim.editToken ||
+      claim.token || claim.private_token || claim.privateToken;
+    if (!editToken || typeof editToken !== 'string') {
+      console.error('nohumans ownership claim returned no edit token; keys:', Object.keys(claim || {}));
+      noHumansClaimProof = null;
+      return;
+    }
+
+    const patchResp = await fetch(apiBase, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        'x-claim-token': editToken
+      },
+      body: JSON.stringify({ facilitator_url: FACILITATOR })
+    });
+    const patchText = await patchResp.text();
+    console.log('nohumans facilitator repair:', patchResp.status, patchText.slice(0, 800));
+    noHumansClaimProof = null;
+  } catch (error) {
+    noHumansClaimProof = null;
+    console.error('nohumans facilitator repair failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithX402Dash() {
   try {
     const response = await fetch('https://api.x402dash.com/v1/register', {
@@ -2010,6 +2082,9 @@ app.listen(PORT, '0.0.0.0', function() {
     setTimeout(() => {
       registerWithNoHumans().catch(error => console.error('nohumans live registration failed:', error instanceof Error ? error.message : String(error)));
     }, 3200);
+    setTimeout(() => {
+      repairNoHumansListing().catch(error => console.error('nohumans facilitator repair scheduling failed:', error instanceof Error ? error.message : String(error)));
+    }, 5200);
     setTimeout(() => {
       registerWithTrue402().catch(error => console.error('true402 live registration failed:', error instanceof Error ? error.message : String(error)));
     }, 2200);

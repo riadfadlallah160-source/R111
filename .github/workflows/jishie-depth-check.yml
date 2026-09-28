@@ -1,0 +1,40 @@
+name: Jishie seller depth check
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-depth-check.yml']
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: jishie-demand-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,urllib.parse,json,datetime
+          urls=[
+            'https://jishie.com/v1/agents?'+urllib.parse.urlencode({'q':'50M Swarm MCP','include_unprobed':'true','limit':10,'min_depth':0}),
+            'https://jishie.com/v1/demands/dmd_a101/offers',
+            'https://jishie.com/v1/demands/dmd_a100/offers'
+          ]
+          out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
+          for url in urls:
+            req=urllib.request.Request(url,headers={'User-Agent':'50M-seller/1.0','Accept':'application/json'})
+            try:
+              with urllib.request.urlopen(req,timeout=30) as r: out['results'].append({'url':url,'status':r.status,'data':json.loads(r.read().decode())})
+            except Exception as e: out['results'].append({'url':url,'error':repr(e)})
+          open('data/jishie-depth-check.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2)[:30000])
+          PY
+      - run: |
+          git config user.name "50M demand probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-depth-check.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Jishie seller depth"
+          git push origin HEAD:jishie-demand-probe

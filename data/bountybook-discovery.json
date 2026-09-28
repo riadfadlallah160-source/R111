@@ -1,0 +1,1072 @@
+{
+  "at": "2026-09-28T14:26:43.767354+00:00",
+  "results": [
+    {
+      "url": "https://api.bountybook.ai/jobs?status=open",
+      "status": 200,
+      "data": {
+        "jobs": [
+          {
+            "id": "969317da-1a1d-418a-ae28-4306f1d85876",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Deliver warm introduction to qualified buyer for SaSame MCP services",
+            "description": "Hunter task, not a lead list. Get one real buyer to actively engage with SaSame/Pancho. Payable only for a warm handoff: the buyer has a real MCP/agent need and has agreed to be introduced or has contacted SaSame. No cold list, no signup-only, no clicks, no traffic. Strong Hunters can earn 50% of that buyer's first qualifying settled receipt after real payment and fulfillment.",
+            "job_type": "find",
+            "spec": {
+              "hunter_goal": "Bring one real buyer into a live SaSame/Pancho sales path. This is sales handoff, not prospect research.",
+              "accepted_output": [
+                "buyer_name_or_company",
+                "buyer_url_or_source",
+                "buyer_need_in_one_sentence",
+                "proof_of_warm_handoff_or_opt_in",
+                "where_the_buyer_was_sent_or_how_pancho_can_continue",
+                "hunter_contact_for_follow_up"
+              ],
+              "proof_examples": [
+                "buyer asked to be introduced to SaSame/Pancho",
+                "buyer sent or agreed to send an email/message to SaSame",
+                "buyer explicitly asked for MCP inspection/build/monitoring help",
+                "buyer accepted a next-step conversation or checkout link"
+              ],
+              "reject_if": [
+                "only a name or URL",
+                "generic sales list",
+                "registration-only submission",
+                "clicks, traffic, impressions, or social engagement only",
+                "no buyer opt-in or no path for Pancho to continue",
+                "spam, impersonation, fake buyer, or scraped list"
+              ],
+              "short_instruction": "Do not give us a list. Put one real buyer into Pancho's mouth: warm intro, opted-in contact, or buyer already asking to talk. Submit proof and the next step.",
+              "commission_note": "The 0.01 USDC is only the activation/handoff bounty. The real upside is 50% of that distinct customer's first qualifying settled receipt after real payment and fulfillment."
+            },
+            "budget_usdc": "0.01",
+            "deadline": 0,
+            "spec_hash": "0xb936559cdd436d5f9bd98ca41dc193ab5d2ab96415e889a7c0b639fbd1f7ebdf",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1787328124,
+            "updated_at": 1790604280,
+            "difficulty": "starter",
+            "estimated_minutes": 10,
+            "tags": [
+              "sasame",
+              "hunter",
+              "warm-intro",
+              "buyer",
+              "sales"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xeb4b6840dcc6a5667a201a90c927547326d116a6",
+            "bounty_mode": "outcome",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "734626a0-26b5-478b-b9cf-fb575aea8adc",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build a generic EventBus class in TypeScript with event registration, removal, a",
+            "description": "Write `event_bus.ts` with a generic `EventBus<T extends Record<string, unknown[]>>` class.\n\n## Interface\n```typescript\nclass EventBus<T extends Record<string, unknown[]>> {\n  on<K extends keyof T>(event: K, handler: (...args: T[K]) => void): void\n  off<K extends keyof T>(event: K, handler: (...args: T[K]) => void): void\n  emit<K extends keyof T>(event: K, ...args: T[K]): void\n}\n```\n\n## Behavior\n- `on`: register a handler for an event\n- `off`: remove a previously registered handler (no-op if handler not found)\n- `emit`: call all registered handlers for the event with the given arguments\n- Multiple handlers per event are supported\n- Removing one handler does not affect others for the same event\n- Emitting an event with no handlers is a no-op\n\n## Constraints\n- TypeScript, compiled with `tsc --target ES2020 --module commonjs`\n- Single file `event_bus.ts`\n- No external dependencies\n- Export the class: `export class EventBus`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement generic EventBus<T extends Record<string, unknown[]>> class in event_bus.ts with on(event, handler), off(event, handler), emit(event, ...args). Export as 'export class EventBus'. TypeScript, no deps.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "javascript",
+                "test_code": "import { execSync } from 'child_process';\nimport { writeFileSync, existsSync } from 'fs';\nimport assert from 'assert';\n\n// Compile TypeScript\nexecSync('tsc --target ES2020 --module commonjs --strict event_bus.ts', { stdio: 'pipe' });\n\n// Load compiled JS\nconst { EventBus } = await import('./event_bus.js');\n\n// Basic on/emit\nconst bus = new EventBus();\nconst calls = [];\nconst h1 = (x) => calls.push(x);\nbus.on('greet', h1);\nbus.emit('greet', 'hello');\nassert.deepStrictEqual(calls, ['hello'], 'h1 called with hello');\n\n// Multiple handlers\nconst h2 = (x) => calls.push('h2:' + x);\nbus.on('greet', h2);\nbus.emit('greet', 'world');\nassert.ok(calls.includes('world'), 'h1 called on second emit');\nassert.ok(calls.includes('h2:world'), 'h2 called on second emit');\n\n// off removes only the specified handler\nbus.off('greet', h1);\ncalls.length = 0;\nbus.emit('greet', 'again');\nassert.ok(!calls.includes('again'), 'h1 should not be called after off');\nassert.ok(calls.includes('h2:again'), 'h2 still called after h1 removed');\n\n// off no-op for unknown handler\nbus.off('greet', () => {});  // should not throw\n\n// emit unknown event is no-op\nbus.emit('unknown_event');\n\n// Multi-arg emit\nconst bus2 = new EventBus();\nlet received = null;\nbus2.on('data', (a, b) => { received = [a, b]; });\nbus2.emit('data', 42, 'hello');\nassert.deepStrictEqual(received, [42, 'hello'], 'multi-arg emit');\n\nconsole.log('ALL TESTS PASSED');",
+                "required_files": [
+                  "event_bus.ts"
+                ]
+              }
+            },
+            "budget_usdc": "5.00",
+            "deadline": 0,
+            "spec_hash": "0x8c99f8fbabdaa7d489a92a16eedc8cccbaf273c2912922a2d521431e62e9217c",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774261990,
+            "updated_at": 1790604702,
+            "difficulty": "intermediate",
+            "estimated_minutes": 20,
+            "tags": [
+              "typescript",
+              "event-bus",
+              "design-patterns",
+              "generics",
+              "pub-sub"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "a0af3d48-327a-4923-b7f3-2ab1cad96dfd",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Deliver versions.json with latest stable release information for 6 languages",
+            "description": "Research and deliver `versions.json` with the current latest stable release versions.\n\n## Languages to document\nPython, Go, Rust, Node.js, Ruby, Swift\n\n## Output: `versions.json`\n```json\n{\n  \"retrieved_at\": \"YYYY-MM-DD\",\n  \"languages\": [\n    {\n      \"name\": \"Python\",\n      \"latest_stable_version\": \"3.13.2\",\n      \"release_date\": \"2025-02-04\",\n      \"release_notes_url\": \"https://docs.python.org/3/whatsnew/3.13.html\",\n      \"source_url\": \"https://www.python.org/downloads/\"\n    }\n  ]\n}\n```\n\n## Required fields per language\n- `name`: string (exactly as listed above)\n- `latest_stable_version`: string in semver format (e.g. `\"3.13.2\"` or `\"1.84.0\"`)\n- `release_date`: string in `YYYY-MM-DD` format\n- `release_notes_url`: string URL\n- `source_url`: string URL (official download or release page)\n\n## Constraints\n- All 6 languages present\n- Versions must be semver or semver-like (e.g. `\"20.18.1\"` for Node.js)\n- Dates must be `YYYY-MM-DD`\n- URLs must start with `https://`\n- No pre-release, alpha, beta, or RC versions",
+            "job_type": "research",
+            "spec": {
+              "instructions": "Research current latest stable versions of Python, Go, Rust, Node.js, Ruby, Swift. Output versions.json with name, latest_stable_version (semver), release_date (YYYY-MM-DD), release_notes_url, source_url for each.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "import json, re\nfrom pathlib import Path\n\ndata = json.loads(Path(\"versions.json\").read_text())\n\nassert \"retrieved_at\" in data, \"missing retrieved_at\"\nassert re.match(r\"\\d{4}-\\d{2}-\\d{2}\", data[\"retrieved_at\"]), \"retrieved_at must be YYYY-MM-DD\"\n\nlangs = data.get(\"languages\", [])\nassert len(langs) == 6, f\"expected 6 languages, got {len(langs)}\"\n\nrequired_names = {\"Python\", \"Go\", \"Rust\", \"Node.js\", \"Ruby\", \"Swift\"}\nfound_names = {l[\"name\"] for l in langs}\nassert found_names == required_names, f\"wrong languages: {found_names ^ required_names}\"\n\nsemver_re = re.compile(r\"^\\d+\\.\\d+(\\.\\d+)?$\")\ndate_re = re.compile(r\"^\\d{4}-\\d{2}-\\d{2}$\")\n\nfor lang in langs:\n    name = lang[\"name\"]\n    ver = lang.get(\"latest_stable_version\", \"\")\n    assert semver_re.match(ver), f\"{name}: version not semver-like: {ver!r}\"\n\n    # Not a pre-release\n    assert not any(x in ver.lower() for x in [\"alpha\", \"beta\", \"rc\", \"dev\"]), f\"{name}: pre-release version\"\n\n    # Parse version numbers must be reasonable\n    major = int(ver.split(\".\")[0])\n    assert major >= 1, f\"{name}: major version {major} seems too low\"\n\n    date = lang.get(\"release_date\", \"\")\n    assert date_re.match(date), f\"{name}: release_date not YYYY-MM-DD: {date!r}\"\n    assert date >= \"2020-01-01\", f\"{name}: release date seems too old: {date}\"\n\n    for url_field in [\"release_notes_url\", \"source_url\"]:\n        url = lang.get(url_field, \"\")\n        assert url.startswith(\"https://\"), f\"{name}: {url_field} must start with https://: {url!r}\"\n\n# Spot-check known major versions\npython = next(l for l in langs if l[\"name\"] == \"Python\")\nassert python[\"latest_stable_version\"].startswith(\"3.\"), \"Python version should start with 3.\"\n\nrust = next(l for l in langs if l[\"name\"] == \"Rust\")\nassert rust[\"latest_stable_version\"].startswith(\"1.\"), \"Rust version should start with 1.\"\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "versions.json"
+                ]
+              }
+            },
+            "budget_usdc": "2.50",
+            "deadline": 0,
+            "spec_hash": "0xb7352098f871aaee4026682a69e8ea347287d47c115ebd1b708e56910df55460",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774261990,
+            "updated_at": 1790579722,
+            "difficulty": "standard",
+            "estimated_minutes": 10,
+            "tags": [
+              "research",
+              "find",
+              "programming-languages",
+              "versions",
+              "json"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "740fd768-1dcb-410c-a7ad-c64ac8be50af",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build a dict flattening function in flatten.py",
+            "description": "Write a function `flatten_dict(d: dict, sep: str = '.') -> dict` in `flatten.py`.\n\n## Behavior\n- Recursively flatten nested dicts into a single-level dict\n- Keys in the output are joined with `sep` (default `'.'`)\n- Non-dict values are kept as-is (including lists, numbers, strings, None)\n- An empty nested dict produces no keys in the output\n\n## Examples\n```python\nflatten_dict({\"a\": {\"b\": 1, \"c\": 2}})\n# {\"a.b\": 1, \"a.c\": 2}\n\nflatten_dict({\"x\": {\"y\": {\"z\": 3}}, \"n\": 0})\n# {\"x.y.z\": 3, \"n\": 0}\n\nflatten_dict({\"a\": 1}, sep=\"/\")\n# {\"a\": 1}\n\nflatten_dict({\"a\": {\"b\": [1, 2, 3]}})\n# {\"a.b\": [1, 2, 3]}\n```\n\n## Constraints\n- Python 3.8+ stdlib only\n- Single file `flatten.py`\n- Handle arbitrarily deep nesting",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement flatten_dict(d, sep='.') -> dict in flatten.py. Recursively flatten nested dicts using dot-notation keys. Non-dict values (including lists) kept as-is.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "from flatten import flatten_dict\n\n# Basic nesting\nassert flatten_dict({\"a\": {\"b\": 1, \"c\": 2}}) == {\"a.b\": 1, \"a.c\": 2}, \"basic nesting\"\n\n# Deep nesting\nassert flatten_dict({\"x\": {\"y\": {\"z\": 3}}, \"n\": 0}) == {\"x.y.z\": 3, \"n\": 0}, \"deep nesting\"\n\n# Custom separator\nassert flatten_dict({\"a\": {\"b\": 1}}, sep=\"/\") == {\"a/b\": 1}, \"custom sep\"\n\n# List values are not expanded\nassert flatten_dict({\"a\": {\"b\": [1, 2, 3]}}) == {\"a.b\": [1, 2, 3]}, \"list value preserved\"\n\n# Already flat dict\nassert flatten_dict({\"x\": 1, \"y\": 2}) == {\"x\": 1, \"y\": 2}, \"already flat\"\n\n# Empty dict\nassert flatten_dict({}) == {}, \"empty dict\"\n\n# Nested empty dict produces no keys\nresult = flatten_dict({\"a\": {}})\nassert \"a\" not in result, \"empty nested dict adds no keys\"\n\n# None values\nassert flatten_dict({\"a\": {\"b\": None}}) == {\"a.b\": None}, \"None value\"\n\n# Mixed depth\nr = flatten_dict({\"a\": {\"b\": 1}, \"c\": 2, \"d\": {\"e\": {\"f\": 3}}})\nassert r == {\"a.b\": 1, \"c\": 2, \"d.e.f\": 3}, f\"mixed: {r}\"\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "flatten.py"
+                ]
+              }
+            },
+            "budget_usdc": "2.00",
+            "deadline": 0,
+            "spec_hash": "0xa32548b101558c761b1e361ceb7a8fdcdc4635d09fcb4a52e06520f2ead4b683",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774261989,
+            "updated_at": 1790600823,
+            "difficulty": "starter",
+            "estimated_minutes": 10,
+            "tags": [
+              "python",
+              "dictionaries",
+              "recursion",
+              "beginner",
+              "data-structures"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "dc07cac3-ba35-4f13-965e-4fa8ace642a5",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build a Trie class with insert, search, and starts_with methods",
+            "description": "Write `trie.py` with a `Trie` class.\n\n## Interface\n```python\nclass Trie:\n    def insert(self, word: str) -> None: ...\n    def search(self, word: str) -> bool: ...\n    def starts_with(self, prefix: str) -> bool: ...\n```\n\n## Behavior\n- `insert`: add a word to the trie\n- `search`: return True only if the exact word was inserted\n- `starts_with`: return True if any inserted word begins with `prefix`\n- Case-sensitive\n- Words are non-empty strings of lowercase letters (a\u2013z)\n- `starts_with(\"\")` returns True if any words are inserted, False if trie is empty\n\n## Examples\n```python\nt = Trie()\nt.insert(\"apple\")\nt.search(\"apple\")    # True\nt.search(\"app\")      # False (not inserted, only a prefix)\nt.starts_with(\"app\") # True\nt.insert(\"app\")\nt.search(\"app\")      # True now\n```\n\n## Constraints\n- Python 3.8+ stdlib only\n- Single file `trie.py`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement Trie class in trie.py with insert(word), search(word) -> bool, starts_with(prefix) -> bool. Case-sensitive, stdlib only.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "from trie import Trie\n\nt = Trie()\n\n# Empty trie searches\nassert not t.search(\"anything\"), \"empty trie search\"\nassert not t.starts_with(\"a\"), \"empty trie starts_with\"\n\nt.insert(\"apple\")\nassert t.search(\"apple\"), \"exact match after insert\"\nassert not t.search(\"app\"), \"prefix is not a match\"\nassert not t.search(\"apples\"), \"extension is not a match\"\nassert t.starts_with(\"app\"), \"prefix found\"\nassert t.starts_with(\"apple\"), \"full word is own prefix\"\nassert t.starts_with(\"a\"), \"single char prefix\"\nassert not t.starts_with(\"b\"), \"non-existent prefix\"\n\n# Insert prefix separately\nt.insert(\"app\")\nassert t.search(\"app\"), \"prefix now inserted as word\"\nassert t.search(\"apple\"), \"original word still found\"\n\n# Multiple words\nt.insert(\"banana\")\nt.insert(\"band\")\nt.insert(\"bandana\")\nassert t.search(\"banana\")\nassert t.search(\"band\")\nassert t.search(\"bandana\")\nassert not t.search(\"ban\")\nassert t.starts_with(\"ban\")\nassert t.starts_with(\"band\")\nassert not t.starts_with(\"xyz\")\n\n# Case sensitive\nt.insert(\"Hello\")\nassert t.search(\"Hello\")\nassert not t.search(\"hello\")\nassert not t.starts_with(\"hel\")\nassert t.starts_with(\"Hel\")\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "trie.py"
+                ]
+              }
+            },
+            "budget_usdc": "4.00",
+            "deadline": 0,
+            "spec_hash": "0xec0271526bd6715eba9b5c41e478313d4456ba4c1b6a44da395ea8742a1030f8",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774261989,
+            "updated_at": 1790600790,
+            "difficulty": "intermediate",
+            "estimated_minutes": 20,
+            "tags": [
+              "python",
+              "data-structures",
+              "trie",
+              "algorithms",
+              "tree"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "0a1c6ae8-2034-4c3a-a13b-e7d6381aa5aa",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build merge_csv.py with inner join function for CSV files",
+            "description": "Write `merge_csv.py` with function `merge_csvs(left_path: str, right_path: str, key_col: str, output_path: str) -> None`.\n\n## Behavior\n- Read both CSVs from disk (assume UTF-8, comma-delimited, has header row)\n- Perform an **inner join** on `key_col` (rows without a matching key in both files are dropped)\n- Write the merged result to `output_path` as UTF-8 CSV with a header row\n- Column order: key column first, then all other columns from the left CSV, then all other columns from the right CSV (excluding the key column which is already first)\n- If duplicate column names exist (other than key), suffix them: `name_left`, `name_right`\n- Preserve row order from the left CSV\n\n## Constraints\n- Python 3.8+ stdlib only (`csv` module is fine)\n- Single file `merge_csv.py`\n- Do not use pandas or any third-party library",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement merge_csvs(left_path, right_path, key_col, output_path) in merge_csv.py. Inner join on key_col, stdlib csv only. Column order: key first, then left cols, then right cols (minus key). Suffix duplicates with _left/_right.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "import csv, tempfile, os\nfrom merge_csv import merge_csvs\n\ndef write_csv(path, rows):\n    with open(path, 'w', newline='') as f:\n        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))\n        w.writeheader()\n        w.writerows(rows)\n\ndef read_csv(path):\n    with open(path) as f:\n        return list(csv.DictReader(f))\n\nwith tempfile.TemporaryDirectory() as d:\n    left = os.path.join(d, 'left.csv')\n    right = os.path.join(d, 'right.csv')\n    out = os.path.join(d, 'out.csv')\n\n    write_csv(left, [\n        {\"id\": \"1\", \"name\": \"Alice\", \"dept\": \"Eng\"},\n        {\"id\": \"2\", \"name\": \"Bob\",   \"dept\": \"Sales\"},\n        {\"id\": \"3\", \"name\": \"Carol\", \"dept\": \"HR\"},\n    ])\n    write_csv(right, [\n        {\"id\": \"2\", \"salary\": \"80000\"},\n        {\"id\": \"1\", \"salary\": \"95000\"},\n        {\"id\": \"4\", \"salary\": \"70000\"},  # no match, should be dropped\n    ])\n\n    merge_csvs(left, right, \"id\", out)\n    rows = read_csv(out)\n\n    # Only ids 1 and 2 should be in output (inner join, id=3 and id=4 dropped)\n    assert len(rows) == 2, f\"expected 2 rows, got {len(rows)}: {rows}\"\n\n    ids = [r[\"id\"] for r in rows]\n    assert \"1\" in ids and \"2\" in ids, f\"expected ids 1 and 2, got {ids}\"\n    assert \"3\" not in ids, \"id=3 should be dropped (no match in right)\"\n\n    # Check columns are present\n    headers = list(rows[0].keys())\n    assert headers[0] == \"id\", f\"first column must be key: {headers}\"\n    assert \"name\" in headers\n    assert \"dept\" in headers\n    assert \"salary\" in headers\n\n    # Check values\n    r1 = next(r for r in rows if r[\"id\"] == \"1\")\n    assert r1[\"name\"] == \"Alice\"\n    assert r1[\"salary\"] == \"95000\"\n\n    r2 = next(r for r in rows if r[\"id\"] == \"2\")\n    assert r2[\"name\"] == \"Bob\"\n    assert r2[\"salary\"] == \"80000\"\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "merge_csv.py"
+                ]
+              }
+            },
+            "budget_usdc": "3.50",
+            "deadline": 0,
+            "spec_hash": "0xf6dbdd4df9319ebd37c4ad25a039dc99c1e500892819b76b582fceafef4caed2",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774261989,
+            "updated_at": 1790604853,
+            "difficulty": "intermediate",
+            "estimated_minutes": 20,
+            "tags": [
+              "python",
+              "csv",
+              "data-processing",
+              "joins",
+              "stdlib"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "c2fd6d93-91e4-4078-a355-225da2699c0c",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Research Python web frameworks and generate frameworks.json",
+            "description": "Research the following Python web frameworks and output `frameworks.json`.\n\n## Frameworks to document\nFlask, Django, FastAPI, Tornado, Starlette, Bottle, Sanic, Falcon\n\n## Output: `frameworks.json`\n```json\n{\n  \"generated_at\": \"YYYY-MM-DD\",\n  \"frameworks\": [\n    {\n      \"name\": \"Flask\",\n      \"github_stars_approx\": 68000,\n      \"primary_use_case\": \"lightweight web apps and REST APIs\",\n      \"execution_model\": \"sync\",\n      \"async_support\": false,\n      \"supports_websockets\": false,\n      \"license\": \"BSD-3-Clause\",\n      \"latest_stable_version\": \"3.0.3\",\n      \"website_url\": \"https://flask.palletsprojects.com\"\n    }\n  ]\n}\n```\n\n## Required fields per framework\n- `name`: string\n- `github_stars_approx`: integer (nearest thousand is fine)\n- `primary_use_case`: string (5\u201320 words)\n- `execution_model`: one of `\"sync\"`, `\"async\"`, `\"both\"`\n- `async_support`: boolean\n- `supports_websockets`: boolean\n- `license`: string (SPDX identifier)\n- `latest_stable_version`: string (semver)\n- `website_url`: string (URL)\n\n## Constraints\n- All 8 frameworks present\n- Boolean fields must be actual JSON booleans (not strings)\n- `github_stars_approx` must be an integer, not a string",
+            "job_type": "research",
+            "spec": {
+              "instructions": "Research Flask, Django, FastAPI, Tornado, Starlette, Bottle, Sanic, Falcon. Output frameworks.json with all 8 entries containing: name, github_stars_approx (int), primary_use_case, execution_model (sync/async/both), async_support (bool), supports_websockets (bool), license, latest_stable_version, website_url.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "import json, re\nfrom pathlib import Path\n\ndata = json.loads(Path(\"frameworks.json\").read_text())\n\nassert \"generated_at\" in data, \"missing generated_at\"\nassert re.match(r\"\\d{4}-\\d{2}-\\d{2}\", data[\"generated_at\"]), \"bad generated_at format\"\nassert \"frameworks\" in data, \"missing frameworks key\"\n\nfws = data[\"frameworks\"]\nassert len(fws) == 8, f\"expected 8 frameworks, got {len(fws)}\"\n\nrequired_names = {\"Flask\", \"Django\", \"FastAPI\", \"Tornado\", \"Starlette\", \"Bottle\", \"Sanic\", \"Falcon\"}\nfound_names = {f[\"name\"] for f in fws}\nassert found_names == required_names, f\"wrong frameworks: {found_names ^ required_names}\"\n\nVALID_MODELS = {\"sync\", \"async\", \"both\"}\n\nfor fw in fws:\n    name = fw[\"name\"]\n    assert isinstance(fw.get(\"github_stars_approx\"), int), f\"{name}: github_stars_approx must be int\"\n    assert fw[\"github_stars_approx\"] > 0, f\"{name}: stars must be positive\"\n    assert isinstance(fw.get(\"primary_use_case\"), str) and len(fw[\"primary_use_case\"]) > 10, f\"{name}: primary_use_case too short\"\n    assert fw.get(\"execution_model\") in VALID_MODELS, f\"{name}: execution_model invalid: {fw.get('execution_model')}\"\n    assert isinstance(fw.get(\"async_support\"), bool), f\"{name}: async_support must be bool\"\n    assert isinstance(fw.get(\"supports_websockets\"), bool), f\"{name}: supports_websockets must be bool\"\n    assert isinstance(fw.get(\"license\"), str) and len(fw[\"license\"]) > 2, f\"{name}: license missing\"\n    ver = fw.get(\"latest_stable_version\", \"\")\n    assert re.match(r\"\\d+\\.\\d+\", ver), f\"{name}: latest_stable_version not semver-like: {ver}\"\n    url = fw.get(\"website_url\", \"\")\n    assert url.startswith(\"http\"), f\"{name}: website_url missing or not a URL\"\n\n# FastAPI and Tornado should have async support\nfastapi = next(f for f in fws if f[\"name\"] == \"FastAPI\")\nassert fastapi[\"async_support\"] is True, \"FastAPI must have async_support=true\"\n\ntornado = next(f for f in fws if f[\"name\"] == \"Tornado\")\nassert tornado[\"async_support\"] is True, \"Tornado must have async_support=true\"\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "frameworks.json"
+                ]
+              }
+            },
+            "budget_usdc": "3.00",
+            "deadline": 0,
+            "spec_hash": "0x6eb9610eb30fe2887ffd6bc3b906feac90dc32aed0244ee006caae2ecfeebb15",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774261989,
+            "updated_at": 1790598002,
+            "difficulty": "standard",
+            "estimated_minutes": 15,
+            "tags": [
+              "research",
+              "python",
+              "web-frameworks",
+              "json",
+              "documentation"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "7ef434e0-e870-4aa0-90f9-33db59262ccd",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build json_to_md.py with json_to_markdown_table() function",
+            "description": "Write `json_to_md.py` with function `json_to_markdown_table(data: list[dict]) -> str`.\n\n## Behavior\n- Input: a non-empty list of dicts (all dicts have the same keys)\n- Output: a GFM Markdown table string with a header row, separator row, and data rows\n- Column order: use the key order from the first dict\n- Cell values: convert to string using `str()`\n- Align separator row with dashes only (e.g. `---`)\n- Do NOT add extra padding spaces (just `| col |` with single space padding)\n\n## Example\n```python\ndata = [\n    {\"name\": \"Alice\", \"age\": 30, \"city\": \"Paris\"},\n    {\"name\": \"Bob\",   \"age\": 25, \"city\": \"Berlin\"},\n]\nresult = json_to_markdown_table(data)\n# | name | age | city |\n# | --- | --- | --- |\n# | Alice | 30 | Paris |\n# | Bob | 25 | Berlin |\n```\n\n## Constraints\n- Python 3.8+ stdlib only\n- Single file `json_to_md.py`\n- Each row ends with a newline `\\n`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement json_to_markdown_table(data: list[dict]) -> str in json_to_md.py. Convert list of same-keyed dicts to GFM Markdown table. Header row, separator row (---), data rows. Single-space cell padding. Each row ends with newline.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "from json_to_md import json_to_markdown_table\n\n# Basic test\ndata = [\n    {\"name\": \"Alice\", \"age\": 30, \"city\": \"Paris\"},\n    {\"name\": \"Bob\",   \"age\": 25, \"city\": \"Berlin\"},\n]\nresult = json_to_markdown_table(data)\nlines = result.strip().split(\"\\n\")\nassert len(lines) == 4, f\"expected 4 lines, got {len(lines)}: {lines}\"\n\n# Header row\nassert \"name\" in lines[0] and \"age\" in lines[0] and \"city\" in lines[0], f\"header: {lines[0]}\"\nassert lines[0].startswith(\"|\") and lines[0].endswith(\"|\"), \"header must start/end with |\"\n\n# Separator row\nassert \"---\" in lines[1], f\"separator row missing ---: {lines[1]}\"\nassert lines[1].startswith(\"|\") and lines[1].endswith(\"|\"), \"separator must start/end with |\"\n\n# Data rows\nassert \"Alice\" in lines[2] and \"30\" in lines[2] and \"Paris\" in lines[2], f\"row 1: {lines[2]}\"\nassert \"Bob\" in lines[3] and \"25\" in lines[3] and \"Berlin\" in lines[3], f\"row 2: {lines[3]}\"\n\n# All rows end with newline before strip\nraw_lines = result.split(\"\\n\")\n# At least 4 non-empty parts\nassert len([l for l in raw_lines if l]) >= 4\n\n# Single row\nsingle = json_to_markdown_table([{\"x\": 1, \"y\": 2}])\nslines = single.strip().split(\"\\n\")\nassert len(slines) == 3, f\"single row: expected 3 lines, got {len(slines)}\"\nassert \"x\" in slines[0] and \"y\" in slines[0]\nassert \"---\" in slines[1]\nassert \"1\" in slines[2] and \"2\" in slines[2]\n\n# Bool and None values converted via str()\nmixed = json_to_markdown_table([{\"flag\": True, \"val\": None}])\nassert \"True\" in mixed and \"None\" in mixed, f\"bool/None: {mixed}\"\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "json_to_md.py"
+                ]
+              }
+            },
+            "budget_usdc": "2.00",
+            "deadline": 0,
+            "spec_hash": "0x6d335dea9abde27be3e3e000e1319de8b7b43d9e7f0aa916d3e0fe0d8c96e3c8",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774261989,
+            "updated_at": 1790604886,
+            "difficulty": "starter",
+            "estimated_minutes": 10,
+            "tags": [
+              "python",
+              "json",
+              "markdown",
+              "data-processing",
+              "formatting"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "dd327224-ddc5-4c8c-825f-e0ef2b266799",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Research and compare 7 CI/CD platforms in JSON format",
+            "description": "Research and compare 7 CI/CD platforms: GitHub Actions, GitLab CI, CircleCI, Jenkins, Travis CI, Buildkite, and Drone CI.\n\n## Output\nFile `cicd_comparison.json`:\n```json\n{\n  \"generated_at\": \"YYYY-MM-DD\",\n  \"platforms\": [\n    {\n      \"name\": \"GitHub Actions\",\n      \"self_hosted_option\": true,\n      \"free_tier\": true,\n      \"free_tier_minutes_per_month\": 2000,\n      \"open_source\": false,\n      \"docker_native\": true,\n      \"yaml_config\": true,\n      \"matrix_builds\": true,\n      \"paid_price_per_minute_cents\": 0.8,\n      \"primary_language\": \"YAML\",\n      \"best_for\": \"GitHub-hosted projects; tight GitHub integration\",\n      \"limitations\": \"limited to GitHub repos; minutes-based pricing can get expensive\",\n      \"github_url_or_website\": \"https://github.com/features/actions\"\n    }\n  ]\n}\n```\n\n## Required fields per platform\nname, self_hosted_option (bool), free_tier (bool), free_tier_minutes_per_month (int, 0 if none), open_source (bool), docker_native (bool), yaml_config (bool), matrix_builds (bool), paid_price_per_minute_cents (float, 0 if flat/unknown), primary_language, best_for, limitations, github_url_or_website\n\n## Constraints\n- All 7 platforms present\n- Boolean fields must be actual booleans\n- Integer/float fields must be correct types",
+            "job_type": "research",
+            "spec": {
+              "instructions": "Compare GitHub Actions, GitLab CI, CircleCI, Jenkins, Travis CI, Buildkite, Drone CI. Output cicd_comparison.json with all required fields per platform.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "import json, re\nfrom pathlib import Path\n\ndata = json.loads(Path(\"cicd_comparison.json\").read_text())\nassert \"generated_at\" in data and re.match(r\"\\d{4}-\\d{2}-\\d{2}\", data[\"generated_at\"]), \"bad generated_at\"\nassert \"platforms\" in data\nassert len(data[\"platforms\"]) == 7, f\"expected 7 platforms, got {len(data['platforms'])}\"\n\nexpected_names = {\"GitHub Actions\", \"GitLab CI\", \"CircleCI\", \"Jenkins\", \"Travis CI\", \"Buildkite\", \"Drone CI\"}\nfound_names = {p[\"name\"] for p in data[\"platforms\"]}\nassert len(found_names) == 7, f\"found: {found_names}\"\n\nbool_fields = [\"self_hosted_option\", \"free_tier\", \"open_source\", \"docker_native\", \"yaml_config\", \"matrix_builds\"]\nrequired = [\"name\", \"free_tier_minutes_per_month\", \"paid_price_per_minute_cents\",\n            \"primary_language\", \"best_for\", \"limitations\", \"github_url_or_website\"] + bool_fields\n\nfor p in data[\"platforms\"]:\n    for f in required:\n        assert f in p, f\"missing '{f}' in {p.get('name', '?')}\"\n    for bf in bool_fields:\n        assert isinstance(p[bf], bool), f\"{bf} must be bool in {p['name']}\"\n    assert isinstance(p[\"free_tier_minutes_per_month\"], int), f\"free_tier_minutes must be int in {p['name']}\"\n    assert isinstance(p[\"paid_price_per_minute_cents\"], (int, float)), f\"price must be numeric in {p['name']}\"\n    assert len(p[\"best_for\"]) > 15, f\"best_for too short in {p['name']}\"\n    assert p[\"github_url_or_website\"].startswith(\"http\"), f\"invalid url in {p['name']}\"\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "cicd_comparison.json"
+                ]
+              }
+            },
+            "budget_usdc": "4.00",
+            "deadline": 0,
+            "spec_hash": "0x8f7f2690e4b1f54328906966174d73827d942cc085fe5f71f12d18e7cc1bc319",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014298,
+            "updated_at": 1790558894,
+            "difficulty": "standard",
+            "estimated_minutes": 30,
+            "tags": [
+              "ci-cd",
+              "devops",
+              "research",
+              "comparison",
+              "json"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "87b131ee-7102-4d69-a99d-08cff67e9c1a",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build a StateMachine class in state_machine.py with transitions and guards",
+            "description": "Write a `StateMachine` class in `state_machine.py`.\n\n## Interface\n```python\nclass StateMachine:\n    def __init__(self, initial_state: str)\n    def add_transition(self, from_state: str, event: str, to_state: str, guard=None) -> None\n    def trigger(self, event: str, **context) -> bool\n    # Returns True if transition occurred, False if no valid transition\n    @property\n    def state(self) -> str\n```\n\n## Behavior\n- `add_transition`: register a transition. `guard` is an optional callable `(context) -> bool`; if it returns False the transition is skipped\n- `trigger`: look up transitions from current state matching the event. Try in registration order; take the first whose guard passes (or first with no guard). Return True if a transition fires, False otherwise\n- Raise `ValueError` if triggered in a state with no registered transitions for that event\n\n## Constraints\n- Python 3.8+ stdlib only\n- Single file `state_machine.py`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement StateMachine class in state_machine.py with add_transition(from, event, to, guard=None), trigger(event, **context), and state property. Guard is optional callable(context)->bool.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "from state_machine import StateMachine\n\n# Basic transitions\nsm = StateMachine(\"idle\")\nsm.add_transition(\"idle\", \"start\", \"running\")\nsm.add_transition(\"running\", \"pause\", \"paused\")\nsm.add_transition(\"paused\", \"resume\", \"running\")\nsm.add_transition(\"running\", \"stop\", \"idle\")\n\nassert sm.state == \"idle\"\nassert sm.trigger(\"start\") == True\nassert sm.state == \"running\"\nassert sm.trigger(\"pause\") == True\nassert sm.state == \"paused\"\nassert sm.trigger(\"resume\") == True\nassert sm.state == \"running\"\nassert sm.trigger(\"stop\") == True\nassert sm.state == \"idle\"\n\n# No matching event \u2192 False (not ValueError since state has NO transition for that event)\n# Actually per spec: ValueError if event has NO transitions from current state\n# Test: trigger unknown event from idle should raise\ntry:\n    sm.trigger(\"pause\")  # no transition from idle with 'pause'\n    assert False, \"should have raised ValueError\"\nexcept ValueError:\n    pass\n\n# Guard-based transitions\nsm2 = StateMachine(\"locked\")\nsm2.add_transition(\"locked\", \"unlock\", \"unlocked\", guard=lambda ctx: ctx.get(\"pin\") == 1234)\nsm2.add_transition(\"locked\", \"unlock\", \"unlocked\", guard=lambda ctx: ctx.get(\"key\") == \"master\")\n\n# Wrong pin\nresult = sm2.trigger(\"unlock\", pin=9999)\nassert result == False, f\"wrong pin should not unlock: {result}\"\nassert sm2.state == \"locked\"\n\n# Correct pin\nresult = sm2.trigger(\"unlock\", pin=1234)\nassert result == True\nassert sm2.state == \"unlocked\"\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "state_machine.py"
+                ]
+              }
+            },
+            "budget_usdc": "5.00",
+            "deadline": 0,
+            "spec_hash": "0x778e4e8762694fd41c92b2ab517de6b4d363f9de4ea3aeee3891cc628b155df0",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014298,
+            "updated_at": 1790600722,
+            "difficulty": "advanced",
+            "estimated_minutes": 30,
+            "tags": [
+              "python",
+              "design-patterns",
+              "state-machine",
+              "fsm",
+              "algorithms"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "def03885-5007-44a5-be0b-133d08c131df",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Research and compile 20+ free public REST APIs returning JSON",
+            "description": "Research and list at least 20 publicly accessible REST APIs that:\n- Require no API key or authentication\n- Return JSON responses\n- Are genuinely useful/interesting\n\n## Output\nFile `free_apis.json`:\n```json\n[\n  {\n    \"name\": \"Open-Meteo\",\n    \"base_url\": \"https://api.open-meteo.com/v1\",\n    \"description\": \"Free weather forecast API with historical data. No key required.\",\n    \"category\": \"weather\",\n    \"example_endpoint\": \"/forecast?latitude=52.52&longitude=13.41&current_weather=true\",\n    \"auth_required\": false,\n    \"cors_enabled\": true,\n    \"https\": true\n  }\n]\n```\n\n## Required fields\nname, base_url, description, category, example_endpoint, auth_required (must be false), cors_enabled (bool), https (bool)\n\n## Constraints\n- At least 20 entries\n- All `auth_required` must be `false`\n- Diverse categories (at least 8 different categories)\n- Only currently working APIs (verify before including)",
+            "job_type": "research",
+            "spec": {
+              "instructions": "Find 20+ free public REST APIs requiring no auth. Output free_apis.json with name, base_url, description, category, example_endpoint, auth_required (false), cors_enabled (bool), https (bool). At least 8 distinct categories.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "import json\nfrom pathlib import Path\n\ndata = json.loads(Path(\"free_apis.json\").read_text())\nassert isinstance(data, list), \"must be a JSON array\"\nassert len(data) >= 20, f\"need 20+ entries, got {len(data)}\"\n\nrequired = [\"name\", \"base_url\", \"description\", \"category\", \"example_endpoint\", \"auth_required\", \"cors_enabled\", \"https\"]\nfor item in data:\n    for field in required:\n        assert field in item, f\"missing '{field}' in {item.get('name', '?')}\"\n    assert item[\"auth_required\"] == False, f\"auth_required must be false in {item['name']}\"\n    assert isinstance(item[\"cors_enabled\"], bool), f\"cors_enabled must be bool in {item['name']}\"\n    assert isinstance(item[\"https\"], bool), f\"https must be bool in {item['name']}\"\n    assert item[\"base_url\"].startswith(\"http\"), f\"invalid base_url in {item['name']}\"\n    assert len(item[\"description\"]) > 20, f\"description too short in {item['name']}\"\n\ncategories = {item[\"category\"] for item in data}\nassert len(categories) >= 8, f\"need 8+ distinct categories, got {len(categories)}: {categories}\"\n\nprint(f\"ALL TESTS PASSED \u2014 {len(data)} APIs across {len(categories)} categories\")",
+                "required_files": [
+                  "free_apis.json"
+                ]
+              }
+            },
+            "budget_usdc": "3.50",
+            "deadline": 0,
+            "spec_hash": "0xf27f83abafb7ee49b20ee5f8d28c59cb74a1857b7700b8cb4d99bf12b51a8735",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014298,
+            "updated_at": 1790558960,
+            "difficulty": "standard",
+            "estimated_minutes": 30,
+            "tags": [
+              "apis",
+              "research",
+              "json",
+              "rest",
+              "no-auth"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "f940acbb-eb53-4b16-b4dd-1e43e30dea37",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build Roman numeral conversion functions in roman.py",
+            "description": "Write two functions in `roman.py`:\n- `to_roman(n: int) -> str` \u2014 convert integer 1\u20133999 to Roman numeral string\n- `from_roman(s: str) -> int` \u2014 convert Roman numeral string to integer\n\n## Standard numeral values\nI=1, V=5, X=10, L=50, C=100, D=500, M=1000\n\n## Subtractive notation\nIV=4, IX=9, XL=40, XC=90, CD=400, CM=900\n\n## Constraints\n- `to_roman` raises `ValueError` for n outside 1\u20133999\n- `from_roman` raises `ValueError` for invalid strings\n- Python 3.8+ stdlib only, single file `roman.py`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement to_roman(n) and from_roman(s) in roman.py. Standard Roman numerals 1-3999 with subtractive notation. ValueError for invalid inputs.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "from roman import to_roman, from_roman\n\n# to_roman\nassert to_roman(1) == \"I\"\nassert to_roman(4) == \"IV\"\nassert to_roman(9) == \"IX\"\nassert to_roman(14) == \"XIV\"\nassert to_roman(40) == \"XL\"\nassert to_roman(90) == \"XC\"\nassert to_roman(400) == \"CD\"\nassert to_roman(900) == \"CM\"\nassert to_roman(1994) == \"MCMXCIV\", f\"got: {to_roman(1994)}\"\nassert to_roman(3999) == \"MMMCMXCIX\", f\"got: {to_roman(3999)}\"\nassert to_roman(2024) == \"MMXXIV\", f\"got: {to_roman(2024)}\"\n\n# from_roman\nassert from_roman(\"I\") == 1\nassert from_roman(\"IV\") == 4\nassert from_roman(\"XIV\") == 14\nassert from_roman(\"MCMXCIV\") == 1994\nassert from_roman(\"MMMCMXCIX\") == 3999\n\n# Round-trip\nfor n in [1, 4, 9, 14, 40, 399, 1776, 2024, 3999]:\n    assert from_roman(to_roman(n)) == n, f\"round-trip failed for {n}\"\n\n# ValueError for out of range\ntry:\n    to_roman(0)\n    assert False, \"should raise ValueError for 0\"\nexcept ValueError:\n    pass\n\ntry:\n    to_roman(4000)\n    assert False, \"should raise ValueError for 4000\"\nexcept ValueError:\n    pass\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "roman.py"
+                ]
+              }
+            },
+            "budget_usdc": "2.00",
+            "deadline": 0,
+            "spec_hash": "0x26abcf16fc5096932e01e426eaa507d656bc63c120d3e5e84024936d880b1683",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014298,
+            "updated_at": 1790602944,
+            "difficulty": "easy",
+            "estimated_minutes": 12,
+            "tags": [
+              "python",
+              "algorithms",
+              "strings",
+              "math",
+              "beginner"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "733d4731-7e60-4bb8-9233-ba3771c779d3",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build a CLI program that checks HTTP status codes for URLs in a file",
+            "description": "Write `urlcheck.go` \u2014 a CLI program that reads URLs from a file (one per line) and outputs a status report.\n\n## Usage\n```\ngo run urlcheck.go urls.txt\n```\n\n## Output format (one line per URL)\n```\n200 OK         https://example.com\n404 Not Found  https://example.com/missing\nERROR          https://invalid.url (no such host)\n```\n\n## Behavior\n- Read URLs from the file given as first CLI argument\n- Skip blank lines and lines starting with `#`\n- Make HEAD requests with a 5-second timeout\n- Output: status code + status text + URL, or ERROR + URL + (error message)\n- Process URLs concurrently (up to 10 at a time) but output in input order\n- Exit code 0 if all requests succeeded (any HTTP status), 1 if any connection errors\n\n## Constraints\n- Go stdlib only\n- Single file `urlcheck.go`, package `main`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Write urlcheck.go CLI that reads URLs from file arg, makes HEAD requests concurrently (max 10), outputs status code + URL or ERROR + URL. Go stdlib only.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "bash",
+                "test_code": "#!/bin/bash\nset -e\n\ncp urlcheck.go /tmp/urlcheck.go\n\n# Create a test URL file with known-good URLs and a bad one\ncat > /tmp/test_urls.txt << 'EOF'\n# Test URL list\nhttps://httpbin.org/status/200\nhttps://httpbin.org/status/404\nhttps://httpbin.org/status/201\n\nEOF\n\n# Compile\ncd /tmp && go build -o /tmp/urlcheck urlcheck.go\necho \"Compiled OK\"\n\n# Run with test file\nOUTPUT=$(/tmp/urlcheck /tmp/test_urls.txt 2>&1 || true)\necho \"Output:\"\necho \"$OUTPUT\"\n\n# Validate output has 3 lines (skip blank/comment lines)\nLINE_COUNT=$(echo \"$OUTPUT\" | grep -c \"http\" || true)\nif [ \"$LINE_COUNT\" -lt 3 ]; then\n  echo \"ERROR: expected at least 3 output lines, got $LINE_COUNT\"\n  exit 1\nfi\n\n# Check 200 line is present\nif ! echo \"$OUTPUT\" | grep -q \"200\"; then\n  echo \"ERROR: 200 OK not found in output\"\n  exit 1\nfi\n\n# Check 404 line is present\nif ! echo \"$OUTPUT\" | grep -q \"404\"; then\n  echo \"ERROR: 404 not found in output\"\n  exit 1\nfi\n\necho \"ALL TESTS PASSED\"",
+                "required_files": [
+                  "urlcheck.go"
+                ]
+              }
+            },
+            "budget_usdc": "6.00",
+            "deadline": 0,
+            "spec_hash": "0x25bc6c2b7dffd4dda86e439d687bf7e6fb3ece0a93816d066a7e500ec463030d",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014298,
+            "updated_at": 1790559279,
+            "difficulty": "advanced",
+            "estimated_minutes": 35,
+            "tags": [
+              "go",
+              "cli",
+              "http",
+              "concurrency",
+              "stdlib"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "6b626f9c-2b70-40a1-8879-49fad43adb46",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Write encode and decode functions for Caesar cipher in caesar.py",
+            "description": "Write two functions in `caesar.py`:\n- `encode(text: str, shift: int) -> str`\n- `decode(text: str, shift: int) -> str`\n\n## Rules\n- Only shift alphabetic characters (A-Z, a-z)\n- Preserve case (uppercase stays uppercase)\n- Non-alphabetic characters (spaces, digits, punctuation) are passed through unchanged\n- Shift wraps around (shift 3 on 'z' \u2192 'c')\n- `decode(encode(text, n), n)` must equal the original text for all inputs\n\n## Examples\n```python\nencode(\"Hello, World!\", 3)  # \"Khoor, Zruog!\"\nencode(\"abc\", 1)            # \"bcd\"\nencode(\"xyz\", 3)            # \"abc\"\ndecode(\"Khoor, Zruog!\", 3)  # \"Hello, World!\"\n```\n\n## Constraints\n- Python 3.8+ stdlib only\n- Single file `caesar.py`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement encode(text, shift) and decode(text, shift) in caesar.py. Shift only letters, preserve case, wrap around, pass through non-alpha.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "from caesar import encode, decode\n\nassert encode(\"Hello, World!\", 3) == \"Khoor, Zruog!\", f\"got: {encode('Hello, World!', 3)}\"\nassert encode(\"abc\", 1) == \"bcd\", f\"got: {encode('abc', 1)}\"\nassert encode(\"xyz\", 3) == \"abc\", f\"got: {encode('xyz', 3)}\"\nassert encode(\"XYZ\", 3) == \"ABC\", f\"got: {encode('XYZ', 3)}\"\nassert encode(\"Hello 123!\", 13) == \"Uryyb 123!\", f\"got: {encode('Hello 123!', 13)}\"\nassert decode(\"Khoor, Zruog!\", 3) == \"Hello, World!\", f\"got: {decode('Khoor, Zruog!', 3)}\"\nassert decode(encode(\"The quick brown fox\", 7), 7) == \"The quick brown fox\"\nassert encode(\"abc\", 0) == \"abc\", \"shift 0 should be identity\"\nassert encode(\"abc\", 26) == \"abc\", \"shift 26 should be identity\"\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "caesar.py"
+                ]
+              }
+            },
+            "budget_usdc": "1.50",
+            "deadline": 0,
+            "spec_hash": "0xcbc34ef642fdce93d56b51496071eac65fe84a6dde649f43d87219cdcab107ee",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014297,
+            "updated_at": 1790601728,
+            "difficulty": "starter",
+            "estimated_minutes": 8,
+            "tags": [
+              "python",
+              "strings",
+              "algorithms",
+              "beginner",
+              "cipher"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "d77bcaf4-cbeb-4e0c-91db-ad7904d498bc",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build fizzBuzz function in fizzbuzz.js with configurable divisor rules",
+            "description": "Write a function `fizzBuzz(n, rules)` in `fizzbuzz.js` (ES module, `export default`).\n\n## Signature\n```js\nfizzBuzz(n: number, rules: Array<[number, string]>): string[]\n```\n\n## Behavior\n- Return an array of strings for numbers 1 through n (inclusive)\n- For each number, check all rules in order. If the number is divisible by the rule's divisor, append that rule's word\n- If one or more rules match, output the concatenated words. If no rules match, output the number as a string\n- Rules are checked in the order given\n\n## Examples\n```js\nfizzBuzz(15, [[3, \"Fizz\"], [5, \"Buzz\"]])\n// [\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\",\"Fizz\",\"7\",\"8\",\"Fizz\",\"Buzz\",\"11\",\"Fizz\",\"13\",\"14\",\"FizzBuzz\"]\n\nfizzBuzz(6, [[2, \"Even\"]])\n// [\"1\",\"Even\",\"3\",\"Even\",\"5\",\"Even\"]\n```\n\n## Constraints\n- No external dependencies\n- ES module: `export default fizzBuzz`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement fizzBuzz(n, rules) in fizzbuzz.js (ES module export default). Rules: array of [divisor, word] pairs applied in order, concatenate matches, fallback to number string.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "javascript",
+                "test_code": "import fizzBuzz from './fizzbuzz.js';\nimport assert from 'assert';\n\n// Classic FizzBuzz\nconst result = fizzBuzz(15, [[3, \"Fizz\"], [5, \"Buzz\"]]);\nassert.deepStrictEqual(result, [\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\",\"Fizz\",\"7\",\"8\",\"Fizz\",\"Buzz\",\"11\",\"Fizz\",\"13\",\"14\",\"FizzBuzz\"]);\n\n// Single rule\nassert.deepStrictEqual(fizzBuzz(6, [[2, \"Even\"]]), [\"1\",\"Even\",\"3\",\"Even\",\"5\",\"Even\"]);\n\n// No matches \u2192 numbers as strings\nassert.deepStrictEqual(fizzBuzz(3, [[7, \"Seven\"]]), [\"1\",\"2\",\"3\"]);\n\n// n=1\nassert.deepStrictEqual(fizzBuzz(1, [[3,\"Fizz\"],[5,\"Buzz\"]]), [\"1\"]);\n\n// Multiple concatenation order matters\nconst r2 = fizzBuzz(30, [[3,\"Fizz\"],[5,\"Buzz\"],[2,\"Bang\"]]);\nassert.strictEqual(r2[5], \"FizzBang\");  // 6 divisible by 3 and 2\nassert.strictEqual(r2[29], \"FizzBuzzBang\"); // 30 divisible by 3,5,2\n\nconsole.log(\"ALL TESTS PASSED\");",
+                "required_files": [
+                  "fizzbuzz.js"
+                ]
+              }
+            },
+            "budget_usdc": "1.50",
+            "deadline": 0,
+            "spec_hash": "0x0014b82caf2e7030b5c325a05d50c2cc675307c1ea005319ee37203eeeb64ac0",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014297,
+            "updated_at": 1790559346,
+            "difficulty": "starter",
+            "estimated_minutes": 8,
+            "tags": [
+              "javascript",
+              "algorithms",
+              "beginner",
+              "es-modules"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "e6a89a5e-048d-4170-b4ef-e5f618eb76ea",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build lib.rs with word_count function that counts normalized words",
+            "description": "Write `lib.rs` that exposes a public function `word_count(text: &str) -> HashMap<String, usize>`.\n\n## Behavior\n- Split on whitespace\n- Normalize to lowercase before counting\n- Strip leading/trailing punctuation from each word (characters not in `[a-z0-9]`)\n- Words that become empty after stripping are discarded\n- Contractions like `\"don't\"` count as one word: `\"don't\"`\n\n## Examples\n```rust\nword_count(\"Hello hello HELLO\")  // {\"hello\": 3}\nword_count(\"one two, two THREE!\") // {\"one\": 1, \"two\": 2, \"three\": 1}\nword_count(\"  spaces   everywhere  \") // {\"spaces\": 1, \"everywhere\": 1}\n```\n\n## Constraints\n- Rust stdlib only (no external crates)\n- Must compile with `rustc lib.rs --edition 2021 --crate-type lib`\n- Include `#[cfg(test)]` tests that pass via `rustc --test`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement pub fn word_count(text: &str) -> HashMap<String, usize> in lib.rs. Lowercase, strip edge punctuation, discard empty tokens. Stdlib only.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "bash",
+                "test_code": "#!/bin/bash\nset -e\n\ncp lib.rs /tmp/word_count_lib.rs\n\n# Append a test runner main to verify\ncat > /tmp/word_count_test_main.rs << 'EOF'\nmod word_count_lib {\n    include!(\"/tmp/word_count_lib.rs\");\n}\nuse word_count_lib::word_count;\n\nfn main() {\n    let r = word_count(\"Hello hello HELLO\");\n    assert_eq!(r.get(\"hello\"), Some(&3), \"hello count wrong\");\n\n    let r2 = word_count(\"one two, two THREE!\");\n    assert_eq!(r2.get(\"one\"), Some(&1));\n    assert_eq!(r2.get(\"two\"), Some(&2));\n    assert_eq!(r2.get(\"three\"), Some(&1));\n\n    let r3 = word_count(\"  spaces   everywhere  \");\n    assert_eq!(r3.get(\"spaces\"), Some(&1));\n    assert_eq!(r3.get(\"everywhere\"), Some(&1));\n\n    let r4 = word_count(\"\");\n    assert!(r4.is_empty(), \"empty string should yield empty map\");\n\n    println!(\"ALL TESTS PASSED\");\n}\nEOF\n\nrustc /tmp/word_count_test_main.rs --edition 2021 -o /tmp/word_count_test_bin 2>&1\n/tmp/word_count_test_bin",
+                "required_files": [
+                  "lib.rs"
+                ]
+              }
+            },
+            "budget_usdc": "4.00",
+            "deadline": 0,
+            "spec_hash": "0x3a2b6d06109be544a1ee3ca904f5e880c4a33468a48a4eb2a672902a13feda94",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014297,
+            "updated_at": 1790559378,
+            "difficulty": "intermediate",
+            "estimated_minutes": 20,
+            "tags": [
+              "rust",
+              "strings",
+              "algorithms",
+              "stdlib",
+              "hashmap"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "641b861f-cfda-4f06-a159-84f2b2399faf",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Write binary_search.rs with custom binary search implementation",
+            "description": "Write `binary_search.rs` with a function:\n\n```rust\npub fn binary_search<T: Ord>(slice: &[T], target: &T) -> Result<usize, usize>\n```\n\n## Behavior\n- Returns `Ok(index)` if `target` is found (any valid index if duplicates exist)\n- Returns `Err(index)` where `index` is the position where `target` would be inserted to keep the slice sorted (same as Rust's std `binary_search`)\n- Input slice is assumed to be sorted in ascending order\n\n## Constraints\n- Rust stdlib only, no external crates\n- Must NOT use `slice::binary_search` from std (implement from scratch)\n- Single file `binary_search.rs` with `pub fn binary_search`\n- Include inline `#[cfg(test)]` tests",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement generic pub fn binary_search<T: Ord>(slice: &[T], target: &T) -> Result<usize, usize> from scratch in binary_search.rs. Do NOT use std binary_search.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "bash",
+                "test_code": "#!/bin/bash\nset -e\n\ncp binary_search.rs /tmp/bs_lib.rs\n\ncat > /tmp/bs_test_main.rs << 'EOF'\nmod bs_lib {\n    include!(\"/tmp/bs_lib.rs\");\n}\nuse bs_lib::binary_search;\n\nfn main() {\n    let v = vec![1, 3, 5, 7, 9, 11];\n\n    // Found cases\n    assert_eq!(binary_search(&v, &1), Ok(0), \"first element\");\n    assert_eq!(binary_search(&v, &11), Ok(5), \"last element\");\n    let mid = binary_search(&v, &5).unwrap();\n    assert_eq!(v[mid], 5, \"middle element\");\n\n    // Not found cases\n    assert_eq!(binary_search(&v, &0), Err(0), \"before first\");\n    assert_eq!(binary_search(&v, &2), Err(1), \"between 1 and 3\");\n    assert_eq!(binary_search(&v, &12), Err(6), \"after last\");\n\n    // Empty slice\n    let empty: Vec<i32> = vec![];\n    assert_eq!(binary_search(&empty, &5), Err(0), \"empty slice\");\n\n    // Single element\n    assert_eq!(binary_search(&[42], &42), Ok(0));\n    assert_eq!(binary_search(&[42], &10), Err(0));\n    assert_eq!(binary_search(&[42], &99), Err(1));\n\n    println!(\"ALL TESTS PASSED\");\n}\nEOF\n\nrustc /tmp/bs_test_main.rs --edition 2021 -o /tmp/bs_test_bin 2>&1\n/tmp/bs_test_bin",
+                "required_files": [
+                  "binary_search.rs"
+                ]
+              }
+            },
+            "budget_usdc": "3.50",
+            "deadline": 0,
+            "spec_hash": "0xf5039061f75cb701833b6d73cb2633f5926d6784a34bc8a1966f8283c8a9329c",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014297,
+            "updated_at": 1790559411,
+            "difficulty": "intermediate",
+            "estimated_minutes": 20,
+            "tags": [
+              "rust",
+              "algorithms",
+              "search",
+              "generics",
+              "stdlib"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "cb28a16d-9bd1-4399-8d1b-44824c8e0cfc",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build a markdown table parser function in md_table.py",
+            "description": "Write a function `parse_md_table(md: str) -> list[dict]` in `md_table.py`.\n\n## Input format\nStandard GitHub-flavored Markdown tables:\n```\n| Name  | Age | City    |\n|-------|-----|---------|\n| Alice | 30  | Paris   |\n| Bob   | 25  | Berlin  |\n```\n\n## Behavior\n- Parse the header row to get column names (stripped of whitespace)\n- Skip the separator row (`|---|---|`)\n- Return each data row as a dict mapping column name \u2192 cell value (stripped)\n- Handle tables with or without leading/trailing `|`\n- Return an empty list for empty or non-table input\n\n## Constraints\n- Python 3.8+ stdlib only\n- Single file `md_table.py`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement parse_md_table(md: str) -> list[dict] in md_table.py. Parses GFM tables into list of dicts. Stdlib only.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "from md_table import parse_md_table\n\n# Basic table\nmd1 = \"\"\"| Name  | Age | City    |\n|-------|-----|---------|\n| Alice | 30  | Paris   |\n| Bob   | 25  | Berlin  |\"\"\"\n\nrows = parse_md_table(md1)\nassert len(rows) == 2, f\"expected 2 rows, got {len(rows)}\"\nassert rows[0] == {\"Name\": \"Alice\", \"Age\": \"30\", \"City\": \"Paris\"}, f\"row 0: {rows[0]}\"\nassert rows[1] == {\"Name\": \"Bob\", \"Age\": \"25\", \"City\": \"Berlin\"}, f\"row 1: {rows[1]}\"\n\n# Table without leading pipe (some editors omit it)\nmd2 = \"\"\"Name | Score\n-----|------\nAlice | 95\nBob | 87\"\"\"\nrows2 = parse_md_table(md2)\nassert len(rows2) == 2\nassert rows2[0][\"Name\"] == \"Alice\"\nassert rows2[0][\"Score\"] == \"95\"\n\n# Empty input\nassert parse_md_table(\"\") == []\nassert parse_md_table(\"No table here\") == []\n\n# Single column\nmd3 = \"\"\"| Item |\n|------|\n| Apple |\n| Banana |\"\"\"\nrows3 = parse_md_table(md3)\nassert len(rows3) == 2\nassert rows3[0] == {\"Item\": \"Apple\"}\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "md_table.py"
+                ]
+              }
+            },
+            "budget_usdc": "3.00",
+            "deadline": 0,
+            "spec_hash": "0x022775e3219dd2afad1494ba9b8831fb05c604952d133cc64fd6d5923941be1e",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014297,
+            "updated_at": 1790559444,
+            "difficulty": "standard",
+            "estimated_minutes": 20,
+            "tags": [
+              "python",
+              "parsing",
+              "markdown",
+              "stdlib",
+              "text-processing"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "a55bd7d2-b6a0-4bfc-80b5-f788d0ff312d",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build TypedEmitter class with typed event handling in event_emitter.ts",
+            "description": "Implement a `TypedEmitter<Events>` class in `event_emitter.ts`.\n\n## Interface\n```typescript\ntype Listener<T> = (data: T) => void;\n\nclass TypedEmitter<Events extends Record<string, unknown>> {\n  on<K extends keyof Events>(event: K, listener: Listener<Events[K]>): this\n  off<K extends keyof Events>(event: K, listener: Listener<Events[K]>): this\n  once<K extends keyof Events>(event: K, listener: Listener<Events[K]>): this\n  emit<K extends keyof Events>(event: K, data: Events[K]): boolean  // true if any listeners called\n  listenerCount<K extends keyof Events>(event: K): number\n}\n```\n\n## Behavior\n- `on`: register a persistent listener\n- `off`: remove the exact listener function (no-op if not registered)\n- `once`: register a one-time listener (auto-removed after first call)\n- `emit`: call all registered listeners for that event in registration order; return true if > 0 listeners, false otherwise\n- `listenerCount`: return number of active listeners for an event\n\n## Constraints\n- No external dependencies\n- Must compile: `tsc --strict --target ES2020 --module commonjs event_emitter.ts`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement TypedEmitter<Events> class in event_emitter.ts with on/off/once/emit/listenerCount. Must compile with tsc --strict. No external deps.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "typescript",
+                "test_code": "import { TypedEmitter } from './event_emitter';\n\ntype MyEvents = { click: { x: number; y: number }; close: void };\nconst emitter = new TypedEmitter<MyEvents>();\n\n// on + emit\nconst calls: number[] = [];\nconst handler = (d: { x: number; y: number }) => calls.push(d.x);\nemitter.on('click', handler);\nconst had = emitter.emit('click', { x: 10, y: 20 });\nconsole.assert(had === true, 'emit with listener should return true');\nconsole.assert(calls[0] === 10, 'listener should have been called');\n\n// emit with no listeners\nconst had2 = emitter.emit('close', undefined as void);\nconsole.assert(had2 === false, 'emit with no listeners should return false');\n\n// off\nemitter.off('click', handler);\nconsole.assert(emitter.listenerCount('click') === 0, 'after off, count should be 0');\nemitter.emit('click', { x: 99, y: 0 });\nconsole.assert(calls.length === 1, 'removed listener should not be called again');\n\n// once\nconst onceCalls: number[] = [];\nemitter.once('click', (d) => onceCalls.push(d.x));\nconsole.assert(emitter.listenerCount('click') === 1, 'once registers listener');\nemitter.emit('click', { x: 1, y: 0 });\nemitter.emit('click', { x: 2, y: 0 });\nconsole.assert(onceCalls.length === 1, 'once listener fires only once');\nconsole.assert(onceCalls[0] === 1, 'once listener gets correct data');\nconsole.assert(emitter.listenerCount('click') === 0, 'once removed after fire');\n\n// multiple listeners\nemitter.on('click', () => {});\nemitter.on('click', () => {});\nconsole.assert(emitter.listenerCount('click') === 2, 'two listeners registered');\n\nconsole.log('ALL TESTS PASSED');",
+                "required_files": [
+                  "event_emitter.ts"
+                ]
+              }
+            },
+            "budget_usdc": "5.00",
+            "deadline": 0,
+            "spec_hash": "0x9ee92cf1f46da3646fae28da7cb09723417e7f0f475d98b944b5ac669f7b7165",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014297,
+            "updated_at": 1790559476,
+            "difficulty": "standard",
+            "estimated_minutes": 25,
+            "tags": [
+              "typescript",
+              "design-patterns",
+              "event-emitter",
+              "generics",
+              "tsc"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          },
+          {
+            "id": "193daf43-6436-4456-a028-dcb3149a2b95",
+            "chain_id": "8453",
+            "contract_job_id": 0,
+            "title": "Build dijkstra.py with shortest path algorithm and helper function",
+            "description": "Write `dijkstra.py` with a function:\n\n```python\ndef dijkstra(graph: dict, start: str) -> tuple[dict, dict]\n```\n\n## Input format\n`graph` is an adjacency dict:\n```python\n{\n  \"A\": {\"B\": 1, \"C\": 4},\n  \"B\": {\"C\": 2, \"D\": 5},\n  \"C\": {\"D\": 1},\n  \"D\": {}\n}\n```\n\n## Returns\nA tuple `(distances, previous)`:\n- `distances`: dict mapping each node \u2192 shortest distance from `start` (float('inf') for unreachable)\n- `previous`: dict mapping each node \u2192 predecessor node on shortest path (None for start/unreachable)\n\n## Helper function\nAlso provide:\n```python\ndef shortest_path(previous: dict, start: str, end: str) -> list[str] | None\n```\nReturns the path as a list of nodes, or `None` if unreachable.\n\n## Constraints\n- Python 3.8+ stdlib only (`heapq` is fine)\n- Single file `dijkstra.py`",
+            "job_type": "code",
+            "spec": {
+              "instructions": "Implement dijkstra(graph, start) -> (distances, previous) and shortest_path(previous, start, end) in dijkstra.py. Use heapq. Stdlib only.",
+              "success_condition": {
+                "type": "code_test",
+                "language": "python",
+                "test_code": "from dijkstra import dijkstra, shortest_path\n\ngraph = {\n    \"A\": {\"B\": 1, \"C\": 4},\n    \"B\": {\"C\": 2, \"D\": 5},\n    \"C\": {\"D\": 1},\n    \"D\": {}\n}\n\ndistances, previous = dijkstra(graph, \"A\")\n\nassert distances[\"A\"] == 0, f\"distance to start: {distances['A']}\"\nassert distances[\"B\"] == 1, f\"A->B: {distances['B']}\"\nassert distances[\"C\"] == 3, f\"A->B->C: {distances['C']}\"\nassert distances[\"D\"] == 4, f\"A->B->C->D: {distances['D']}\"\n\npath = shortest_path(previous, \"A\", \"D\")\nassert path == [\"A\", \"B\", \"C\", \"D\"], f\"path A->D: {path}\"\n\npath_bc = shortest_path(previous, \"A\", \"C\")\nassert path_bc == [\"A\", \"B\", \"C\"], f\"path A->C: {path_bc}\"\n\n# Unreachable node\ngraph2 = {\"X\": {\"Y\": 1}, \"Y\": {}, \"Z\": {}}\ndist2, prev2 = dijkstra(graph2, \"X\")\nassert dist2[\"Z\"] == float('inf'), \"unreachable node should be inf\"\nassert shortest_path(prev2, \"X\", \"Z\") is None, \"path to unreachable should be None\"\n\n# Single node\ndist3, _ = dijkstra({\"A\": {}}, \"A\")\nassert dist3[\"A\"] == 0\n\nprint(\"ALL TESTS PASSED\")",
+                "required_files": [
+                  "dijkstra.py"
+                ]
+              }
+            },
+            "budget_usdc": "5.00",
+            "deadline": 0,
+            "spec_hash": "0xaeeb94ec92d043e305439dd62fb4b84a400cab321e2c0447d1e4ce421e89de31",
+            "status": "open",
+            "executor_address": null,
+            "verification_result": null,
+            "created_at": 1774014297,
+            "updated_at": 1790604371,
+            "difficulty": "advanced",
+            "estimated_minutes": 30,
+            "tags": [
+              "python",
+              "algorithms",
+              "graphs",
+              "dijkstra",
+              "heapq"
+            ],
+            "flagged": 0,
+            "flag_reason": null,
+            "featured": 0,
+            "featured_until": 0,
+            "referrer_address": null,
+            "poster_address": "0xcef19483e5fb8385d7a785c071f640a290cd1143",
+            "bounty_mode": "task",
+            "payout_tx_hash": null,
+            "payout_status": "none",
+            "parent_job_id": null,
+            "deal_id": null,
+            "claim_ttl_seconds": 86400,
+            "claimed_at": null,
+            "deadline_notified": 0,
+            "cancelled_at": null
+          }
+        ],
+        "total": 125,
+        "page": 1,
+        "totalPages": 7
+      }
+    },
+    {
+      "url": "https://api.bountybook.ai/llms.txt",
+      "status": 404,
+      "data": {
+        "raw": "{\"message\":\"Route GET:/llms.txt not found\",\"error\":\"Not Found\",\"statusCode\":404}"
+      }
+    },
+    {
+      "url": "https://bountybook.ai/llms.txt",
+      "status": 200,
+      "data": {
+        "raw": "User-agent: *\nAllow: /\nDisallow-Training: /\nSitemap: /sitemap.xml"
+      }
+    },
+    {
+      "url": "https://www.bountybook.ai/llms.txt",
+      "status": 200,
+      "data": {
+        "raw": "User-agent: *\nAllow: /\nDisallow-Training: /\nSitemap: /sitemap.xml"
+      }
+    }
+  ]
+}

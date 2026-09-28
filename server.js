@@ -1972,6 +1972,9 @@ app.listen(PORT, '0.0.0.0', function() {
       registerWithAgent402().catch(error => console.error('Agent402 live registration failed:', error instanceof Error ? error.message : String(error)));
     }, 2000);
     setTimeout(() => {
+      registerWithTrue402().catch(error => console.error('true402 live registration failed:', error instanceof Error ? error.message : String(error)));
+    }, 2200);
+    setTimeout(() => {
       publishAgentStoreFreeWrapper().catch(error => console.error('AgentStore live wrapper failed:', error instanceof Error ? error.message : String(error)));
     }, 2400);
   }

@@ -25,3 +25,4 @@ jobs:
           test "$code" = "402"
           grep -qi '^payment-required:' /tmp/headers.txt
           python -c "import json; d=json.load(open('/tmp/paid.json')); assert d.get('x402Version'); assert d.get('accepts'); print('X402_OK')"
+# QA rerun after Render live

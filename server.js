@@ -1895,6 +1895,29 @@ async function submitToMarket402() {
   }
 }
 
+async function registerWithNoHumans() {
+  try {
+    const endpoint = PUBLIC_BASE + '/v1/base/network-status';
+    const response = await fetch('https://nohumans.directory/v1/listings', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        name: '50M Base Network Status',
+        description: 'Live Base mainnet block height, gas price and chain ID for autonomous agents. x402 v2, USDC on Base.',
+        endpoint_url: endpoint,
+        category: 'data.blockchain',
+        price_amount: 0.005,
+        chains: ['base'],
+        sample_query: endpoint
+      })
+    });
+    const body = await response.text();
+    console.log('nohumans registration:', response.status, body.slice(0, 1600));
+  } catch (error) {
+    console.error('nohumans registration failed:', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function registerWithX402Dash() {
   try {
     const response = await fetch('https://api.x402dash.com/v1/register', {
@@ -1982,6 +2005,9 @@ app.listen(PORT, '0.0.0.0', function() {
     setTimeout(() => {
       registerWithX402Dash().catch(error => console.error('x402dash live registration failed:', error instanceof Error ? error.message : String(error)));
     }, 2600);
+    setTimeout(() => {
+      registerWithNoHumans().catch(error => console.error('nohumans live registration failed:', error instanceof Error ? error.message : String(error)));
+    }, 3200);
     setTimeout(() => {
       registerWithTrue402().catch(error => console.error('true402 live registration failed:', error instanceof Error ? error.message : String(error)));
     }, 2200);

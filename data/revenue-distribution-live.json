@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-28T15:19:00.177005+00:00",
+  "generated_at": "2026-09-28T15:25:09.751178+00:00",
   "actions": [
     {
       "url": "https://agent402.tools/api/index/register",
@@ -26,8 +26,8 @@
         "message": "Queued. Your endpoint will be probed in the next round (no payment attached; we expect a spec-compliant 402).",
         "instant_check": {
           "ok": true,
-          "url": "https://fifty-million-agent-gateway.onrender.com/v1/base/network-status",
-          "latency_ms": 122,
+          "url": "https://fifty-million-agent-gateway.onrender.com/v1/security/static-analysis",
+          "latency_ms": 123,
           "checks": [
             {
               "check": "https_url",

@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-09-28T15:17:53.604058+00:00",
+  "actions": [
+    {
+      "url": "https://agent402.tools/api/index/register",
+      "status": 200,
+      "body": {
+        "listed": true,
+        "origin": "https://fifty-million-agent-gateway.onrender.com",
+        "seller": {
+          "displayName": "fifty-million-agent-gateway.onrender.com",
+          "toolCount": 18,
+          "networks": [
+            "eip155:8453"
+          ],
+          "routable": true,
+          "health": 1
+        }
+      }
+    },
+    {
+      "url": "https://market402.com/submit",
+      "status": 422,
+      "body": {
+        "ok": false,
+        "code": "invalid_input",
+        "retryable": false,
+        "action": "fix_input",
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "resource"
+            ],
+            "msg": "Field required",
+            "input": {
+              "url": "https://fifty-million-agent-gateway.onrender.com/v1/base/network-status"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://mainnet.base.org",
+      "status": 200,
+      "body": {
+        "jsonrpc": "2.0",
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "id": 1
+      },
+      "usdc_balance": 0.0
+    }
+  ]
+}

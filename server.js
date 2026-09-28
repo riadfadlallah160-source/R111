@@ -2348,9 +2348,12 @@ async function checkA2A402ProgressOnce() {
   const bidId = 'bid_8de75bee-3ef4-4f65-8caa-50e188014719';
   try {
     const bidsRes = await fetch(base + '/jobs/' + encodeURIComponent(jobId) + '/bids');
-    const bids = await bidsRes.json().catch(() => []);
-    const mine = Array.isArray(bids) ? bids.find(b => b.id === bidId) : null;
-    console.log('A2A402_PROGRESS ' + JSON.stringify({ status: bidsRes.status, bid: mine || null }).slice(0, 12000));
+    const raw = await bidsRes.text();
+    let bids = [];
+    try { bids = JSON.parse(raw); } catch {}
+    const rows = Array.isArray(bids) ? bids : (Array.isArray(bids?.bids) ? bids.bids : (Array.isArray(bids?.data) ? bids.data : []));
+    const mine = rows.find(b => b.id === bidId) || null;
+    console.log('A2A402_PROGRESS_RAW ' + JSON.stringify({ status: bidsRes.status, raw: raw.slice(0, 20000), bid: mine }).slice(0, 24000));
     const contractId = mine?.contractId || null;
     if (!contractId) return;
     const headers = { authorization: 'Bearer ' + authToken, 'x-agent-id': agentId };

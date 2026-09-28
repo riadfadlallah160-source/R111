@@ -1,4 +1,11 @@
 {
-  "time": "2026-09-28T17:56:51.917616+00:00",
-  "error": "<HTTPError 400: 'Bad Request'>"
+  "time": "2026-09-28T17:57:14.894697+00:00",
+  "status": 400,
+  "response": {
+    "ok": false,
+    "stage": "wallet_update",
+    "response": {
+      "error": "No valid fields to update"
+    }
+  }
 }

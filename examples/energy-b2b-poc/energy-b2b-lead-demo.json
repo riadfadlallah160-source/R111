@@ -1,0 +1,108 @@
+{
+  "name": "Energy Storage B2B Lead Qualification POC (Portfolio Demo)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "energy-b2b-lead-demo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Lead Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "energy-b2b-lead-demo"
+    },
+    {
+      "parameters": {
+        "jsCode": "const x = $json.body ?? $json;\nconst text = [\n  x.companyName, x.description, x.industry, x.country, x.websiteText\n].filter(Boolean).join(' ').toLowerCase();\n\nconst positive = [\n  ['battery', 20], ['energy storage', 25], ['bess', 25], ['solar', 12],\n  ['renewable', 12], ['telecom', 8], ['data center', 8], ['distributor', 10],\n  ['integrator', 15], ['wholesaler', 10], ['epc', 15], ['utility', 10]\n];\nconst negative = [\n  ['consumer electronics', -10], ['retail only', -12], ['student', -25]\n];\n\nlet score = 0;\nconst reasons = [];\nfor (const [term, pts] of positive) {\n  if (text.includes(term)) { score += pts; reasons.push('+' + pts + ' ' + term); }\n}\nfor (const [term, pts] of negative) {\n  if (text.includes(term)) { score += pts; reasons.push(String(pts) + ' ' + term); }\n}\nscore = Math.max(0, Math.min(100, score));\n\nconst segment =\n  text.includes('integrator') || text.includes('epc') ? 'SYSTEM_INTEGRATOR' :\n  text.includes('distributor') || text.includes('wholesaler') ? 'DISTRIBUTOR' :\n  text.includes('telecom') || text.includes('data center') ? 'BACKUP_POWER' :\n  text.includes('solar') || text.includes('renewable') ? 'RENEWABLE_ENERGY' :\n  'GENERAL_B2B';\n\nreturn [{\n  json: {\n    leadId: x.leadId ?? ('lead-' + Date.now()),\n    companyName: x.companyName ?? 'Unknown',\n    domain: x.domain ?? '',\n    country: x.country ?? '',\n    segment,\n    fitScore: score,\n    fitReasons: reasons,\n    qualification: score >= 45 ? 'QUALIFIED' : score >= 25 ? 'REVIEW' : 'LOW_FIT',\n    source: x.source ?? 'manual-demo',\n    raw: x\n  }\n}];"
+      },
+      "id": "2",
+      "name": "Deterministic ICP Scoring",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const x = $json;\nconst researchPlan = [\n  'Verify company identity and official domain',\n  'Identify business model and target markets',\n  'Find public evidence of battery/energy-storage demand',\n  'Identify relevant buyer role (procurement, energy systems, operations, business development)',\n  'Collect only public business contact channels',\n  'Draft one outreach angle tied to verified evidence'\n];\n\nlet angle = 'General battery and energy-storage partnership';\nif (x.segment === 'SYSTEM_INTEGRATOR') angle = 'OEM/ODM BESS supply + system-integration support';\nif (x.segment === 'DISTRIBUTOR') angle = 'Distributor/wholesale battery supply and territory expansion';\nif (x.segment === 'BACKUP_POWER') angle = 'Telecom/data-center backup battery reliability and lifecycle';\nif (x.segment === 'RENEWABLE_ENERGY') angle = 'Solar/renewable storage pairing and BESS availability';\n\nreturn [{\n  json: {\n    ...x,\n    researchPlan,\n    outreachAngle: angle,\n    nextAction: x.qualification === 'QUALIFIED'\n      ? 'RESEARCH_AND_PREPARE_OUTREACH'\n      : x.qualification === 'REVIEW'\n        ? 'HUMAN_REVIEW'\n        : 'DROP',\n    guardrails: [\n      'No purchased contact lists',\n      'No private-personal data',\n      'No outreach until company identity and business relevance are verified',\n      'Deduplicate by company domain before any send'\n    ],\n    demoStatus: 'PORTFOLIO_DEMO_ONLY'\n  }\n}];"
+      },
+      "id": "3",
+      "name": "Research + Outreach Planner",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Return Lead Decision",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Lead Intake": {
+      "main": [
+        [
+          {
+            "node": "Deterministic ICP Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deterministic ICP Scoring": {
+      "main": [
+        [
+          {
+            "node": "Research + Outreach Planner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research + Outreach Planner": {
+      "main": [
+        [
+          {
+            "node": "Return Lead Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "energy-b2b-demo-1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

@@ -1,0 +1,19 @@
+name: AgentBounties Live Feed
+on:
+  push:
+    paths:
+      - '.github/workflows/agentbounties-live.yml'
+  workflow_dispatch:
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query canonical Base feed
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --silent 'https://api.agentbounties.app/v1/base/autonomous-bounties/feed?network=base-mainnet&claimable_only=true' -o /tmp/feed.json
+          python - <<'PY'
+          import json
+          d=json.load(open('/tmp/feed.json'))
+          print(json.dumps(d, indent=2)[:60000])
+          PY

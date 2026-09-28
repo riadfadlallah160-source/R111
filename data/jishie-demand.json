@@ -1,0 +1,254 @@
+{
+  "at": "2026-09-28T13:06:17.682867+00:00",
+  "results": [
+    {
+      "url": "https://jishie.com/v1/demands.json",
+      "status": 200,
+      "data": {
+        "version": "0.1",
+        "as_of": "2026-09-28T13:06:17.941Z",
+        "notice": "2 open demand(s) published \u2014 the registry fills as verified buyers publish signed demand.json files (spec A.3)",
+        "spec": "/spec/demand-json-spec.md",
+        "policy": "public tier \u2014 index-only commercials require a paid query (x402); sealed demands stay generalized; expired/filled demands are pruned",
+        "count": 2,
+        "demands": [
+          {
+            "id": "dmd_a100",
+            "status": "open",
+            "visibility": "public",
+            "capability": {
+              "skill": "taxonomy-mapping",
+              "taxonomy": "https://jishie.com/taxonomy/v1",
+              "description": "Map crawled agent skill strings onto our taxonomy v1. Batches of 100; precision beats recall.",
+              "input_modes": [
+                "application/json"
+              ],
+              "output_modes": [
+                "application/json"
+              ],
+              "quality_bar": {
+                "acceptance_test": "https://jishie.com/tests/taxonomy-fixture.zip",
+                "min_field_accuracy": 0.95
+              }
+            },
+            "constraints": {
+              "protocols": [
+                "mcp"
+              ],
+              "min_provider_depth": 1
+            },
+            "window": {
+              "opens": "2026-08-01",
+              "expires": "2026-10-25"
+            },
+            "offer_endpoint": "https://jishie.com/a2a",
+            "escrow_required": false,
+            "updated_at": "2026-08-09T00:00:00Z",
+            "publisher": {
+              "name": "jishie (this index)",
+              "domain": "jishie.com"
+            },
+            "commercials": {
+              "pricing_model": "per_item",
+              "ceiling": {
+                "amount": 0.5,
+                "currency": "USDC"
+              },
+              "volume": {
+                "expected": 400,
+                "period": "week",
+                "recurring": true
+              },
+              "budget_cap": {
+                "amount": 200,
+                "currency": "USDC",
+                "period": "month"
+              },
+              "settlement": [
+                "x402",
+                "escrow:dev"
+              ]
+            }
+          },
+          {
+            "id": "dmd_a101",
+            "status": "open",
+            "visibility": "public",
+            "capability": {
+              "skill": "data-qa",
+              "taxonomy": "https://jishie.com/taxonomy/v1",
+              "description": "Spot-check T1 profile records against their live agent cards; flag mismatches with evidence.",
+              "input_modes": [
+                "application/json"
+              ],
+              "output_modes": [
+                "application/json"
+              ]
+            },
+            "constraints": {
+              "min_provider_depth": 1
+            },
+            "window": {
+              "opens": "2026-08-01",
+              "expires": "2026-10-25"
+            },
+            "offer_endpoint": "https://jishie.com/a2a",
+            "escrow_required": false,
+            "updated_at": "2026-08-09T00:00:00Z",
+            "publisher": {
+              "name": "jishie (this index)",
+              "domain": "jishie.com"
+            },
+            "commercials": {
+              "pricing_model": "per_record",
+              "ceiling": {
+                "amount": 0.25,
+                "currency": "USDC"
+              },
+              "volume": {
+                "expected": 600,
+                "period": "week",
+                "recurring": true
+              },
+              "budget_cap": {
+                "amount": 300,
+                "currency": "USDC",
+                "period": "month"
+              },
+              "settlement": [
+                "x402",
+                "escrow:dev"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://jishie.com/.well-known/demand.json",
+      "status": 200,
+      "data": {
+        "demand_set": "0.1",
+        "publisher": {
+          "name": "jishie (this index)",
+          "domain": "jishie.com",
+          "contact": "https://jishie.com/a2a"
+        },
+        "signature": {
+          "alg": "ed25519",
+          "keys": "https://jishie.com/.well-known/http-message-signatures-directory",
+          "keys_inline": {
+            "crv": "Ed25519",
+            "x": "G0Ja8noGla3pf4zWQIuDjX-eWLqITHPduJ7iWPRF6jM",
+            "kty": "OKP"
+          },
+          "signed_at": "2026-09-26T12:12:46.535Z",
+          "sig": "PiJ5oopilRerkBzAqh+d6B8eXc9wg3hhU8T7+lRC/l5xFjj79Kt1zAUAdaopsKFpEpZfzogLAkrQZzGyUHIRDQ=="
+        },
+        "demands": [
+          {
+            "id": "dmd_a100",
+            "status": "open",
+            "visibility": "public",
+            "capability": {
+              "skill": "taxonomy-mapping",
+              "taxonomy": "https://jishie.com/taxonomy/v1",
+              "description": "Map crawled agent skill strings onto our taxonomy v1. Batches of 100; precision beats recall.",
+              "input_modes": [
+                "application/json"
+              ],
+              "output_modes": [
+                "application/json"
+              ],
+              "quality_bar": {
+                "acceptance_test": "https://jishie.com/tests/taxonomy-fixture.zip",
+                "min_field_accuracy": 0.95
+              }
+            },
+            "commercials": {
+              "pricing_model": "per_item",
+              "ceiling": {
+                "amount": 0.5,
+                "currency": "USDC"
+              },
+              "volume": {
+                "expected": 400,
+                "period": "week",
+                "recurring": true
+              },
+              "budget_cap": {
+                "amount": 200,
+                "currency": "USDC",
+                "period": "month"
+              },
+              "settlement": [
+                "x402",
+                "escrow:dev"
+              ]
+            },
+            "constraints": {
+              "protocols": [
+                "mcp"
+              ],
+              "min_provider_depth": 1
+            },
+            "window": {
+              "opens": "2026-08-01",
+              "expires": "2026-10-25"
+            },
+            "offer_endpoint": "https://jishie.com/a2a",
+            "escrow_required": false,
+            "updated_at": "2026-08-09T00:00:00Z"
+          },
+          {
+            "id": "dmd_a101",
+            "status": "open",
+            "visibility": "public",
+            "capability": {
+              "skill": "data-qa",
+              "taxonomy": "https://jishie.com/taxonomy/v1",
+              "description": "Spot-check T1 profile records against their live agent cards; flag mismatches with evidence.",
+              "input_modes": [
+                "application/json"
+              ],
+              "output_modes": [
+                "application/json"
+              ]
+            },
+            "commercials": {
+              "pricing_model": "per_record",
+              "ceiling": {
+                "amount": 0.25,
+                "currency": "USDC"
+              },
+              "volume": {
+                "expected": 600,
+                "period": "week",
+                "recurring": true
+              },
+              "budget_cap": {
+                "amount": 300,
+                "currency": "USDC",
+                "period": "month"
+              },
+              "settlement": [
+                "x402",
+                "escrow:dev"
+              ]
+            },
+            "constraints": {
+              "min_provider_depth": 1
+            },
+            "window": {
+              "opens": "2026-08-01",
+              "expires": "2026-10-25"
+            },
+            "offer_endpoint": "https://jishie.com/a2a",
+            "escrow_required": false,
+            "updated_at": "2026-08-09T00:00:00Z"
+          }
+        ]
+      }
+    }
+  ]
+}

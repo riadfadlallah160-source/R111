@@ -276,9 +276,16 @@ export function registerMarketHandlers(app, assignment) {
     }
   });
 
-  app.post('/v1/market/gasroute-oracle-preview', async (req, res) => {
+  app.all('/v1/market/gasroute-oracle-preview', async (req, res) => {
     try {
-      const result = await computeGasRoute(req.body);
+      const input = req.method === 'GET'
+        ? {
+            chain_set: String(req.query.chain_set || 'ethereum,bsc,polygon'),
+            calldata_size_bytes: Number(req.query.calldata_size_bytes || 128),
+            gas_units_est: Number(req.query.gas_units_est || 100000)
+          }
+        : req.body;
+      const result = await computeGasRoute(input);
       res.json({ preview: true, x402_endpoint: '/v1/market/gasroute-oracle', ...result });
     } catch (error) {
       res.status(Number(error?.status || 502)).json({ error: String(error?.message || error) });

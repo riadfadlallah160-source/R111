@@ -67,6 +67,7 @@ app.post('/internal/live-authorized/clawlancer-welcome-7aa3f150', async (_req, r
     ok: claim.ok,
     stage: 'claim',
     wallet_updated: true,
+    wallet_update_response: updateBody,
     response: claimBody
   });
 });

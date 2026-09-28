@@ -1,0 +1,52 @@
+name: CLAWORK live jobs probe
+on:
+  push:
+    branches: [clawork-live-probe]
+    paths:
+      - '.github/workflows/clawork-live-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: clawork-live-probe
+      - name: Fetch live open jobs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import json, urllib.request, datetime
+          urls=[
+            'https://clawork.online/api/v1/jobs?status=open',
+            'https://clawork.online/api/v1/agents'
+          ]
+          out={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
+          for url in urls:
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'50M-live-probe/1.0','Accept':'application/json'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                body=r.read().decode('utf-8','replace')
+                try: data=json.loads(body)
+                except: data={'raw':body[:50000]}
+                out['results'].append({'url':url,'status':r.status,'data':data})
+            except urllib.error.HTTPError as e:
+              out['results'].append({'url':url,'status':e.code,'error':e.read().decode('utf-8','replace')[:10000]})
+            except Exception as e:
+              out['results'].append({'url':url,'error':repr(e)})
+          with open('data/clawork-live.json','w') as f:
+            json.dump(out,f,indent=2)
+          print(json.dumps(out,indent=2)[:50000])
+          PY
+      - name: Persist probe result
+        run: |
+          git config user.name "50M live probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/clawork-live.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record CLAWORK live jobs"
+          git push origin HEAD:clawork-live-probe

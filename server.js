@@ -1182,15 +1182,16 @@ app.get('/.well-known/402index-verify.txt', function(_req, res) {
 app.get('/.well-known/x402-service.json', function(_req, res) {
   res.json({
     x402: '1.0',
-    name: '50m-dollar-slot',
-    capabilities: ['data','automation','text','json','csv','hashing','normalization'],
-    pricing: { currency: 'USDC', base: '1.00', unit: 'request' },
+    name: '50m-agent-utility-gateway',
+    description: 'Pay-per-call Base network data, market data, security analysis, data profiling, web analysis, and deterministic batch processing.',
+    capabilities: ['base-network-status','crypto-price','security-analysis','data-profile','web-analysis','batch-processing'],
+    pricing: { currency: 'USDC', base: '0.005', unit: 'request' },
     payment: {
       address: PAY_TO,
       chain: 'base',
       facilitator: FACILITATOR
     },
-    endpoint: PUBLIC_BASE + '/v1/slot/run'
+    endpoint: PUBLIC_BASE + '/v1/base/network-status'
   });
 });
 
@@ -1334,27 +1335,13 @@ async function registerWith402Index() {
 
 async function registerWithTrue402() {
   try {
-    const response = await fetch('https://true402.dev/api/v1/services', {
+    const response = await fetch('https://true402.dev/api/v1/services/register', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        url: PUBLIC_BASE,
-        manifest: {
-          x402: '1.0',
-          name: '50m-dollar-slot',
-          capabilities: ['data','automation','text','json','csv','hashing','normalization'],
-          pricing: { currency: 'USDC', base: '1.00', unit: 'request' },
-          payment: {
-            address: PAY_TO,
-            chain: 'base',
-            facilitator: FACILITATOR
-          },
-          endpoint: PUBLIC_BASE + '/v1/slot/run'
-        }
-      })
+      body: JSON.stringify({ url: PUBLIC_BASE })
     });
     const body = await response.text();
-    console.log('true402 registration:', response.status, body.slice(0, 400));
+    console.log('true402 registration:', response.status, body.slice(0, 1200));
   } catch (error) {
     console.error('true402 registration failed:', error instanceof Error ? error.message : String(error));
   }

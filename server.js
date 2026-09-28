@@ -2237,3 +2237,26 @@ async function inspectSuperteamEarnOnce() {
 setTimeout(() => {
   inspectSuperteamEarnOnce().catch(error => console.error('SUPERTEAM_INSPECT_ERROR ' + (error instanceof Error ? error.message : String(error))));
 }, 9000);
+
+
+async function probeDirectRevenueRailsOnce() {
+  if (process.env.REVENUE_RAIL_PROBE_ONCE !== '1') return;
+  const targets = [
+    ['A2A402_JOBS', 'https://a2a402.market/jobs?status=OPEN'],
+    ['A2A402_ONBOARD', 'https://a2a402.market/agents/onboard.json'],
+    ['AGENTSOUK_DEMAND', 'https://agentsouk.dev/v1/demand'],
+    ['AGENTSOUK_OPPORTUNITIES', 'https://agentsouk.dev/v1/opportunities']
+  ];
+  for (const [label, url] of targets) {
+    try {
+      const r = await fetch(url, { headers: { 'user-agent': '50M-Revenue-Hunt/1.0', accept: 'application/json,text/plain,*/*' } });
+      const body = await r.text();
+      console.log('REVENUE_RAIL_PROBE ' + JSON.stringify({ label, url, status:r.status, body:body.slice(0,30000) }));
+    } catch (error) {
+      console.error('REVENUE_RAIL_PROBE ' + JSON.stringify({ label, url, error:error instanceof Error ? error.message : String(error) }));
+    }
+  }
+}
+setTimeout(() => {
+  probeDirectRevenueRailsOnce().catch(error => console.error('REVENUE_RAIL_PROBE_ERROR ' + (error instanceof Error ? error.message : String(error))));
+}, 12000);

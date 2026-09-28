@@ -1,0 +1,50 @@
+name: Jishie offer encoding compatibility
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-offer-encoding.yml']
+permissions:
+  contents: write
+jobs:
+  offer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: jishie-demand-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          cat > /tmp/enc.mjs <<'JS'
+          import crypto from 'node:crypto'; import fs from 'node:fs';
+          const sort=v=>Array.isArray(v)?v.map(sort):(v&&typeof v==='object')?Object.fromEntries(Object.keys(v).sort().map(k=>[k,sort(v[k])])):v;
+          const core={offer:'0.1',demand_id:'dmd_a101',seller:{domain:'fifty-million-agent-gateway.onrender.com',agent_card:'https://fifty-million-agent-gateway.onrender.com/.well-known/agent.json',index_ref:'aix_e13bf173d4'},price:{amount:0.20,currency:'USDC',model:'per_record'},capacity:{max_per_day:120},sla:{p95_ms:3000,uptime:0.99},settlement:{rail:'x402'},valid_until:'2026-10-25'};
+          const stable=Buffer.from(JSON.stringify(sort(core))); const nover=(()=>{const {offer,...x}=core;return Buffer.from(JSON.stringify(sort(x)))})();
+          const variants=[
+            ['stable-core-base64url',stable,false,'base64url'],
+            ['stable-core-sha256-base64',stable,true,'base64'],
+            ['stable-core-sha256-base64url',stable,true,'base64url'],
+            ['stable-no-version-base64url',nover,false,'base64url']
+          ];
+          const results=[];
+          for(const [name,msg,digest,enc] of variants){
+            const {publicKey,privateKey}=crypto.generateKeyPairSync('ed25519'); const jwk=publicKey.export({format:'jwk'});
+            const data=digest?crypto.createHash('sha256').update(msg).digest():msg;
+            const sig=crypto.sign(null,data,privateKey).toString(enc);
+            const body={...core,signature:{alg:'ed25519',keys_inline:{kty:'OKP',crv:'Ed25519',x:jwk.x},signed_at:new Date().toISOString(),sig}};
+            const r=await fetch('https://jishie.com/v1/demands/dmd_a101/offers',{method:'POST',headers:{'content-type':'application/json','accept':'application/json','user-agent':'50M-seller-encoding-compat/1.0'},body:JSON.stringify(body)});
+            const raw=await r.text(); let res; try{res=JSON.parse(raw)}catch{res={raw:raw.slice(0,4000)}}
+            results.push({variant:name,status:r.status,response:res});
+            if(r.status>=200&&r.status<300) break;
+            if(r.status!==422 || !String(res?.error||'').toLowerCase().includes('signature')) break;
+          }
+          fs.writeFileSync('data/jishie-offer-encoding.json',JSON.stringify({at:new Date().toISOString(),results},null,2)); console.log(JSON.stringify({results},null,2));
+          JS
+          node /tmp/enc.mjs
+      - run: |
+          git config user.name "50M demand seller"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-offer-encoding.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Jishie offer encoding compatibility"
+          git push origin HEAD:jishie-demand-probe

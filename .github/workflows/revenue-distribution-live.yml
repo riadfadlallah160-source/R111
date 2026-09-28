@@ -39,7 +39,7 @@ jobs:
             except Exception as e:
               return {'url':url,'error':repr(e)}
           out['actions'].append(post('https://agent402.tools/api/index/register',{'origin':origin}))
-          out['actions'].append(post('https://market402.com/submit',{'resource':origin+'/v1/base/network-status'}))
+          out['actions'].append(post('https://market402.com/submit',{'resource':origin+'/v1/security/static-analysis'}))
           out['actions'].append(post('https://api.cdp.coinbase.com/platform/v2/x402/validate',{'resource':origin+'/v1/base/network-status','method':'POST'}))
           # Read Base USDC balance via public JSON-RPC eth_call balanceOf(address)
           wallet='f744573cdffc211163c11c0a31730851da78f708'

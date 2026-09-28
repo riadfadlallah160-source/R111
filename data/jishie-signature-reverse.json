@@ -1,0 +1,11 @@
+{
+  "checks": {
+    "stable-demands": true,
+    "plain-demands": false,
+    "stable-set-no-sig": false,
+    "stable-core-set": false,
+    "plain-core-set": false
+  },
+  "signature_length": 64,
+  "x": "G0Ja8noGla3pf4zWQIuDjX-eWLqITHPduJ7iWPRF6jM"
+}

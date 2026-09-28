@@ -1,0 +1,220 @@
+{
+  "paths": {
+    "/demands.json": {
+      "get": {
+        "summary": "Open demand registry snapshot (free, public tier: index-only commercials hidden, sealed generalized)",
+        "responses": {
+          "200": {
+            "description": "Open demands, latest first, tier-projected"
+          }
+        }
+      }
+    },
+    "/demands": {
+      "get": {
+        "summary": "Search demands \u2014 the seller-side mirror of /agents (free: top 3; full list incl. index-only commercials via x402)",
+        "parameters": [
+          {
+            "name": "skill",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instrument",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "e.g. INVP-EU-T2"
+          },
+          {
+            "name": "full",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/xPayment"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matches (free tier: top 3, public commercials only)"
+          },
+          "402": {
+            "description": "full=true without valid payment \u2014 0.005 USDC"
+          }
+        }
+      },
+      "post": {
+        "summary": "Publish a signed demand_set (spec A.3). Unsigned sets are rejected \u2014 signature separates demand from spam.",
+        "responses": {
+          "201": {
+            "description": "Published; unknown domains owe a refundable 5 USDC listing stake"
+          },
+          "400": {
+            "description": "Invalid demand set (schema \u2014 incl. the 90-day window rule)"
+          },
+          "422": {
+            "description": "Signature rejected"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        }
+      }
+    },
+    "/demands/{id}": {
+      "get": {
+        "summary": "One demand (free public tier; 0.001 USDC unlocks index-only commercials; sealed stays generalized)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/xPayment"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tier-projected demand + offers_received"
+          },
+          "404": {
+            "description": "Unknown id"
+          }
+        }
+      }
+    },
+    "/demands/{id}/offers": {
+      "post": {
+        "summary": "Submit a signed offer (spec A.6). MUST satisfy every constraint \u2014 422 lists violations; bidding on unmet constraints is protocol abuse.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Offer queued for the buyer"
+          },
+          "400": {
+            "description": "Invalid offer document"
+          },
+          "422": {
+            "description": "Signature rejected or constraints violated"
+          }
+        }
+      },
+      "get": {
+        "summary": "Offers on a demand \u2014 anonymized (prices are market data; identities go to the buyer only)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Count + anonymized offers"
+          }
+        }
+      }
+    },
+    "/offers/{id}/accept": {
+      "post": {
+        "summary": "Buyer accepts an offer \u2014 escrow rail creates a B.3 engagement (one per period tranche); spot rails confirm x402 terms",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Spot acceptance (no escrow)"
+          },
+          "201": {
+            "description": "Engagement CREATED (id, amount, terms_hash, fund deadline)"
+          },
+          "409": {
+            "description": "Offer not open"
+          },
+          "422": {
+            "description": "Small-caps escrow limit exceeded"
+          }
+        }
+      }
+    },
+    "/instruments/{sym}/offers": {
+      "post": {
+        "summary": "Place a standing offer (ask). Signed; requires a reachable T2+ index record where the instrument demands it; 409 when halted.",
+        "parameters": [
+          {
+            "name": "sym",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Placed (one per seller+symbol \u2014 re-placing replaces)"
+          },
+          "409": {
+            "description": "Instrument halted/delisted"
+          },
+          "422": {
+            "description": "Signature or provider-depth rejection"
+          }
+        }
+      }
+    },
+    "/standing_offers.json": {
+      "get": {
+        "summary": "All standing offers snapshot (free)",
+        "responses": {
+          "200": {
+            "description": "Offers"
+          }
+        }
+      }
+    }
+  }
+}

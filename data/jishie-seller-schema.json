@@ -1,0 +1,503 @@
+{
+  "paths": {
+    "/agents": {
+      "get": {
+        "summary": "Search agents (free: top 3 ranked; full list via x402)",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "free-text over name/operator/skills"
+          },
+          {
+            "name": "skill",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "e.g. invoice-parsing"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "global",
+                "eu",
+                "us",
+                "apac"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "ISO 639-1"
+          },
+          {
+            "name": "verified",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "only T3 records"
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "USDC per call/unit"
+          },
+          {
+            "name": "access",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "x402",
+                "oauth",
+                "auth",
+                "open",
+                "autonomous"
+              ]
+            },
+            "description": "filter by how the agent gates a machine: x402 (pays per call, no human) \u00b7 oauth (human clicks Allow) \u00b7 auth (api-key) \u00b7 open (ungated) \u00b7 autonomous (x402 OR open \u2014 connectable with no human in the loop)"
+          },
+          {
+            "name": "min_depth",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3,
+              "default": 2
+            }
+          },
+          {
+            "name": "include_unprobed",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "include T0/T1 records (returned unscored)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "pagination offset over the ranked list (total is always the full count)"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "taxonomy category (see GET /v1/taxonomy)"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "score",
+                "depth",
+                "price",
+                "latency",
+                "uptime",
+                "name"
+              ],
+              "default": "score"
+            }
+          },
+          {
+            "name": "dir",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            },
+            "description": "sort direction; defaults to each sort key's natural direction"
+          },
+          {
+            "name": "axis_<name>",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3
+            },
+            "description": "AXIS filter family: axis_<name>=<minLevel> keeps only agents whose named AXIS trust axis is at least <minLevel>. <name> is any of identity, reliability, behavior, pricing, data_privacy, recourse, track_record, conformance, transparency (e.g. axis_identity=2). This is the filter THE AGENT STANDARD \u00a75.4 points machines to."
+          },
+          {
+            "name": "full",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "request the full ranked list (triggers the 402 flow when unpaid). Billing is gated on this flag: a bare X-PAYMENT header without full=true is served the free tier and never charged."
+          },
+          {
+            "$ref": "#/components/parameters/xPayment"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ranked matches. Free tier: top 3 + payment pointer. Paid: full list. When a default (depth>=2) search matches nothing, the response carries a `hint` naming how many indexed-but-unprobed records match and how to see them (include_unprobed=true) \u2014 shallow records are never shown by default.",
+            "headers": {
+              "X-PAYMENT-RESPONSE": {
+                "$ref": "#/components/headers/XPaymentResponse"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "full=true without valid payment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentRequired"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Submit a new agent (free) \u2014 enters the pipeline at T0 after review",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "skills"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "mcp_endpoint": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "uri"
+                  },
+                  "a2a_endpoint": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "uri"
+                  },
+                  "skills": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1
+                  },
+                  "operator": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "contact": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Queued for liveness check + review"
+          },
+          "400": {
+            "description": "Invalid submission (at least one endpoint required)"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        }
+      }
+    },
+    "/standard/check": {
+      "get": {
+        "summary": "Grade an agent against THE AGENT STANDARD (free) - MCP handshake, tools, card",
+        "parameters": [
+          {
+            "name": "mcp",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "card",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scorecard"
+          },
+          "400": {
+            "description": "Missing/invalid mcp URL"
+          }
+        }
+      }
+    }
+  },
+  "schemas": {
+    "PaymentRequired": {
+      "type": "object",
+      "required": [
+        "x402Version",
+        "error",
+        "accepts"
+      ],
+      "properties": {
+        "x402Version": {
+          "type": "integer",
+          "const": 1
+        },
+        "error": {
+          "type": "string"
+        },
+        "accepts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scheme": {
+                "type": "string",
+                "const": "exact"
+              },
+              "network": {
+                "type": "string"
+              },
+              "maxAmountRequired": {
+                "type": "string",
+                "description": "USDC atomic units (6 decimals)"
+              },
+              "resource": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "mimeType": {
+                "type": "string"
+              },
+              "payTo": {
+                "type": "string"
+              },
+              "maxTimeoutSeconds": {
+                "type": "integer"
+              },
+              "asset": {
+                "type": "string"
+              },
+              "extra": {
+                "type": "object",
+                "description": "rail metadata",
+                "properties": {
+                  "rail": {
+                    "type": "string",
+                    "const": "x402"
+                  },
+                  "mode": {
+                    "type": "string"
+                  },
+                  "price_usdc": {
+                    "type": "number"
+                  },
+                  "feePayer": {
+                    "type": "string",
+                    "description": "Solana only \u2014 the account the client names as the transaction fee payer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "AgentSummary": {
+      "type": "object",
+      "description": "Free projection of a record. aix_score is null below T2 \u2014 'not yet scored', never guessed.",
+      "required": [
+        "id",
+        "name",
+        "depth",
+        "status",
+        "skills",
+        "scored"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^aix_[a-z0-9]+$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string"
+        },
+        "depth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "claimed",
+            "unclaimed"
+          ]
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "protocols": {
+          "type": "object",
+          "properties": {
+            "mcp": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "a2a": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "pricing": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aix_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "scored": {
+          "type": "boolean"
+        },
+        "score_note": {
+          "type": "string"
+        }
+      }
+    },
+    "SearchResponse": {
+      "type": "object",
+      "required": [
+        "query",
+        "total",
+        "returned",
+        "free_tier",
+        "results"
+      ],
+      "properties": {
+        "query": {
+          "type": "object",
+          "description": "effective parameters incl. effective_min_depth"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "returned": {
+          "type": "integer"
+        },
+        "free_tier": {
+          "type": "boolean"
+        },
+        "payment": {
+          "type": "object",
+          "description": "present on capped free-tier responses"
+        },
+        "policy": {
+          "type": "string"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/AgentSummary"
+          }
+        }
+      }
+    }
+  }
+}

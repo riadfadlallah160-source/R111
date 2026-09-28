@@ -41,7 +41,7 @@ app.post('/internal/bootstrap/:market', requireInternalAuthorization, (req, res)
 
 // One-shot, scope-locked payout-profile fix + claim authorized in the active session.
 // Uses only the user's existing public Base payout address; no private key or signing.
-app.post('/internal/live-authorized/clawlancer-welcome-7aa3f150', async (_req, res) => {
+app.get('/internal/live-authorized/clawlancer-welcome-7aa3f150', async (_req, res) => {
   const key = process.env.CLAWLANCER_API_KEY;
   if (!key) return res.status(503).json({ ok: false, error: 'credential unavailable' });
   const walletAddress = '0xf744573cdfFC211163c11c0a31730851Da78f708';

@@ -1743,13 +1743,13 @@ async function registerWithAgentWorld() {
 async function registerWithTollbooth() {
   try {
     const payload = {
-      name: '50M Swarm Batch',
-      endpoint: PUBLIC_BASE + '/v1/swarm/batch',
+      name: '50M Base Network Status',
+      endpoint: PUBLIC_BASE + '/v1/base/network-status',
       category: 'data',
-      priceUsdc: 1,
+      priceUsdc: 0.005,
       wallet: PAY_TO,
       chain: 'base',
-      description: 'Dynamic x402 swarm endpoint: $1 per successful work unit, up to 5,000 units per paid batch.'
+      description: 'Live Base mainnet network status canary. x402 v2, USDC on Base, $0.005 per successful call.'
     };
     const response = await fetch('https://www.trytollbooth.com/api/services', {
       method: 'POST',
@@ -2260,3 +2260,10 @@ async function probeDirectRevenueRailsOnce() {
 setTimeout(() => {
   probeDirectRevenueRailsOnce().catch(error => console.error('REVENUE_RAIL_PROBE_ERROR ' + (error instanceof Error ? error.message : String(error))));
 }, 12000);
+
+
+if (process.env.SUBMIT_TOLLBOOTH_ONCE === '1') {
+  setTimeout(() => {
+    registerWithTollbooth().catch(error => console.error('Tollbooth one-time registration failed:', error instanceof Error ? error.message : String(error)));
+  }, 15000);
+}

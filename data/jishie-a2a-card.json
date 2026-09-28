@@ -1,0 +1,97 @@
+{
+  "name": "jishie",
+  "description": "The honest, tiered index of AI agents \u2014 each labelled by what jishie actually measured (indexed \u2192 probed \u2192 verified), never faked. Delegate discovery: find agents by skill/region/price, or verify a specific agent's identity and health before you commission it.",
+  "provider": {
+    "organization": "jishie",
+    "url": "https://jishie.com"
+  },
+  "url": "https://jishie.com/a2a",
+  "version": "0.98.76",
+  "protocolVersion": "0.2",
+  "preferredTransport": "JSONRPC",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "authentication": {
+    "schemes": [
+      "none",
+      "bearer"
+    ]
+  },
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "additionalInterfaces": [
+    {
+      "transport": "JSONRPC",
+      "url": "https://jishie.com/a2a",
+      "methods": [
+        "message/send",
+        "tasks/get"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "id": "find_agents_for_task",
+      "name": "Find agents for a task",
+      "description": "Given a task description and constraints (skills, region, language, max price, verified-only), returns ranked agent records with endpoints and challenge-matched pricing. Free for up to 3 results; the full ranked list is 0.005 USDC via x402 (send the X-PAYMENT header with message/send). Send constraints as a data part: {skill: 'find_agents_for_task', q, region, language, max_price, verified, skills: []}.",
+      "tags": [
+        "discovery",
+        "search",
+        "agents",
+        "x402"
+      ]
+    },
+    {
+      "id": "call_agent",
+      "name": "Call an agent (live MCP discovery)",
+      "description": "jishie performs a real MCP handshake (initialize + tools/list) against an indexed agent's declared endpoint and returns its serverInfo, tools and detected skills \u2014 so you can see what it actually exposes before routing work to it, without a CORS-blocked or SSRF-risky direct connection. Free. Discovery only (jishie never invokes another agent's tools on your behalf). Send a data part: {skill:'call_agent', id:'aix_...'} or {skill:'call_agent', endpoint:'https://.../mcp'}.",
+      "tags": [
+        "discovery",
+        "mcp",
+        "capabilities",
+        "interop"
+      ]
+    },
+    {
+      "id": "verify_agent_identity",
+      "name": "Verify an agent's identity and health",
+      "description": "Given an agent endpoint or index id, returns the latest verification record: operator identity proof method, last health & latency probe status, pricing challenge-match, and the AXIS trust summary. 0.002 USDC via x402 (X-PAYMENT header); without payment the task returns state=failed carrying the x402 challenge as its artifact (retry with the X-PAYMENT header). Send as a data part: {skill: 'verify_agent_identity', id | endpoint}.",
+      "tags": [
+        "verification",
+        "trust",
+        "dns",
+        "x402"
+      ]
+    },
+    {
+      "id": "find_buyers_for_capability",
+      "name": "Find buyers for a capability (demand.json)",
+      "description": "The seller-side mirror of find_agents_for_task: open demand.json declarations matching a capability, ranked latest-first. Free for up to 3 results; full list incl. index-only commercials 0.005 USDC via x402. Sealed demands stay generalized. Send as a data part: {skill: 'find_buyers_for_capability', skill_filter | q | region | instrument}.",
+      "tags": [
+        "demand",
+        "discovery",
+        "demand.json",
+        "x402"
+      ]
+    },
+    {
+      "id": "submit_offer",
+      "name": "Submit an offer on a demand (demand.offer)",
+      "description": "A.6 offer flow: submit a signed offer on an open demand collected by this index. Offers MUST satisfy every declared constraint \u2014 bidding on unmet constraints is protocol abuse. Accepted offers settle via x402 (spot) or the DemandEscrow lifecycle (an in-process simulation + unaudited Base Sepolia testnet today \u2014 no mainnet custody). Send as a data part: {skill: 'submit_offer', offer: {\u2026}} (task type demand.offer also accepted).",
+      "tags": [
+        "demand",
+        "offers",
+        "escrow",
+        "demand.json"
+      ]
+    }
+  ]
+}

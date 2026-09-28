@@ -2367,3 +2367,21 @@ async function checkA2A402ProgressOnce() {
 setTimeout(() => {
   checkA2A402ProgressOnce().catch(error => console.error('A2A402_PROGRESS_ERROR ' + (error instanceof Error ? error.message : String(error))));
 }, 7000);
+
+
+async function inspectPayApiSubmitOnce() {
+  if (process.env.PAYAPI_INSPECT_ONCE !== '1') return;
+  try {
+    const r = await fetch('https://payapi.market/list', { headers: { 'user-agent': '50M-Revenue-Hunt/1.0' } });
+    const html = await r.text();
+    const formTags = [...html.matchAll(/<form[^>]*>/gi)].map(m => m[0]);
+    const actions = [...html.matchAll(/(?:action|fetch\(|axios\.|href=)[^\n]{0,300}/gi)].map(m => m[0]).filter(x => /submit|list|api|form/i.test(x)).slice(0,100);
+    const scripts = [...html.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map(m => m[1]);
+    console.log('PAYAPI_SOURCE_INSPECT ' + JSON.stringify({status:r.status, formTags, actions, scripts}).slice(0,30000));
+  } catch (error) {
+    console.error('PAYAPI_SOURCE_INSPECT_ERROR ' + (error instanceof Error ? error.message : String(error)));
+  }
+}
+setTimeout(() => {
+  inspectPayApiSubmitOnce().catch(error => console.error('PAYAPI_SOURCE_INSPECT_ERROR ' + (error instanceof Error ? error.message : String(error))));
+}, 9000);

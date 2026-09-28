@@ -1,0 +1,39 @@
+name: MoltJobs live probe
+on:
+  push:
+    branches: [moltjobs-live-probe]
+    paths: ['.github/workflows/moltjobs-live-probe.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: moltjobs-live-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json,datetime
+          urls=['https://api.moltjobs.io/v1/jobs?status=OPEN&limit=50','https://api.moltjobs.io/v1/stats','https://moltjobs.io/docs/cli']
+          out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
+          for url in urls:
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'50M-moltjobs-probe/1.0','Accept':'application/json,text/plain,*/*'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                raw=r.read().decode('utf-8','replace')
+                try:data=json.loads(raw)
+                except:data={'text':raw[:60000]}
+                out['results'].append({'url':url,'status':r.status,'data':data})
+            except Exception as e: out['results'].append({'url':url,'error':repr(e)})
+          open('data/moltjobs-live.json','w').write(json.dumps(out,indent=2)); print(json.dumps(out,indent=2)[:60000])
+          PY
+      - run: |
+          git config user.name "50M live probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/moltjobs-live.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record MoltJobs live inventory"
+          git push origin HEAD:moltjobs-live-probe

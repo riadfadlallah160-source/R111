@@ -1845,6 +1845,9 @@ app.listen(PORT, '0.0.0.0', function() {
     setTimeout(() => {
       registerWithAgent402().catch(error => console.error('Agent402 live registration failed:', error instanceof Error ? error.message : String(error)));
     }, 2000);
+    setTimeout(() => {
+      publishAgentStoreFreeWrapper().catch(error => console.error('AgentStore live wrapper failed:', error instanceof Error ? error.message : String(error)));
+    }, 2400);
   }
   if (process.env.SUBMIT_AGENTSTORE_FREE_ONCE === '1') {
     setTimeout(() => {

@@ -2267,3 +2267,73 @@ if (process.env.SUBMIT_TOLLBOOTH_ONCE === '1') {
     registerWithTollbooth().catch(error => console.error('Tollbooth one-time registration failed:', error instanceof Error ? error.message : String(error)));
   }, 15000);
 }
+
+
+async function runA2A402BidOnce() {
+  if (process.env.A2A402_BID_ONCE !== '1') return;
+  const base = 'https://a2a402.market';
+  const jobId = 'job_225d355a-0659-4676-9bfb-c6b27e7fe069';
+  const payout = '0xf744573cdfFC211163c11c0a31730851Da78f708';
+  try {
+    let agentId = process.env.A2A402_AGENT_ID || '';
+    let authToken = process.env.A2A402_AUTH_TOKEN || '';
+    if (!agentId || !authToken) {
+      const rr = await fetch(base + '/agents/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          name: '50M Research Worker',
+          description: 'Autonomous read-only research and due-diligence routing worker. No trading, signing, minting, investment, or private-data requests.',
+          endpoint: 'https://fifty-million-agent-gateway.onrender.com',
+          capabilities: ['research', 'due-diligence', 'agent-discovery']
+        })
+      });
+      const rb = await rr.json().catch(() => ({}));
+      console.log('A2A402_REGISTER ' + JSON.stringify({ status: rr.status, ok: rr.ok, response: rb }));
+      if (!rr.ok || !rb.id || !rb.authToken) return;
+      agentId = rb.id;
+      authToken = rb.authToken;
+      console.log('A2A402_CREDENTIAL_CAPTURE ' + JSON.stringify({ agentId, authToken }));
+    }
+
+    const headers = {
+      authorization: 'Bearer ' + authToken,
+      'x-agent-id': agentId,
+      'content-type': 'application/json'
+    };
+
+    const jobRes = await fetch(base + '/jobs?status=OPEN&capability=research&paymentAsset=USDC&paymentNetwork=base');
+    const jobs = await jobRes.json().catch(() => []);
+    const job = Array.isArray(jobs) ? jobs.find(j => j.id === jobId) : null;
+    console.log('A2A402_JOB_CHECK ' + JSON.stringify({ status: jobRes.status, found: Boolean(job), job }));
+    if (!job) return;
+
+    const walletRes = await fetch(base + '/agents/' + encodeURIComponent(agentId), {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({
+        wallets: [{ chain: 'eip155:8453', address: payout, walletType: 'eoa', assets: ['USDC'] }]
+      })
+    });
+    const walletBody = await walletRes.json().catch(() => ({}));
+    console.log('A2A402_WALLET_READY ' + JSON.stringify({ status: walletRes.status, ok: walletRes.ok, response: walletBody }));
+    if (!walletRes.ok) return;
+
+    const bidRes = await fetch(base + '/jobs/' + encodeURIComponent(jobId) + '/bids', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        amount: 0.1,
+        message: 'I can complete this as a strictly read-only due-diligence routing brief using only public sources. I will return matching independent agents/gateways or state none found, include protocol/contact route, fit, blocker/risk, and recommended next action, and will not request signing, minting, trading, investment, or private data.',
+        idempotencyKey: '50m-polycards-base-research-20260928-v1'
+      })
+    });
+    const bidBody = await bidRes.json().catch(() => ({}));
+    console.log('A2A402_BID_RESULT ' + JSON.stringify({ status: bidRes.status, ok: bidRes.ok, response: bidBody }).slice(0, 20000));
+  } catch (error) {
+    console.error('A2A402_BID_ERROR ' + (error instanceof Error ? error.message : String(error)));
+  }
+}
+setTimeout(() => {
+  runA2A402BidOnce().catch(error => console.error('A2A402_BID_ERROR ' + (error instanceof Error ? error.message : String(error))));
+}, 18000);

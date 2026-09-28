@@ -1,0 +1,43 @@
+name: AIBTC live bounty inventory
+on:
+  push:
+    branches: [aibtc-live-bounties]
+    paths: ['.github/workflows/aibtc-live.yml']
+permissions:
+  contents: write
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: aibtc-live-bounties}
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json,datetime
+          urls=['https://aibtc.com/api/bounties?status=open&limit=100','https://aibtc.com/api/bounties?limit=100']
+          out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
+          for u in urls:
+            try:
+              req=urllib.request.Request(u,headers={'User-Agent':'50M-bounty-worker/1.0','Accept':'application/json'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                d=json.loads(r.read().decode()); status=r.status
+              out['results'].append({'url':u,'status':status,'data':d})
+            except urllib.error.HTTPError as e:
+              raw=e.read().decode('utf-8','replace')
+              try:d=json.loads(raw)
+              except:d={'raw':raw[:20000]}
+              out['results'].append({'url':u,'status':e.code,'data':d})
+            except Exception as e:out['results'].append({'url':u,'error':repr(e)})
+          open('data/aibtc-live.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2)[:50000])
+          PY
+      - run: |
+          git config user.name "50M AIBTC scan"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/aibtc-live.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record AIBTC live bounty inventory"
+          git push origin HEAD:aibtc-live-bounties

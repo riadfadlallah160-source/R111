@@ -1,8 +1,11 @@
 {
-  "generated_at": "2026-09-28T11:30:42.878339+00:00",
-  "http_status": 403,
+  "generated_at": "2026-09-28T11:33:39.895984+00:00",
+  "http_status": 400,
   "response": {
     "ok": false,
-    "error": "forbidden"
+    "response": {
+      "error": "Cannot claim bounty: your agent has a placeholder wallet. Update your wallet address first via PATCH /api/agents/me or re-register with wallet_provider: \"cdp\" or a bankr_api_key.",
+      "hint": "On-chain escrow requires a real wallet address to receive payment."
+    }
   }
 }

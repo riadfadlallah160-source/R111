@@ -1,1 +1,26 @@
-name: GasRoute QA\non:\n  push:\n    paths:\n      - '.github/workflows/gasroute-qa.yml'\n  workflow_dispatch:\njobs:\n  qa:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Wait for Render\n        run: sleep 50\n      - name: Verify live preview\n        run: |\n          set -euo pipefail\n          curl --fail --show-error --silent --retry 5 --retry-delay 5 \\n            'https://fifty-million-agent-gateway.onrender.com/v1/market/gasroute-oracle-preview?chain_set=ethereum%2Cbsc%2Cpolygon&calldata_size_bytes=128&gas_units_est=100000' \\n            | tee /tmp/preview.json\n          python - <<'PY'\n          import json\n          d=json.load(open('/tmp/preview.json'))\n          assert d['preview'] is True\n          assert d['chain'] in {'ethereum','bsc','polygon'}\n          assert isinstance(d['fee_usd'], (int,float)) and d['fee_usd'] >= 0\n          assert len(d['quotes']) >= 2\n          assert all(q['gas_price_wei'] for q in d['quotes'])\n          print('PREVIEW_OK', json.dumps(d, separators=(',',':')))\n          PY\n      - name: Verify x402 challenge\n        run: |\n          set -euo pipefail\n          code=$(curl --show-error --silent -o /tmp/paid.json -D /tmp/headers.txt -w '%{http_code}' \\n            -X POST 'https://fifty-million-agent-gateway.onrender.com/v1/market/gasroute-oracle' \\n            -H 'content-type: application/json' \\n            --data '{"chain_set":["ethereum","bsc","polygon"],"calldata_size_bytes":128,"gas_units_est":100000}')\n          cat /tmp/headers.txt\n          cat /tmp/paid.json\n          test "$code" = "402"\n          grep -qi '^payment-required:' /tmp/headers.txt\n          python - <<'PY'\n          import json\n          d=json.load(open('/tmp/paid.json'))\n          assert d.get('x402Version')\n          assert d.get('accepts')\n          print('X402_OK')\n          PY
+name: GasRoute QA
+on:
+  push:
+    paths:
+      - '.github/workflows/gasroute-qa.yml'
+  workflow_dispatch:
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Render
+        run: sleep 15
+      - name: Verify live preview
+        run: |
+          set -euo pipefail
+          curl --fail --show-error --silent --retry 5 --retry-delay 5 'https://fifty-million-agent-gateway.onrender.com/v1/market/gasroute-oracle-preview?chain_set=ethereum%2Cbsc%2Cpolygon&calldata_size_bytes=128&gas_units_est=100000' | tee /tmp/preview.json
+          python -c "import json; d=json.load(open('/tmp/preview.json')); assert d['preview'] is True; assert d['chain'] in {'ethereum','bsc','polygon'}; assert isinstance(d['fee_usd'],(int,float)) and d['fee_usd']>=0; assert len(d['quotes'])>=2; assert all(q['gas_price_wei'] for q in d['quotes']); print('PREVIEW_OK',json.dumps(d,separators=(',',':')))"
+      - name: Verify x402 challenge
+        run: |
+          set -euo pipefail
+          code=$(curl --show-error --silent -o /tmp/paid.json -D /tmp/headers.txt -w '%{http_code}' -X POST 'https://fifty-million-agent-gateway.onrender.com/v1/market/gasroute-oracle' -H 'content-type: application/json' --data '{"chain_set":["ethereum","bsc","polygon"],"calldata_size_bytes":128,"gas_units_est":100000}')
+          cat /tmp/headers.txt
+          cat /tmp/paid.json
+          test "$code" = "402"
+          grep -qi '^payment-required:' /tmp/headers.txt
+          python -c "import json; d=json.load(open('/tmp/paid.json')); assert d.get('x402Version'); assert d.get('accepts'); print('X402_OK')"

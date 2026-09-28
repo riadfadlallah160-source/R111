@@ -1,0 +1,41 @@
+name: BountyBook API discovery
+on:
+  push:
+    branches: [bountybook-live]
+    paths: ['.github/workflows/bountybook-discovery.yml']
+permissions:
+  contents: write
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: bountybook-live}
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json,datetime
+          urls=['https://api.bountybook.ai/jobs?status=open','https://api.bountybook.ai/llms.txt','https://bountybook.ai/llms.txt','https://www.bountybook.ai/llms.txt']
+          out={'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
+          for u in urls:
+            try:
+              req=urllib.request.Request(u,headers={'User-Agent':'50M-agent/1.0','Accept':'application/json,text/plain'})
+              with urllib.request.urlopen(req,timeout=30) as r:raw=r.read().decode('utf-8','replace'); status=r.status
+              try:d=json.loads(raw)
+              except:d={'raw':raw[:30000]}
+              out['results'].append({'url':u,'status':status,'data':d})
+            except urllib.error.HTTPError as e:
+              out['results'].append({'url':u,'status':e.code,'data':{'raw':e.read().decode('utf-8','replace')[:10000]}})
+            except Exception as e:out['results'].append({'url':u,'error':repr(e)})
+          open('data/bountybook-discovery.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2)[:50000])
+          PY
+      - run: |
+          git config user.name "50M BountyBook scan"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/bountybook-discovery.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: discover BountyBook live API"
+          git push origin HEAD:bountybook-live

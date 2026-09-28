@@ -1,0 +1,33 @@
+name: Jishie seller registration probe
+on:
+  push:
+    branches: [jishie-demand-probe]
+    paths: ['.github/workflows/jishie-seller-schema.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: jishie-demand-probe }
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request,json
+          req=urllib.request.Request('https://jishie.com/v1/openapi.json',headers={'User-Agent':'50M-demand-probe/1.0','Accept':'application/json'})
+          with urllib.request.urlopen(req,timeout=30) as r: spec=json.loads(r.read())
+          keep={k:v for k,v in spec.get('paths',{}).items() if k in ['/agents','/standard/check']}
+          comps=spec.get('components',{}).get('schemas',{})
+          open('data/jishie-seller-schema.json','w').write(json.dumps({'paths':keep,'schemas':comps},indent=2))
+          print(json.dumps({'paths':keep},indent=2))
+          PY
+      - run: |
+          git config user.name "50M demand probe"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/jishie-seller-schema.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Jishie seller schema"
+          git push origin HEAD:jishie-demand-probe

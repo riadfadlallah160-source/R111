@@ -1,0 +1,108 @@
+{
+  "name": "Household Privacy + Approval Gate (Portfolio Demo)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "household-intake-demo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Household Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "household-intake-demo"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json.body ?? $json;\nconst text = String(input.text ?? '');\nconst action = String(input.action ?? 'read_only');\nconst requestedDestination = String(input.destination ?? 'local');\nconst sensitivePatterns = [\n  /passport|bank|account number|medical|password|secret|private key|seed phrase/i,\n  /child|children|home address|identity document/i\n];\nconst containsSensitiveData = sensitivePatterns.some((r) => r.test(text));\nconst route = containsSensitiveData ? 'local' : (requestedDestination === 'cloud' ? 'cloud' : 'local');\nconst mutatingActions = new Set(['send_email','create_event','update_notion','delete','purchase','share_external']);\nconst requiresApproval = mutatingActions.has(action);\nreturn [{\n  json: {\n    requestId: input.requestId ?? ('demo-' + Date.now()),\n    text,\n    action,\n    route,\n    containsSensitiveData,\n    requiresApproval,\n    approved: Boolean(input.approved),\n    policyVersion: 'demo-1',\n    note: 'Portfolio demo only. No external action is executed by this workflow.'\n  }\n}];"
+      },
+      "id": "2",
+      "name": "Privacy Policy Engine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const x = $json;\nconst approvalState = x.requiresApproval ? (x.approved ? 'approved' : 'blocked_pending_human_approval') : 'not_required';\nconst nextStep =\n  approvalState === 'blocked_pending_human_approval'\n    ? 'Present proposed action to household owner; do not mutate external systems.'\n    : x.route === 'local'\n      ? 'Route content to client-owned local model (for example Ollama/LM Studio) and keep raw sensitive text off cloud services.'\n      : 'Cloud processing may be used only for the minimum non-sensitive payload allowed by client policy.';\nreturn [{\n  json: {\n    ...x,\n    approvalState,\n    nextStep,\n    actionExecution: 'NOT_IMPLEMENTED_IN_DEMO',\n    audit: {\n      timestamp: new Date().toISOString(),\n      route: x.route,\n      requiresApproval: x.requiresApproval,\n      approvalState\n    }\n  }\n}];"
+      },
+      "id": "3",
+      "name": "Approval + Route Planner",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Return Safe Plan",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Household Intake": {
+      "main": [
+        [
+          {
+            "node": "Privacy Policy Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Privacy Policy Engine": {
+      "main": [
+        [
+          {
+            "node": "Approval + Route Planner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval + Route Planner": {
+      "main": [
+        [
+          {
+            "node": "Return Safe Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "portfolio-demo-household-privacy-1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

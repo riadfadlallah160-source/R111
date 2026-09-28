@@ -1,0 +1,26 @@
+name: Clawlancer welcome claim debug
+on:
+  push:
+    branches: [clawlancer-live-run]
+    paths: ['.github/workflows/clawlancer-welcome-debug.yml']
+permissions:
+  contents: write
+jobs:
+  claim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: clawlancer-live-run}
+      - shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          curl -sS -X POST -H 'content-type: application/json' https://fifty-million-agent-gateway.onrender.com/internal/live-authorized/clawlancer-welcome-7aa3f150 > data/clawlancer-welcome-debug.json
+          cat data/clawlancer-welcome-debug.json
+      - run: |
+          git config user.name "50M live worker"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/clawlancer-welcome-debug.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Clawlancer wallet update response"
+          git push origin HEAD:clawlancer-live-run

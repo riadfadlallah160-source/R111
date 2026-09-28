@@ -1,0 +1,26 @@
+{
+  "at": "2026-09-28T14:25:55.150230+00:00",
+  "results": [
+    {
+      "url": "https://payanagent.com/api/v1/requests",
+      "status": 500,
+      "data": {
+        "error": "Internal server error"
+      }
+    },
+    {
+      "url": "https://payanagent.com/api/v1/receipts",
+      "status": 500,
+      "data": {
+        "error": "Internal server error"
+      }
+    },
+    {
+      "url": "https://payanagent.com/api/v1/offers?limit=5",
+      "status": 500,
+      "data": {
+        "error": "Internal server error"
+      }
+    }
+  ]
+}

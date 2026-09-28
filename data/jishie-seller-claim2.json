@@ -1,0 +1,10 @@
+{
+  "at": "2026-09-28T13:09:08.889626+00:00",
+  "status": 201,
+  "data": {
+    "claim_id": "claim_6e5d1119f8",
+    "status": "pending",
+    "next": "verify via dns-txt (instructions sent to 50m-demand@agentmail.to); claim bumps the probe queue",
+    "probe_queue_position": 1
+  }
+}

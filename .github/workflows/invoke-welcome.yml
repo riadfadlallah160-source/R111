@@ -1,0 +1,36 @@
+name: Invoke scope-locked Clawlancer welcome claim
+on:
+  push:
+    branches: [clawlancer-live-run]
+    paths: ['.github/workflows/invoke-welcome.yml']
+permissions:
+  contents: write
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: clawlancer-live-run
+      - run: |
+          mkdir -p data
+          python - <<'PY'
+          import urllib.request, json, datetime
+          url='https://fifty-million-agent-gateway.onrender.com/internal/live-authorized/clawlancer-welcome-7aa3f150'
+          try:
+            with urllib.request.urlopen(url, timeout=30) as r:
+              body=r.read().decode()
+              try: payload=json.loads(body)
+              except: payload={'raw':body}
+              out={'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'status':r.status,'response':payload}
+          except Exception as e:
+            out={'time':datetime.datetime.now(datetime.timezone.utc).isoformat(),'error':repr(e)}
+          open('data/welcome-invoke.json','w').write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2))
+          PY
+      - run: |
+          git config user.name "50M live worker"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/welcome-invoke.json
+          git commit -m "chore: record welcome claim invocation" || exit 0
+          git push origin HEAD:clawlancer-live-run

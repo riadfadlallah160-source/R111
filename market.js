@@ -71,7 +71,7 @@ const GAS_CHAINS = {
   polygon: {
     rpc: 'https://polygon-bor-rpc.publicnode.com',
     symbol: 'POL',
-    priceId: 'matic-network'
+    priceId: 'polygon-ecosystem-token'
   }
 };
 
@@ -106,14 +106,13 @@ function busyLevel(ratio) {
 }
 
 async function usdPrices(ids) {
-  const unique = [...new Set(ids)];
+  const keys = [...new Set(ids)].map(id => 'coingecko:' + id);
   const response = await fetch(
-    'https://api.coingecko.com/api/v3/simple/price?ids=' +
-    encodeURIComponent(unique.join(',')) +
-    '&vs_currencies=usd'
+    'https://coins.llama.fi/prices/current/' + encodeURIComponent(keys.join(','))
   );
   if (!response.ok) throw new Error('price upstream HTTP ' + response.status);
-  return response.json();
+  const body = await response.json();
+  return body?.coins || {};
 }
 
 async function gasQuote(chain, calldataBytes, requestedGasUnits, prices) {
@@ -129,7 +128,7 @@ async function gasQuote(chain, calldataBytes, requestedGasUnits, prices) {
   const gasUnits = Math.max(requestedGasUnits, minimumIntrinsic);
   const feeWei = gasPriceWei * BigInt(gasUnits);
   const feeNative = Number(feeWei) / 1e18;
-  const usd = Number(prices?.[config.priceId]?.usd || 0);
+  const usd = Number(prices?.['coingecko:' + config.priceId]?.price || 0);
 
   const ratios = Array.isArray(feeHistory?.gasUsedRatio)
     ? feeHistory.gasUsedRatio.map(Number)
@@ -161,7 +160,7 @@ async function gasQuote(chain, calldataBytes, requestedGasUnits, prices) {
     recent_block_utilization: Number(utilization.toFixed(4)),
     tip_hint: Number((tipWei / 1e9).toFixed(6)) + ' gwei',
     native_usd: usd,
-    source: 'live chain JSON-RPC + CoinGecko'
+    source: 'live chain JSON-RPC + DefiLlama Coins'
   };
 }
 

@@ -1,0 +1,11 @@
+{
+  "time": "2026-09-28T17:57:26.769225+00:00",
+  "status": 400,
+  "response": {
+    "ok": false,
+    "stage": "wallet_update",
+    "response": {
+      "error": "No valid fields to update"
+    }
+  }
+}

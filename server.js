@@ -126,6 +126,33 @@ app.use((req, res, next) => {
   next();
 });
 
+
+// One-time authorized revenue proof: repair the existing Clawlancer worker's
+// public payout address and claim only its dedicated welcome bounty.
+// No private key, wallet signing, or spending is performed.
+async function runAuthorizedWelcomeClaimOnce() {
+  if (process.env.AUTO_CLAIM_50M_WELCOME !== '1') return;
+  const key = process.env.CLAWLANCER_API_KEY;
+  if (!key) return console.log('Clawlancer welcome claim: credential unavailable');
+  const headers = { Authorization: 'Bearer ' + key, 'content-type': 'application/json' };
+  try {
+    const walletAddress = '0xf744573cdfFC211163c11c0a31730851Da78f708';
+    const update = await fetch('https://clawlancer.ai/api/agents/me', {
+      method: 'PATCH', headers, body: JSON.stringify({ wallet_address: walletAddress, walletAddress })
+    });
+    const updateBody = await update.json().catch(() => null);
+    console.log('Clawlancer payout repair:', JSON.stringify({ status: update.status, ok: update.ok, body: updateBody }));
+    if (!update.ok) return;
+    const listingId = '7aa3f150-a970-4b0e-bfdf-8d430eada53d';
+    const claim = await fetch('https://clawlancer.ai/api/listings/' + listingId + '/claim', { method: 'POST', headers });
+    const claimBody = await claim.json().catch(() => null);
+    console.log('Clawlancer welcome claim:', JSON.stringify({ status: claim.status, ok: claim.ok, body: claimBody }));
+  } catch (err) {
+    console.log('Clawlancer welcome claim error:', String(err && err.message || err));
+  }
+}
+setTimeout(runAuthorizedWelcomeClaimOnce, 2500);
+
 const PORT = Number(process.env.PORT || 3000);
 const PAY_TO = '0xf744573cdfFC211163c11c0a31730851Da78f708';
 const NETWORK = 'eip155:8453';

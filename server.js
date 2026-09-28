@@ -1826,10 +1826,39 @@ async function registerWithAgent402() {
   }
 }
 
+async function runAuthorizedClawlancerWelcomeClaim() {
+  const key = process.env.CLAWLANCER_API_KEY;
+  if (!key) {
+    console.error('CLAWLANCER_WELCOME_RESULT ' + JSON.stringify({ ok: false, stage: 'credential', error: 'credential unavailable' }));
+    return;
+  }
+  const agentId = 'f85386b5-0def-4df5-9105-9c74f37ab733';
+  const walletAddress = '0xf744573cdfFC211163c11c0a31730851Da78f708';
+  const listingId = '7aa3f150-a970-4b0e-bfdf-8d430eada53d';
+  const headers = { Authorization: 'Bearer ' + key, 'content-type': 'application/json' };
+
+  const update = await fetch('https://clawlancer.ai/api/agents/' + agentId, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify({ wallet_address: walletAddress })
+  });
+  const updateBody = await update.json().catch(() => null);
+  console.log('CLAWLANCER_WALLET_UPDATE ' + JSON.stringify({ status: update.status, ok: update.ok, response: updateBody }));
+  if (!update.ok) return;
+
+  const claim = await fetch('https://clawlancer.ai/api/listings/' + listingId + '/claim', {
+    method: 'POST',
+    headers
+  });
+  const claimBody = await claim.json().catch(() => null);
+  console.log('CLAWLANCER_WELCOME_RESULT ' + JSON.stringify({ status: claim.status, ok: claim.ok, response: claimBody }));
+}
+
 app.listen(PORT, '0.0.0.0', function() {
   console.log('50M Agent Utility Gateway listening on port ' + PORT);
   console.log('x402 facilitator: ' + FACILITATOR);
   console.log('Base USDC payTo: ' + PAY_TO);
+  setTimeout(() => { runAuthorizedClawlancerWelcomeClaim().catch(error => console.error('CLAWLANCER_WELCOME_ERROR ' + (error instanceof Error ? error.message : String(error)))); }, 3500);
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.

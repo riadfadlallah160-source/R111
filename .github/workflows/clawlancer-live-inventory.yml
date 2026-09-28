@@ -1,0 +1,51 @@
+name: Clawlancer live inventory
+on:
+  push:
+    branches: [clawlancer-live-run]
+    paths:
+      - '.github/workflows/clawlancer-live-inventory.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: clawlancer-live-run
+      - name: Fetch live inventory and worker status
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          python - <<'PY'
+          import json, urllib.request, datetime
+          urls=[
+            'https://clawlancer.ai/api/listings?listing_type=BOUNTY',
+            'https://fifty-million-agent-gateway.onrender.com/internal/bootstrap/clawlancer'
+          ]
+          out={'generated_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'results':[]}
+          for url in urls:
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'50M-live-worker/1.0','Accept':'application/json'})
+              with urllib.request.urlopen(req,timeout=30) as r:
+                body=r.read().decode('utf-8','replace')
+                try: data=json.loads(body)
+                except: data={'raw':body[:30000]}
+                out['results'].append({'url':url,'status':r.status,'data':data})
+            except urllib.error.HTTPError as e:
+              out['results'].append({'url':url,'status':e.code,'error':e.read().decode('utf-8','replace')[:10000]})
+            except Exception as e:
+              out['results'].append({'url':url,'error':repr(e)})
+          with open('data/clawlancer-live.json','w') as f: json.dump(out,f,indent=2)
+          print(json.dumps(out,indent=2)[:50000])
+          PY
+      - name: Persist result
+        run: |
+          git config user.name "50M live worker"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/clawlancer-live.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: record Clawlancer live inventory"
+          git push origin HEAD:clawlancer-live-run

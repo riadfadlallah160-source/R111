@@ -1,0 +1,33 @@
+{
+  "at": "2026-09-28T13:13:47.387Z",
+  "results": [
+    {
+      "variant": "stable-core-base64url",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "stable-core-sha256-base64",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "stable-core-sha256-base64url",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "stable-no-version-base64url",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    }
+  ]
+}

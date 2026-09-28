@@ -1,0 +1,61 @@
+{
+  "at": "2026-09-28T13:11:51.667Z",
+  "results": [
+    {
+      "variant": "stable-core",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "plain-core",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "stable-array-core",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "plain-array-core",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "stable-with-meta",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "plain-with-meta",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "stable-no-version",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    },
+    {
+      "variant": "stable-offer-wrapper",
+      "status": 422,
+      "response": {
+        "error": "signature rejected: ed25519 signature does not verify against keys_inline"
+      }
+    }
+  ]
+}

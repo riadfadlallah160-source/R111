@@ -1,0 +1,85 @@
+{
+  "at": "2026-09-28T13:09:42.744064+00:00",
+  "results": [
+    {
+      "url": "https://jishie.com/v1/agents?q=50M+Swarm+MCP&include_unprobed=true&limit=10&min_depth=0",
+      "status": 200,
+      "data": {
+        "query": {
+          "q": "50M Swarm MCP",
+          "min_depth": 0,
+          "include_unprobed": true,
+          "limit": 10,
+          "effective_min_depth": 0
+        },
+        "total": 1,
+        "returned": 1,
+        "free_tier": true,
+        "policy": "search defaults to depth>=2; records below T2 are \"not yet scored\", never guessed; unreachable endpoints are never candidates",
+        "results": [
+          {
+            "id": "aix_e13bf173d4",
+            "name": "50M Swarm MCP",
+            "operator": "(unclaimed - source: self-graded \u00b7 publisher: fifty-million-agent-gateway.onrender.com)",
+            "depth": 1,
+            "status": "unclaimed",
+            "skills": [
+              "market-data",
+              "onchain-data"
+            ],
+            "protocols": {
+              "mcp": "https://fifty-million-agent-gateway.onrender.com/mcp",
+              "a2a": null
+            },
+            "pricing": null,
+            "regions": [
+              "global"
+            ],
+            "languages": [
+              "en"
+            ],
+            "aix_score": null,
+            "scored": false,
+            "score_note": "not yet scored \u2014 probes have not run (T0/T1)",
+            "axis": {
+              "v": "2.0",
+              "headline": "strict",
+              "level": 0,
+              "capped_by": "identity",
+              "disclosed_axes": 2,
+              "platform_measurable_axes": 6,
+              "reviews": {
+                "avg_stars": null,
+                "verified_review_count": 0,
+                "delivery_confirmed_count": 0,
+                "payment_only_count": 0,
+                "sub_ratings": null,
+                "flagged_count": 0
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://jishie.com/v1/demands/dmd_a101/offers",
+      "status": 200,
+      "data": {
+        "demand_id": "dmd_a101",
+        "count": 0,
+        "note": "seller identities are disclosed to the buyer only; prices are public market data",
+        "offers": []
+      }
+    },
+    {
+      "url": "https://jishie.com/v1/demands/dmd_a100/offers",
+      "status": 200,
+      "data": {
+        "demand_id": "dmd_a100",
+        "count": 0,
+        "note": "seller identities are disclosed to the buyer only; prices are public market data",
+        "offers": []
+      }
+    }
+  ]
+}

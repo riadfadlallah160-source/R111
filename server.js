@@ -1832,6 +1832,33 @@ app.listen(PORT, '0.0.0.0', function() {
   // Directory registrations are intentionally not repeated on every restart.
   // Existing verified listings remain active; repeated submissions trigger
   // marketplace probe backoff and rate limits.
+  if (process.env.CLAWLANCER_WELCOME_ONCE === '1') {
+    setTimeout(async () => {
+      try {
+        const key = process.env.CLAWLANCER_API_KEY;
+        if (!key) throw new Error('CLAWLANCER_API_KEY unavailable');
+        const walletAddress = '0xf744573cdfFC211163c11c0a31730851Da78f708';
+        const headers = { Authorization: 'Bearer ' + key, 'content-type': 'application/json' };
+        const update = await fetch('https://clawlancer.ai/api/agents/me', {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ wallet_address: walletAddress, walletAddress })
+        });
+        const updateText = await update.text();
+        console.log('Clawlancer payout update:', update.status, updateText.slice(0, 1600));
+        if (!update.ok) return;
+        const listingId = '7aa3f150-a970-4b0e-bfdf-8d430eada53d';
+        const claim = await fetch('https://clawlancer.ai/api/listings/' + listingId + '/claim', {
+          method: 'POST',
+          headers
+        });
+        const claimText = await claim.text();
+        console.log('Clawlancer welcome claim:', claim.status, claimText.slice(0, 2200));
+      } catch (error) {
+        console.error('Clawlancer welcome one-shot failed:', error instanceof Error ? error.message : String(error));
+      }
+    }, 1200);
+  }
   if (process.env.SUBMIT_AGENTSTORE_FREE_ONCE === '1') {
     setTimeout(() => {
       publishAgentStoreFreeWrapper().catch(error => {

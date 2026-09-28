@@ -1,4 +1,4 @@
-name: Superteam Live Discovery
+name: Agent Paid Work Discovery
 
 on:
   pull_request:
@@ -11,68 +11,40 @@ jobs:
   discover:
     runs-on: ubuntu-latest
     steps:
-      - name: Register ephemeral agent and list live paid work
-        env:
-          RUN_ID: ${{ github.run_id }}
+      - name: Query live agent-paid work
         run: |
           python - <<'PY'
-          import json, os, urllib.request
+          import json, urllib.request, urllib.error
 
-          base = 'https://superteam.fun'
-          name = 'riad-discovery-' + os.environ.get('RUN_ID', 'manual')
+          def get_json(url, headers=None):
+              req = urllib.request.Request(url, headers=headers or {}, method='GET')
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      return {'status': r.status, 'data': json.loads(r.read().decode())}
+              except urllib.error.HTTPError as e:
+                  body = e.read().decode(errors='replace')
+                  return {'status': e.code, 'error': body[:1000]}
 
-          def request(url, method='GET', headers=None, body=None):
-              req = urllib.request.Request(
-                  url,
-                  data=None if body is None else json.dumps(body).encode(),
-                  headers=headers or {},
-                  method=method,
-              )
-              with urllib.request.urlopen(req, timeout=30) as r:
-                  return json.loads(r.read().decode())
+          tb = get_json('https://www.task-bounty.com/api/v1/tasks?state=open&limit=20')
+          data = tb.get('data')
+          tasks = []
+          if isinstance(data, dict) and isinstance(data.get('tasks'), list):
+              for item in data['tasks']:
+                  tasks.append({
+                      'id': item.get('id'),
+                      'title': item.get('title'),
+                      'reward': item.get('reward') or item.get('reward_usd') or item.get('budget') or item.get('amount'),
+                      'language': item.get('language') or item.get('primary_language'),
+                      'repo': item.get('github_repo_url'),
+                      'issue': item.get('github_issue_url'),
+                      'state': item.get('state'),
+                      'deadline': item.get('deadline') or item.get('expires_at'),
+                  })
 
-          agent = request(
-              base + '/api/agents',
-              method='POST',
-              headers={'Content-Type': 'application/json'},
-              body={'name': name},
-          )
-          api_key = agent.get('apiKey')
-          if not api_key:
-              raise RuntimeError('Registration did not return an API key')
-
-          data = request(
-              base + '/api/agents/listings/live?take=50',
-              headers={'Authorization': 'Bearer ' + api_key},
-          )
-
-          if isinstance(data, list):
-              listings = data
-          elif isinstance(data, dict) and isinstance(data.get('listings'), list):
-              listings = data['listings']
-          elif isinstance(data, dict) and isinstance(data.get('data'), list):
-              listings = data['data']
-          else:
-              listings = []
-
-          safe = []
-          for item in listings:
-              safe.append({
-                  'id': item.get('id') or item.get('_id'),
-                  'slug': item.get('slug'),
-                  'title': item.get('title'),
-                  'type': item.get('type') or item.get('listingType'),
-                  'compensation': item.get('compensation') or item.get('reward') or item.get('rewards') or item.get('amount'),
-                  'compensationType': item.get('compensationType'),
-                  'deadline': item.get('deadline') or item.get('deadlineAt'),
-                  'agentAccess': item.get('agentAccess'),
-                  'skills': item.get('skills'),
-              })
-
-          print('SUPERTEAM_SAFE_RESULT=' + json.dumps({
-              'agentId': agent.get('agentId'),
-              'username': agent.get('username'),
-              'listingCount': len(listings),
-              'listings': safe,
+          print('TASKBOUNTY_SAFE_RESULT=' + json.dumps({
+              'httpStatus': tb.get('status'),
+              'taskCount': len(tasks),
+              'tasks': tasks,
+              'error': tb.get('error'),
           }, separators=(',', ':')))
           PY

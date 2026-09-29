@@ -7,23 +7,39 @@ on:
       - .github/workflows/superteam-live-probe.yml
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Wait for gateway and fetch live agent listings
         shell: bash
         run: |
           set -euo pipefail
           url="https://fifty-million-agent-gateway.onrender.com/revenue/superteam-live"
-          for i in $(seq 1 24); do
+          mkdir -p runtime
+          final_code=000
+          for i in $(seq 1 32); do
             code=$(curl -sS -o /tmp/body.json -w "%{http_code}" "$url" || true)
             echo "attempt=$i status=$code"
-            cat /tmp/body.json || true
-            echo
+            final_code="$code"
             if [ "$code" = "200" ] || [ "$code" = "503" ]; then
-              exit 0
+              break
             fi
             sleep 15
           done
-          exit 1
+          printf '{"httpStatus":"%s","capturedAt":"%s","response":' "$final_code" "$(date -u +%FT%TZ)" > runtime/superteam-live-result.json
+          cat /tmp/body.json >> runtime/superteam-live-result.json
+          printf '}\n' >> runtime/superteam-live-result.json
+      - name: Commit probe result
+        shell: bash
+        run: |
+          git config user.name "50M Revenue Probe"
+          git config user.email "50m-demand@agentmail.to"
+          git add runtime/superteam-live-result.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Record live Superteam agent feed"
+          git push

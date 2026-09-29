@@ -8,6 +8,7 @@ import { createPremiumPaidRoutes, registerPremiumHandlers } from './premium.js';
 import { createSwarmPaidRoute, registerSwarmHandler } from './swarm.js';
 import { createMarketPaidRoutes, registerMarketHandlers } from './market.js';
 import { createIntelPaidRoutes, registerIntelHandlers } from './intel.js';
+import { createWebPaidRoutes, registerWebHandlers } from './webtools.js';
 import { registerEnterpriseRoutes } from './enterprise.js';
 import { registerMicrosoftMarketplaceRoutes } from './microsoft-marketplace.js';
 import { registerMcpRoutes } from './mcp.js';
@@ -328,12 +329,13 @@ resourceServer.onAfterSettle(async ({ result, requirements, phase }) => {
 });
 
 const paidRoutes = {
+  ...createWebPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
   ...createIntelPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
   ...createMarketPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
   ...createSwarmPaidRoute({ PAY_TO, NETWORK, PUBLIC_BASE }),
   ...createPremiumPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }),
   'POST /v1/text/metrics': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Text metrics, reading time, vocabulary and sentence statistics.',
     mimeType: 'application/json',
     resource: {
@@ -358,7 +360,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/text/extract': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Extract emails, URLs, hashtags, mentions, IPv4 addresses and numbers.',
     mimeType: 'application/json',
     resource: {
@@ -383,7 +385,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/text/keywords': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Keyword frequency analysis with stop-word removal.',
     mimeType: 'application/json',
     resource: {
@@ -408,7 +410,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/text/dedupe': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Remove duplicate lines or list items while preserving order.',
     mimeType: 'application/json',
     resource: {
@@ -433,7 +435,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/url/normalize': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Normalize and validate URLs for agent pipelines.',
     mimeType: 'application/json',
     resource: {
@@ -458,7 +460,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/data/csv-to-json': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Convert CSV into structured JSON.',
     mimeType: 'application/json',
     resource: {
@@ -483,7 +485,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/data/json-validate': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Validate JSON and return normalized compact and pretty forms.',
     mimeType: 'application/json',
     resource: {
@@ -508,7 +510,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/data/hash': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Generate SHA-256, SHA-1 and MD5 hashes for supplied text.',
     mimeType: 'application/json',
     resource: {
@@ -533,7 +535,7 @@ const paidRoutes = {
     })
   },
   'POST /v1/slot/run': {
-    accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+    accepts: [{ scheme: 'exact', price: '$0.002', network: NETWORK, payTo: PAY_TO }],
     description: 'Universal one-dollar agent slot. Run one deterministic operation: metrics, extract, keywords, dedupe, normalize-url, csv-to-json, json-validate, or hash.',
     mimeType: 'application/json',
     resource: {
@@ -1395,6 +1397,7 @@ registerPremiumHandlers(app, assignment);
 registerSwarmHandler(app, assignment, crypto);
 registerMarketHandlers(app, assignment);
 registerIntelHandlers(app, assignment);
+registerWebHandlers(app, assignment);
 registerEnterpriseRoutes(app);
 registerMicrosoftMarketplaceRoutes(app);
 registerMcpRoutes(app);

@@ -1,0 +1,80 @@
+name: Superteam Public Agent Crosscheck
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/superteam-public-agent-crosscheck.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Fetch public listings and isolate agent-eligible work
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p runtime
+          curl -fsSL --retry 3 --connect-timeout 10 "https://superteam.fun/api/listings?take=100" -o /tmp/listings.json
+          python3 - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          with open('/tmp/listings.json',encoding='utf-8') as f:
+              body=json.load(f)
+          def rows(x):
+              if isinstance(x,list): return x
+              if not isinstance(x,dict): return []
+              for k in ('result','listings','data','items','results'):
+                  v=x.get(k)
+                  if isinstance(v,list): return v
+                  if isinstance(v,dict):
+                      for kk in ('listings','data','items','results'):
+                          vv=v.get(kk)
+                          if isinstance(vv,list): return vv
+              return []
+          def slim(x):
+              return {
+                  'id':x.get('id') or x.get('listingId'),
+                  'slug':x.get('slug'),
+                  'title':x.get('title') or x.get('name'),
+                  'type':x.get('type'),
+                  'status':x.get('status'),
+                  'agentAccess':x.get('agentAccess'),
+                  'rewardAmount':x.get('rewardAmount'),
+                  'token':x.get('token') or x.get('currency'),
+                  'deadline':x.get('deadline'),
+                  'compensationType':x.get('compensationType'),
+                  'isWinnersAnnounced':x.get('isWinnersAnnounced'),
+              }
+          all_rows=[slim(x) for x in rows(body)]
+          eligible=[x for x in all_rows if x.get('status')=='OPEN' and x.get('agentAccess') in ('AGENT_ALLOWED','AGENT_ONLY')]
+          out={
+              'scannedAt':datetime.now(timezone.utc).isoformat(),
+              'publicCount':len(all_rows),
+              'eligibleCount':len(eligible),
+              'eligible':eligible,
+          }
+          with open('runtime/superteam-public-agent-crosscheck.json','w',encoding='utf-8') as f:
+              json.dump(out,f,indent=2,ensure_ascii=False)
+          print(json.dumps({'publicCount':len(all_rows),'eligibleCount':len(eligible)}))
+          PY
+
+      - name: Persist result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Riad Revenue Agent"
+          git config user.email "actions@users.noreply.github.com"
+          git add runtime/superteam-public-agent-crosscheck.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: refresh Superteam public agent crosscheck"
+          git push origin HEAD:main

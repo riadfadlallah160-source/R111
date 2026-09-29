@@ -1,3 +1,4 @@
+# refresh: 2026-09-29-2
 name: x402 deploy and register
 on:
   push:

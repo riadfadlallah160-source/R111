@@ -1,0 +1,29 @@
+name: Superteam live probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - server.js
+      - .github/workflows/superteam-live-probe.yml
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for gateway and fetch live agent listings
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://fifty-million-agent-gateway.onrender.com/revenue/superteam-live"
+          for i in $(seq 1 24); do
+            code=$(curl -sS -o /tmp/body.json -w "%{http_code}" "$url" || true)
+            echo "attempt=$i status=$code"
+            cat /tmp/body.json || true
+            echo
+            if [ "$code" = "200" ] || [ "$code" = "503" ]; then
+              exit 0
+            fi
+            sleep 15
+          done
+          exit 1

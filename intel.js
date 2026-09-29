@@ -3,7 +3,7 @@ import { declareDiscoveryExtension } from '@x402/extensions/bazaar';
 export function createIntelPaidRoutes({ PAY_TO, NETWORK, PUBLIC_BASE }) {
   return {
     'POST /v1/security/vulnerability-intel': {
-      accepts: [{ scheme: 'exact', price: '$1', network: NETWORK, payTo: PAY_TO }],
+      accepts: [{ scheme: 'exact', price: '$0.01', network: NETWORK, payTo: PAY_TO }],
       description: 'Query live open-source vulnerability intelligence for up to 100 package/version pairs using OSV.',
       mimeType: 'application/json',
       resource: {

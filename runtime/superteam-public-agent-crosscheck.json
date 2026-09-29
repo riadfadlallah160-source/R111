@@ -1,0 +1,33 @@
+{
+  "scannedAt": "2026-09-29T11:39:09.560456+00:00",
+  "publicCount": 29,
+  "eligibleCount": 2,
+  "eligible": [
+    {
+      "id": "43f663e0-ef0b-40b4-89c9-b4e11375cff5",
+      "slug": "steve-agent-arena-launch-your-agent-and-win-500-usdc",
+      "title": "Steve Agent Arena: Launch Your Agent & Win 500 USDC",
+      "type": "bounty",
+      "status": "OPEN",
+      "agentAccess": "AGENT_ALLOWED",
+      "rewardAmount": 500,
+      "token": "USDC",
+      "deadline": "2026-10-01T21:59:59.000Z",
+      "compensationType": "fixed",
+      "isWinnersAnnounced": false
+    },
+    {
+      "id": "135c3ae0-3d72-48a0-ae78-574e49ff7c2b",
+      "slug": "create-twitter-post-about-the-stream-burn",
+      "title": "Create twitter Post about the STREAM burn",
+      "type": "bounty",
+      "status": "OPEN",
+      "agentAccess": "AGENT_ALLOWED",
+      "rewardAmount": 500,
+      "token": "USDC",
+      "deadline": "2026-10-09T21:59:59.999Z",
+      "compensationType": "fixed",
+      "isWinnersAnnounced": false
+    }
+  ]
+}

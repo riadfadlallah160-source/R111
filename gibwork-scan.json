@@ -1,0 +1,789 @@
+{
+  "scanned_at": "2026-09-29T11:23:07.024158+00:00",
+  "attempts": [
+    {
+      "url": "https://api.gib.work/explore?page=1",
+      "http_status": 200,
+      "data": {
+        "lastPage": 1,
+        "page": 1,
+        "limit": 15,
+        "total": 10,
+        "results": [
+          {
+            "id": "1052f22d-3f87-4b1d-b0d7-71a60679e7fa",
+            "title": "Gibwork Developer Hackathon Bounty",
+            "content": "Join this Gibwork Developer Hackathon bounty to create a new non-web-app use case for Gibwork using the SDK, CLI, or MCP. This bounty is focused on practical developer workflows, automations, integrations, or tooling that demonstrate a compelling way Gibwork can be used outside of traditional web applications.Bounty DescriptionThe selected participants will be responsible for:Designing and building a new Gibwork bounty use case that uses the SDK, CLI, or MCP in a meaningful and functional way.Focusing this bounty on non-web-app development, such as developer tooling, automation flows, terminal-based utilities, AI agent integrations, backend workflows, local productivity tools, or other creative bounty concepts.Implementing a working prototype that clearly shows how the bounty use case works, what problem it solves, and how Gibwork is integrated.Documenting the bounty solution so another developer can understand the setup, usage flow, and expected output.Providing a short demo of the completed bounty build, including the core workflow and successful execution.RequirementsThe bounty must use Gibwork SDK, CLI, or MCP as a core part of the implementation.The bounty must be a new use case, not a minor variation of an existing demo.The bounty must not be a web app, frontend dashboard, or browser-based product.The bounty should solve a real developer, operations, automation, research, or workflow problem with a clear practical outcome.The bounty submission must include clear setup instructions, dependencies, and steps to run or test the project.The submission should be functional, organized, and understandable enough for basic reviewer validation.Must attend at least 2 of the hackathon sessions on Discord.What to SubmitA public GitHub repository URL for the completed bounty project, including all source code and a README.A short written summary in the repository README or shared document explaining the bounty use case, why it is valuable, and which Gibwork toolset was used (SDK, CLI, or MCP).Setup and usage instructions for the bounty project, including installation steps, environment variables, commands to run, and sample input/output.A screen recording or demo video URL showing the bounty workflow from setup or execution through successful output.Screenshots of the bounty project running, such as terminal output, logs, agent interactions, or generated results.Any exported deliverables produced by the bounty project, such as output files, reports, generated artifacts, or shared document links, if applicable.How to startSubmit to the Google form https://docs.google.com/forms/d/e/1FAIpQLSejpks7hItR6zBUXpdrwgUDrwvEcmnJj6nlFbUXKIyNkVVfag/viewform?usp=dialogCheck Discord (https://discord.gg/2577tTsRt) to see if you have been rewarded the Hackathon role.Once rewarded the Discord role you can start the work.",
+            "deadline": "2026-10-30T04:00:00.000Z",
+            "tags": [
+              "Development"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 1000,
+            "xpBonus": 981,
+            "token": null,
+            "asset": {
+              "id": "18c15237-6d50-4602-aee6-0f277e1362af",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "1000000000",
+              "price": 1000,
+              "decimals": 6
+            },
+            "user": {
+              "id": "70b7628d-cf0b-4f5b-b8df-f7f687d3b057",
+              "username": "gibwork",
+              "profilePicture": "https://ucarecdn.com/616c31ba-f260-4c96-8a03-d2100ab3d08c/",
+              "isPremium": true,
+              "membership": {
+                "tier": "plus",
+                "entitlementLevel": 1,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "d321ae8f-34f0-4c2f-b6ef-af7773d096ba",
+            "title": "Create an X Thread About the Gibwork Mobile App Bounty",
+            "content": "This bounty invites contributors to create a clear, engaging X thread explaining the Gibwork mobile app on iOS and Android, including what the app does and the opportunities it offers users. The goal of this bounty is to produce a thread that helps new audiences understand the value of the Gibwork mobile app and encourages interest in the bounty ecosystem around it.Bounty DescriptionThe selected participant will be responsible for:Creating an original X thread for this bounty that explains the Gibwork mobile app, covering both iOS and Android availability.Highlighting the main opportunities available through the app in this bounty, such as discovering bounty work, participating in the ecosystem, and engaging with mobile-friendly features.Structuring the bounty thread so it is easy to follow, informative, and appealing to people who may be unfamiliar with Gibwork.Using accurate language and a professional tone in the bounty thread while keeping the content suitable for social sharing.RequirementsThe bounty thread must be written in English and posted publicly on X.Requires X account with 800+ followersThe bounty content must include a concise explanation of what the Gibwork mobile app is, mention both iOS and Android, and describe the opportunities available through the app.The bounty thread should be original, factually accurate, and free of misleading claims.The bounty post should be well formatted as a thread, with clear flow between posts and strong readability.The bounty submission must remain publicly accessible at the time of review.X thread must contain authentic engagement.What to SubmitA public URL to the completed X thread created for this bounty.A screenshot of the full posted bounty thread showing it is live on X.A shared document link or text file containing the full bounty thread copy for review and archive purposes.If applicable for this bounty, links to the iOS App Store page and Android app page referenced in the thread.",
+            "deadline": "2026-11-27T05:00:00.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 400,
+            "xpBonus": 1980,
+            "token": null,
+            "asset": {
+              "id": "7ab857e3-cca7-4426-899c-e78d4e7d0759",
+              "mintAddress": "29bHTjaAH8VCLbsSxeGKFr3YeoQWf6BkStTgnCJmGsRT",
+              "symbol": "CREDITS",
+              "imageUrl": "https://ucarecdn.com/2c174656-7258-4501-b343-e9495f5adf97/credits.png",
+              "amount": "200000000000",
+              "price": 400,
+              "decimals": 9
+            },
+            "user": {
+              "id": "70b7628d-cf0b-4f5b-b8df-f7f687d3b057",
+              "username": "gibwork",
+              "profilePicture": "https://ucarecdn.com/616c31ba-f260-4c96-8a03-d2100ab3d08c/",
+              "isPremium": true,
+              "membership": {
+                "tier": "plus",
+                "entitlementLevel": 1,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "cc14599e-ed38-4bdc-b55a-09cd8f8c1010",
+            "title": "Refer. Share. Win upto $300 USDC",
+            "content": "Upto 30 Winners win upto $300 USDCSign up on defi.com and put your referral link to work!(Bonus rewards unlock for users with 5 or more successful referrals)It\u2019s super simple to enter!How to EnterPost about defi.com on X and share your referral link.On gibwork, submit your registered email plus a public tweet link below for a review.Note:The submitted email must match the email you used while signing up.Quality posts only. Spam, or low-effort submissions will be disqualified.Multiple entries allowed.",
+            "deadline": "2026-10-11T18:30:00.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 300,
+            "xpBonus": 530,
+            "token": null,
+            "asset": {
+              "id": "c6877614-790d-40f0-98db-2b5e60571ea2",
+              "mintAddress": "29bHTjaAH8VCLbsSxeGKFr3YeoQWf6BkStTgnCJmGsRT",
+              "symbol": "CREDITS",
+              "imageUrl": "https://ucarecdn.com/2c174656-7258-4501-b343-e9495f5adf97/credits.png",
+              "amount": "120000000000",
+              "price": 300,
+              "decimals": 9
+            },
+            "user": {
+              "id": "b32f575c-78c5-4e68-a7ce-adbf5df2d7b1",
+              "username": "teamdefidotcom",
+              "profilePicture": "https://ucarecdn.com/8139ce77-bd4a-428a-9e86-d04de8a0e03b/",
+              "isPremium": true,
+              "membership": {
+                "tier": "plus",
+                "entitlementLevel": 1,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "5f073804-bb43-49c9-99c0-3fb498180465",
+            "title": "Create a UGC Video Bounty for the Gibwork Mobile App",
+            "content": "Gibwork is seeking talented UGC creators for a video bounty that highlights what the platform is, how it works, and what users can do with the Gibwork mobile app. This bounty is intended for high-quality short-form video content similar in style and production value to the provided reference, with approved submissions eligible for a $25 base bounty reward plus $1.50 per 1,000 video views.Reference: https://ucarecdn.com/c246aba3-224b-4017-a16b-9d3d056d50a2/Queensley212074006476620771519.mp4Approved Submissions:https://x.com/queensley21/status/2100820325873132016https://x.com/jessica_moon04/status/2102023639281336447https://x.com/heavenxnd/status/2103053825586200874?s=46Bounty DescriptionThe selected participants will be responsible for:Creating one original UGC-style video bounty submission that clearly explains what Gibwork is and why someone would use it.Showing the Gibwork mobile app clearly on screen as part of the bounty, including relevant app navigation, features, or user flow.Matching the overall quality, clarity, and engaging style of the provided reference while keeping the bounty content authentic and easy to follow.Publishing the video bounty submission on a public social media platform where views, likes, and comments are visible and enabled.Ensuring the bounty video is original and not reused, reposted, duplicated, artificially boosted, or supported by bots.RequirementsThis bounty must feature high-quality video production, including clear visuals, readable app footage, and understandable voiceover or on-screen text.This bounty must clearly explain or demonstrate what Gibwork is within the video, not just mention the brand name.This bounty must clearly show the Gibwork mobile app on-screen for a meaningful portion of the video.This bounty must be posted publicly with comments, views, and likes turned on.This bounty must be an original creator upload and must not include bots, paid boosting, reposts, duplicate uploads, or misleading engagement methods.This bounty should follow a short-form UGC format suitable for platforms such as TikTok, Instagram Reels, or YouTube Shorts.What to SubmitA public URL to the posted video bounty submission on X.comA downloadable file link to the final exported video bounty asset in high-quality format (such as MP4 via Google Drive, Dropbox, or similar).If someone referred you, share their X or Gibwork username on your submission.How it worksCreate and post the video on X.comMake a submission sharing the link to your post.If approved, you will receive a comment \u201capproved\u201d within 48 hours of your submission.Once approved, you will accrue $1.50 per 1,000 views.At the bounty deadline you will receive the total payout for your submission.",
+            "deadline": "2026-10-30T04:00:00.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 300,
+            "xpBonus": 1245,
+            "token": null,
+            "asset": {
+              "id": "0c291053-519c-4443-ac4f-fc42c8601ab9",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "300000000",
+              "price": 300,
+              "decimals": 6
+            },
+            "user": {
+              "id": "70b7628d-cf0b-4f5b-b8df-f7f687d3b057",
+              "username": "gibwork",
+              "profilePicture": "https://ucarecdn.com/616c31ba-f260-4c96-8a03-d2100ab3d08c/",
+              "isPremium": true,
+              "membership": {
+                "tier": "plus",
+                "entitlementLevel": 1,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "91dd2813-b2a0-4a05-88b8-818ceba19a21",
+            "title": "How Long Have You Been Staking on BASIS? Pick ONE angle",
+            "content": "Every BASIS position has a timeline. We want to hear yours how long have you been staking on BASIS (basis.pro), the market-neutral yield platform from Base58 Labs, and what does that chapter look like from where you sit?Pick ONE angle below and post your take on X:1. Just started this week first impressions2. Literally on day one deposit just cleared3. About a month in what's changed since day one4. Just finished your first 14-day booster cycle5. 30 days in that first monthly rewards check6. Your 90-day lock is getting close to maturity7. Running a 180-day booster right now8. Six months or more the long view9. A year or more what kept you around10. Took everything out once, then came back11. Started small and scaled up over time12. Started with one asset, then added another13. Started in the flexible pool, later picked a lockup14. Went from no booster to a full 180-day one15. Started with BTC, later branched into ETH/SOL/PAXG16. Claimed your rewards for the first time17. Missed a claim and watched Auto Earn take over18. Reinvested your rewards into the same position19. Your reward-check routine how often you actually look20. The Monday ritual checking in after Auto Earn runs21. Stayed staked straight through a market dip22. Watched DRR move around and didn't flinch23. The moment you decided to increase your stake24. The moment you decided to trim back a little25. Unstaked, waited the 7 days, got everything back26. Withdrew to an external wallet for the first time27. Saw your first booster bonus land28. Hit a personal milestone in accrued rewards29. Convinced a friend to start staking too30. Still deciding between flexible and a booster lockRequirements:- Original post in your own words, min 60 characters- Tag @basis__pro- Your X account must match the account linked to your gib.work profile mismatched accounts will not be paid- Posts published before this mission went live will not be accepted- Ad-style or promo-copy posts will be rejected- No copy-paste posts 80%+ similar to an existing submission will be rejected- Active account only brand-new or bot accounts will be rejected- Submit your post link to claimReward: First 150 approved submissions 1 USDC each. Rewards are released after we verify your post is live.",
+            "deadline": "2026-10-13T06:29:40.453Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 19,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "f595441d-1f06-4842-8714-674c1470ac09",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "150000000",
+              "price": 150,
+              "decimals": 6
+            },
+            "user": {
+              "id": "5dba3b6f-109f-4404-965c-3903c3017c39",
+              "username": "basis",
+              "profilePicture": "https://ucarecdn.com/e17116b7-343d-4883-8767-67b130f7884a/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "b3735fc5-991c-45e6-aea0-8755314acb0c",
+            "title": "Introduce Yourself to the Community",
+            "content": "There\u2019s a person behind every username, and we\u2019d love to meet you.Post a 30\u201360 second intro video in our Discord so other freelancers, builders, and bounty participants can get to know you and discover what you could work on together.What should you share?Tell us a little about yourself:What should we call you? Your name or username is fine.What do you enjoy working on? Share a skill you have or something you\u2019re learning.What kind of work interests you? Tell us which freelance opportunities or bounties you\u2019d like to take on.What\u2019s something that makes you, you? A hobby, a project you\u2019re proud of, or something you\u2019re excited about.These are conversation starters, not a script. Talk like you\u2019re introducing yourself to a new teammate.Keep it realNo fancy equipment, editing, or professional experience needed. A simple phone video with clear audio is enough.Use your own voice and your own words\u2014no AI avatars, generated voices, or copied introductions. You don\u2019t need to promote Gibwork or tell us how great the platform is. We want to learn about you.Only share details you\u2019re comfortable making public.How to submitPost your video in #\ud83d\udc4b|introduce-yourself channel, then submit the direct link to your Discord message as your bounty submission.While you\u2019re there, say hello to someone whose introduction catches your interest. You might find your next collaborator.Rewards will be random based on quality and engagement in the #\ud83d\udc4b|introduce-yourself channel",
+            "deadline": "2026-09-30T04:00:00.000Z",
+            "tags": [
+              "Design"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": true,
+            "remainingAmount": 120,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "092889e0-4cb4-4482-8aed-36e6996b6aa3",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "130000000",
+              "price": 130,
+              "decimals": 6
+            },
+            "user": {
+              "id": "0c7958be-abcd-4750-87ee-32c17d29135a",
+              "username": "anthony",
+              "profilePicture": "https://ucarecdn.com/5571b854-8c7a-4ba4-99eb-c45e737d0aa3/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "d8c7530d-b3b1-4c5b-80ef-a71a0e804ce7",
+            "title": "Invite Users, Earn Points, and Climb the Leaderboard",
+            "content": "Invite people to Gibwork and earn points when they accept your referral and participate in a bounty, connect a qualifying X account, and create funded bounties. Compete for a 125.00 USDC reward pool and follow your progress on our shared leaderboard.\nHow to participate\n\nSubmit \u201cI want to participate\u201d or any other message to this bounty to enter.\nFind your referral link at gib.work/referrals and share it with people you invite. If they download the Gibwork app, make sure they enter your referral code in the app so their referral is attributed to you.\nMake sure they accept your referral on Gibwork and participate in any bounty to earn the base referral point. Clicking your link, downloading the app or accepting your referral alone does not earn that point.\nFollow your referral counts, points and rank in the Google Sheets leaderboard.\n\nPoints breakdown\n\nAccepts your referral on Gibwork and participates in any bounty: +1\nConnects an X account that is X verified and has more than 500 followers: +4 bonus\nCreates and successfully funds a new public Gibwork bounty with an initial reward pool of more than 50 USDC, excluding fees: +20 bonus\n\nBonuses stack: one referred user can earn you up to 25 points. Each milestone counts once per referred user. Additional bounties by that same user do not earn extra creator bonuses.\nExample: Refer 5 eligible users who each accept your referral and participate in a bounty. If 2 qualify for the X bonus and 1 qualifies for the funded-bounty bonus, you earn 5 + (2 \u00d7 4) + 20 = 33 points.\nWhat counts\n\nReferral attribution must be recorded after this bounty is created and before its deadline. If you enter later, eligible referrals from that same campaign window still count.\nThe base referral point requires a recorded submission to any bounty after referral acceptance and before the campaign deadline. Each referred user earns this point only once, regardless of how many bounties they participate in.\nX and funded-bounty bonuses must qualify after referral acceptance and before the deadline. X eligibility must be observed and recorded during the campaign.\nEach referred person counts once. Self-referrals, duplicate accounts and previously attributed referrals do not qualify.\nThe X bonus requires all three conditions: a connected X account, X verification and at least 501 followers. Gibwork verification alone does not satisfy this bonus.\nThe bounty bonus requires a newly created, successfully funded public bounty. Drafts, failed funding, top-ups to older bounties and pools of exactly 50 USDC do not qualify. Cancelled or refunded bounties before final review do not earn the bonus.\n\nTracking and rewards\nWe will manually review Gibwork referral records and qualifying activity, then update the leaderboard. Updates are periodic, not live; check the sheet's last-updated time. Newly earned points may remain pending until reviewed.\nYou must earn at least 25 confirmed points to be considered for a reward. The reward rate is 25 points = 5.00 USDC ($5.00), equivalent to 0.20 USDC per point. For an eligible participant whose points pass final review, 25 points earns 5.00 USDC, 50 points earns 10.00 USDC, and 100 points earns 20.00 USDC.\nSubmitting a message enrolls you in the campaign; it does not guarantee a reward. Scores remain provisional until final review. These are gross reward amounts before any applicable payout fees.\nReward pool: 125.00 USDC\nMinimum score for consideration: 25 confirmed points\nReward rate: 25 points = 5.00 USDC\nMinimum payout: 5.00 USDC\nDeadline: October 14, 2026, at 4:00 p.m. EDT (20:00 UTC).",
+            "deadline": "2026-10-14T20:00:00.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 125,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "e49e0929-f634-4de2-9d4b-793ad0a5dd7b",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "125000000",
+              "price": 125,
+              "decimals": 6
+            },
+            "user": {
+              "id": "0c7958be-abcd-4750-87ee-32c17d29135a",
+              "username": "anthony",
+              "profilePicture": "https://ucarecdn.com/5571b854-8c7a-4ba4-99eb-c45e737d0aa3/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "d13c8c10-ad64-407c-a504-e3760abb0ff0",
+            "title": "Engage with the BASIS ETF Flows Report \u2014 Retweet, Like & Comment",
+            "content": "BASIS just published new market research: the ETF ledger turned positive year-to-date Bitcoin ETF flows flipped to +$926M after the strongest ETF week of 2026, while price refused to confirm. Read the post, share it, and tell us what you make of the flow data.Requirements:1. Retweet this post: https://x.com/basis__pro/status/21048667647903008922. Like the post3. Follow @basis__pro4. Comment on the post with your take on the flow data in your own words \u2014 min 60 characters. Emoji-only or one-word comments will be rejected5. No copy-paste comments 80%+ similar to an existing submission will be rejected6. Active account only brand-new or bot accounts will be rejected7. Submit the link to your comment to claimReward: First 100 approved submissions 1 USDC each. Rewards are released after we verify your retweet, like, follow, and comment are live.",
+            "deadline": "2026-10-13T09:24:52.202Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 4,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "a2cb2362-3b6f-4c87-8356-e838020c7f63",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "100000000",
+              "price": 100,
+              "decimals": 6
+            },
+            "user": {
+              "id": "5dba3b6f-109f-4404-965c-3903c3017c39",
+              "username": "basis",
+              "profilePicture": "https://ucarecdn.com/e17116b7-343d-4883-8767-67b130f7884a/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "c35bd56f-9c59-4155-863a-cacfcb36a4b2",
+            "title": "Invite a UGC Creator to Gibwork and Get a Reply \u2014 $30.00",
+            "content": "Find a UGC creator who would be a strong fit for the Gibwork mobile app video bounty. Send them a personal DM inviting them to participate and get a response.\nChoose someone based on their actual videos and ability to create engaging, original short-form content.\nWho to look for\nA creator with examples of high-quality UGC videos, ideally app demos, product walkthroughs, or explainers.Clear visuals, understandable voiceover or on-screen text, and an authentic presentation style.Ability to show the Gibwork mobile app and explain how it works.A verified X account with at least 800 followers, matching the linked bounty's current participation settings.\nWhat to do\nReview the creator's work and choose someone who fits.Send a personalized X DM explaining why you chose them. Include the linked video bounty and its reward: $25 base for approved videos, plus $1.50 per 1,000 views, subject to that bounty's terms.Get a relevant reply from the creator. A sent message alone does not qualify.\nThe reply must address your invitation\u2014for example, expressing interest, asking a question, or declining. Automated replies, message reactions, and read receipts do not count. The creator does not need to complete a video for this outreach submission to qualify.\nExample of a good referral\nIn the previous referral bounty, the winning submission by siam_1205 referred @dibNotanu. It included the creator's profile, video example 1, video example 2, an explanation of how the creator's previous video campaigns and content quality made her a fit, and an outreach proof screenshot.\nUse this as a model for the quality and completeness of your referral. Find a new creator; do not resubmit @dibNotanu or copy the previous submission or its proof.\nWhat to submit\nThe creator's X profile URL.Links to at least two relevant videos they created.A short explanation of why they fit the video bounty.Screenshots showing your sent invitation, the creator's reply, their X handle, and message dates. Expand messages so the full exchange is readable; use multiple screenshots if needed.\nHide unrelated conversations and private information. Do not submit yourself, fabricate proof, send bulk spam, or claim to represent the Gibwork team.\nReward pool: 30.00 USDC total. Minimum payout: 3.00 USDC per approved submission meeting these requirements. This outreach reward is separate from the creator's video bounty reward.",
+            "deadline": "2026-10-06T19:58:26.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": true,
+            "remainingAmount": 6,
+            "xpBonus": 196,
+            "token": null,
+            "asset": {
+              "id": "a9288704-41b8-4fc7-bacf-1f8484ce6af3",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "30000000",
+              "price": 30,
+              "decimals": 6
+            },
+            "user": {
+              "id": "0c7958be-abcd-4750-87ee-32c17d29135a",
+              "username": "anthony",
+              "profilePicture": "https://ucarecdn.com/5571b854-8c7a-4ba4-99eb-c45e737d0aa3/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "9f881000-866b-4366-a057-292645172adf",
+            "title": "JOIN RAYCASH APP POINTS SYSTEM",
+            "content": "Join the Raycash Points system and earn incentive points for using the Raycash app.(Later Points converted into Tokens)\ud83d\udcdd TaskJoin Raycash using my referral link: https://raycash.xyz/r/UZ4ZBWComplete the required steps to participate in the Raycash Points program.Take a screenshot showing that you have successfully joined.Submit the screenshot as proof of completion.\ud83c\udf81 IncentiveRaycash Points are incentive points awarded through the Raycash app's points system.\ud83d\udcf8 Proof RequiredSubmit \"one clear screenshot\" confirming your successful participation in the Raycash Points program.",
+            "deadline": "2026-10-07T14:39:23.434Z",
+            "tags": [
+              "Design"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 4,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "245da4e2-b601-46e0-b99b-81a0ddf6ebb8",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "5000000",
+              "price": 5,
+              "decimals": 6
+            },
+            "user": {
+              "id": "b84984b6-665b-4646-9912-95360bb5d824",
+              "username": "official",
+              "profilePicture": "https://ucarecdn.com/b4cd2b24-7c2a-4a73-a1b4-9812bc31c8d7/",
+              "isPremium": false,
+              "membership": {
+                "tier": "free",
+                "entitlementLevel": 0,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://app.gib.work/api/explore",
+      "http_status": 200,
+      "data": {
+        "lastPage": 1,
+        "page": 1,
+        "limit": 15,
+        "total": 10,
+        "results": [
+          {
+            "id": "1052f22d-3f87-4b1d-b0d7-71a60679e7fa",
+            "title": "Gibwork Developer Hackathon Bounty",
+            "content": "Join this Gibwork Developer Hackathon bounty to create a new non-web-app use case for Gibwork using the SDK, CLI, or MCP. This bounty is focused on practical developer workflows, automations, integrations, or tooling that demonstrate a compelling way Gibwork can be used outside of traditional web applications.Bounty DescriptionThe selected participants will be responsible for:Designing and building a new Gibwork bounty use case that uses the SDK, CLI, or MCP in a meaningful and functional way.Focusing this bounty on non-web-app development, such as developer tooling, automation flows, terminal-based utilities, AI agent integrations, backend workflows, local productivity tools, or other creative bounty concepts.Implementing a working prototype that clearly shows how the bounty use case works, what problem it solves, and how Gibwork is integrated.Documenting the bounty solution so another developer can understand the setup, usage flow, and expected output.Providing a short demo of the completed bounty build, including the core workflow and successful execution.RequirementsThe bounty must use Gibwork SDK, CLI, or MCP as a core part of the implementation.The bounty must be a new use case, not a minor variation of an existing demo.The bounty must not be a web app, frontend dashboard, or browser-based product.The bounty should solve a real developer, operations, automation, research, or workflow problem with a clear practical outcome.The bounty submission must include clear setup instructions, dependencies, and steps to run or test the project.The submission should be functional, organized, and understandable enough for basic reviewer validation.Must attend at least 2 of the hackathon sessions on Discord.What to SubmitA public GitHub repository URL for the completed bounty project, including all source code and a README.A short written summary in the repository README or shared document explaining the bounty use case, why it is valuable, and which Gibwork toolset was used (SDK, CLI, or MCP).Setup and usage instructions for the bounty project, including installation steps, environment variables, commands to run, and sample input/output.A screen recording or demo video URL showing the bounty workflow from setup or execution through successful output.Screenshots of the bounty project running, such as terminal output, logs, agent interactions, or generated results.Any exported deliverables produced by the bounty project, such as output files, reports, generated artifacts, or shared document links, if applicable.How to startSubmit to the Google form https://docs.google.com/forms/d/e/1FAIpQLSejpks7hItR6zBUXpdrwgUDrwvEcmnJj6nlFbUXKIyNkVVfag/viewform?usp=dialogCheck Discord (https://discord.gg/2577tTsRt) to see if you have been rewarded the Hackathon role.Once rewarded the Discord role you can start the work.",
+            "deadline": "2026-10-30T04:00:00.000Z",
+            "tags": [
+              "Development"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 1000,
+            "xpBonus": 981,
+            "token": null,
+            "asset": {
+              "id": "18c15237-6d50-4602-aee6-0f277e1362af",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "1000000000",
+              "price": 1000,
+              "decimals": 6
+            },
+            "user": {
+              "id": "70b7628d-cf0b-4f5b-b8df-f7f687d3b057",
+              "username": "gibwork",
+              "profilePicture": "https://ucarecdn.com/616c31ba-f260-4c96-8a03-d2100ab3d08c/",
+              "isPremium": true,
+              "membership": {
+                "tier": "plus",
+                "entitlementLevel": 1,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "d321ae8f-34f0-4c2f-b6ef-af7773d096ba",
+            "title": "Create an X Thread About the Gibwork Mobile App Bounty",
+            "content": "This bounty invites contributors to create a clear, engaging X thread explaining the Gibwork mobile app on iOS and Android, including what the app does and the opportunities it offers users. The goal of this bounty is to produce a thread that helps new audiences understand the value of the Gibwork mobile app and encourages interest in the bounty ecosystem around it.Bounty DescriptionThe selected participant will be responsible for:Creating an original X thread for this bounty that explains the Gibwork mobile app, covering both iOS and Android availability.Highlighting the main opportunities available through the app in this bounty, such as discovering bounty work, participating in the ecosystem, and engaging with mobile-friendly features.Structuring the bounty thread so it is easy to follow, informative, and appealing to people who may be unfamiliar with Gibwork.Using accurate language and a professional tone in the bounty thread while keeping the content suitable for social sharing.RequirementsThe bounty thread must be written in English and posted publicly on X.Requires X account with 800+ followersThe bounty content must include a concise explanation of what the Gibwork mobile app is, mention both iOS and Android, and describe the opportunities available through the app.The bounty thread should be original, factually accurate, and free of misleading claims.The bounty post should be well formatted as a thread, with clear flow between posts and strong readability.The bounty submission must remain publicly accessible at the time of review.X thread must contain authentic engagement.What to SubmitA public URL to the completed X thread created for this bounty.A screenshot of the full posted bounty thread showing it is live on X.A shared document link or text file containing the full bounty thread copy for review and archive purposes.If applicable for this bounty, links to the iOS App Store page and Android app page referenced in the thread.",
+            "deadline": "2026-11-27T05:00:00.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 400,
+            "xpBonus": 1980,
+            "token": null,
+            "asset": {
+              "id": "7ab857e3-cca7-4426-899c-e78d4e7d0759",
+              "mintAddress": "29bHTjaAH8VCLbsSxeGKFr3YeoQWf6BkStTgnCJmGsRT",
+              "symbol": "CREDITS",
+              "imageUrl": "https://ucarecdn.com/2c174656-7258-4501-b343-e9495f5adf97/credits.png",
+              "amount": "200000000000",
+              "price": 400,
+              "decimals": 9
+            },
+            "user": {
+              "id": "70b7628d-cf0b-4f5b-b8df-f7f687d3b057",
+              "username": "gibwork",
+              "profilePicture": "https://ucarecdn.com/616c31ba-f260-4c96-8a03-d2100ab3d08c/",
+              "isPremium": true,
+              "membership": {
+                "tier": "plus",
+                "entitlementLevel": 1,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "cc14599e-ed38-4bdc-b55a-09cd8f8c1010",
+            "title": "Refer. Share. Win upto $300 USDC",
+            "content": "Upto 30 Winners win upto $300 USDCSign up on defi.com and put your referral link to work!(Bonus rewards unlock for users with 5 or more successful referrals)It\u2019s super simple to enter!How to EnterPost about defi.com on X and share your referral link.On gibwork, submit your registered email plus a public tweet link below for a review.Note:The submitted email must match the email you used while signing up.Quality posts only. Spam, or low-effort submissions will be disqualified.Multiple entries allowed.",
+            "deadline": "2026-10-11T18:30:00.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 300,
+            "xpBonus": 530,
+            "token": null,
+            "asset": {
+              "id": "c6877614-790d-40f0-98db-2b5e60571ea2",
+              "mintAddress": "29bHTjaAH8VCLbsSxeGKFr3YeoQWf6BkStTgnCJmGsRT",
+              "symbol": "CREDITS",
+              "imageUrl": "https://ucarecdn.com/2c174656-7258-4501-b343-e9495f5adf97/credits.png",
+              "amount": "120000000000",
+              "price": 300,
+              "decimals": 9
+            },
+            "user": {
+              "id": "b32f575c-78c5-4e68-a7ce-adbf5df2d7b1",
+              "username": "teamdefidotcom",
+              "profilePicture": "https://ucarecdn.com/8139ce77-bd4a-428a-9e86-d04de8a0e03b/",
+              "isPremium": true,
+              "membership": {
+                "tier": "plus",
+                "entitlementLevel": 1,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "5f073804-bb43-49c9-99c0-3fb498180465",
+            "title": "Create a UGC Video Bounty for the Gibwork Mobile App",
+            "content": "Gibwork is seeking talented UGC creators for a video bounty that highlights what the platform is, how it works, and what users can do with the Gibwork mobile app. This bounty is intended for high-quality short-form video content similar in style and production value to the provided reference, with approved submissions eligible for a $25 base bounty reward plus $1.50 per 1,000 video views.Reference: https://ucarecdn.com/c246aba3-224b-4017-a16b-9d3d056d50a2/Queensley212074006476620771519.mp4Approved Submissions:https://x.com/queensley21/status/2100820325873132016https://x.com/jessica_moon04/status/2102023639281336447https://x.com/heavenxnd/status/2103053825586200874?s=46Bounty DescriptionThe selected participants will be responsible for:Creating one original UGC-style video bounty submission that clearly explains what Gibwork is and why someone would use it.Showing the Gibwork mobile app clearly on screen as part of the bounty, including relevant app navigation, features, or user flow.Matching the overall quality, clarity, and engaging style of the provided reference while keeping the bounty content authentic and easy to follow.Publishing the video bounty submission on a public social media platform where views, likes, and comments are visible and enabled.Ensuring the bounty video is original and not reused, reposted, duplicated, artificially boosted, or supported by bots.RequirementsThis bounty must feature high-quality video production, including clear visuals, readable app footage, and understandable voiceover or on-screen text.This bounty must clearly explain or demonstrate what Gibwork is within the video, not just mention the brand name.This bounty must clearly show the Gibwork mobile app on-screen for a meaningful portion of the video.This bounty must be posted publicly with comments, views, and likes turned on.This bounty must be an original creator upload and must not include bots, paid boosting, reposts, duplicate uploads, or misleading engagement methods.This bounty should follow a short-form UGC format suitable for platforms such as TikTok, Instagram Reels, or YouTube Shorts.What to SubmitA public URL to the posted video bounty submission on X.comA downloadable file link to the final exported video bounty asset in high-quality format (such as MP4 via Google Drive, Dropbox, or similar).If someone referred you, share their X or Gibwork username on your submission.How it worksCreate and post the video on X.comMake a submission sharing the link to your post.If approved, you will receive a comment \u201capproved\u201d within 48 hours of your submission.Once approved, you will accrue $1.50 per 1,000 views.At the bounty deadline you will receive the total payout for your submission.",
+            "deadline": "2026-10-30T04:00:00.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 300,
+            "xpBonus": 1245,
+            "token": null,
+            "asset": {
+              "id": "0c291053-519c-4443-ac4f-fc42c8601ab9",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "300000000",
+              "price": 300,
+              "decimals": 6
+            },
+            "user": {
+              "id": "70b7628d-cf0b-4f5b-b8df-f7f687d3b057",
+              "username": "gibwork",
+              "profilePicture": "https://ucarecdn.com/616c31ba-f260-4c96-8a03-d2100ab3d08c/",
+              "isPremium": true,
+              "membership": {
+                "tier": "plus",
+                "entitlementLevel": 1,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "91dd2813-b2a0-4a05-88b8-818ceba19a21",
+            "title": "How Long Have You Been Staking on BASIS? Pick ONE angle",
+            "content": "Every BASIS position has a timeline. We want to hear yours how long have you been staking on BASIS (basis.pro), the market-neutral yield platform from Base58 Labs, and what does that chapter look like from where you sit?Pick ONE angle below and post your take on X:1. Just started this week first impressions2. Literally on day one deposit just cleared3. About a month in what's changed since day one4. Just finished your first 14-day booster cycle5. 30 days in that first monthly rewards check6. Your 90-day lock is getting close to maturity7. Running a 180-day booster right now8. Six months or more the long view9. A year or more what kept you around10. Took everything out once, then came back11. Started small and scaled up over time12. Started with one asset, then added another13. Started in the flexible pool, later picked a lockup14. Went from no booster to a full 180-day one15. Started with BTC, later branched into ETH/SOL/PAXG16. Claimed your rewards for the first time17. Missed a claim and watched Auto Earn take over18. Reinvested your rewards into the same position19. Your reward-check routine how often you actually look20. The Monday ritual checking in after Auto Earn runs21. Stayed staked straight through a market dip22. Watched DRR move around and didn't flinch23. The moment you decided to increase your stake24. The moment you decided to trim back a little25. Unstaked, waited the 7 days, got everything back26. Withdrew to an external wallet for the first time27. Saw your first booster bonus land28. Hit a personal milestone in accrued rewards29. Convinced a friend to start staking too30. Still deciding between flexible and a booster lockRequirements:- Original post in your own words, min 60 characters- Tag @basis__pro- Your X account must match the account linked to your gib.work profile mismatched accounts will not be paid- Posts published before this mission went live will not be accepted- Ad-style or promo-copy posts will be rejected- No copy-paste posts 80%+ similar to an existing submission will be rejected- Active account only brand-new or bot accounts will be rejected- Submit your post link to claimReward: First 150 approved submissions 1 USDC each. Rewards are released after we verify your post is live.",
+            "deadline": "2026-10-13T06:29:40.453Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 19,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "f595441d-1f06-4842-8714-674c1470ac09",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "150000000",
+              "price": 150,
+              "decimals": 6
+            },
+            "user": {
+              "id": "5dba3b6f-109f-4404-965c-3903c3017c39",
+              "username": "basis",
+              "profilePicture": "https://ucarecdn.com/e17116b7-343d-4883-8767-67b130f7884a/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "b3735fc5-991c-45e6-aea0-8755314acb0c",
+            "title": "Introduce Yourself to the Community",
+            "content": "There\u2019s a person behind every username, and we\u2019d love to meet you.Post a 30\u201360 second intro video in our Discord so other freelancers, builders, and bounty participants can get to know you and discover what you could work on together.What should you share?Tell us a little about yourself:What should we call you? Your name or username is fine.What do you enjoy working on? Share a skill you have or something you\u2019re learning.What kind of work interests you? Tell us which freelance opportunities or bounties you\u2019d like to take on.What\u2019s something that makes you, you? A hobby, a project you\u2019re proud of, or something you\u2019re excited about.These are conversation starters, not a script. Talk like you\u2019re introducing yourself to a new teammate.Keep it realNo fancy equipment, editing, or professional experience needed. A simple phone video with clear audio is enough.Use your own voice and your own words\u2014no AI avatars, generated voices, or copied introductions. You don\u2019t need to promote Gibwork or tell us how great the platform is. We want to learn about you.Only share details you\u2019re comfortable making public.How to submitPost your video in #\ud83d\udc4b|introduce-yourself channel, then submit the direct link to your Discord message as your bounty submission.While you\u2019re there, say hello to someone whose introduction catches your interest. You might find your next collaborator.Rewards will be random based on quality and engagement in the #\ud83d\udc4b|introduce-yourself channel",
+            "deadline": "2026-09-30T04:00:00.000Z",
+            "tags": [
+              "Design"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": true,
+            "remainingAmount": 120,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "092889e0-4cb4-4482-8aed-36e6996b6aa3",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "130000000",
+              "price": 130,
+              "decimals": 6
+            },
+            "user": {
+              "id": "0c7958be-abcd-4750-87ee-32c17d29135a",
+              "username": "anthony",
+              "profilePicture": "https://ucarecdn.com/5571b854-8c7a-4ba4-99eb-c45e737d0aa3/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "d8c7530d-b3b1-4c5b-80ef-a71a0e804ce7",
+            "title": "Invite Users, Earn Points, and Climb the Leaderboard",
+            "content": "Invite people to Gibwork and earn points when they accept your referral and participate in a bounty, connect a qualifying X account, and create funded bounties. Compete for a 125.00 USDC reward pool and follow your progress on our shared leaderboard.\nHow to participate\n\nSubmit \u201cI want to participate\u201d or any other message to this bounty to enter.\nFind your referral link at gib.work/referrals and share it with people you invite. If they download the Gibwork app, make sure they enter your referral code in the app so their referral is attributed to you.\nMake sure they accept your referral on Gibwork and participate in any bounty to earn the base referral point. Clicking your link, downloading the app or accepting your referral alone does not earn that point.\nFollow your referral counts, points and rank in the Google Sheets leaderboard.\n\nPoints breakdown\n\nAccepts your referral on Gibwork and participates in any bounty: +1\nConnects an X account that is X verified and has more than 500 followers: +4 bonus\nCreates and successfully funds a new public Gibwork bounty with an initial reward pool of more than 50 USDC, excluding fees: +20 bonus\n\nBonuses stack: one referred user can earn you up to 25 points. Each milestone counts once per referred user. Additional bounties by that same user do not earn extra creator bonuses.\nExample: Refer 5 eligible users who each accept your referral and participate in a bounty. If 2 qualify for the X bonus and 1 qualifies for the funded-bounty bonus, you earn 5 + (2 \u00d7 4) + 20 = 33 points.\nWhat counts\n\nReferral attribution must be recorded after this bounty is created and before its deadline. If you enter later, eligible referrals from that same campaign window still count.\nThe base referral point requires a recorded submission to any bounty after referral acceptance and before the campaign deadline. Each referred user earns this point only once, regardless of how many bounties they participate in.\nX and funded-bounty bonuses must qualify after referral acceptance and before the deadline. X eligibility must be observed and recorded during the campaign.\nEach referred person counts once. Self-referrals, duplicate accounts and previously attributed referrals do not qualify.\nThe X bonus requires all three conditions: a connected X account, X verification and at least 501 followers. Gibwork verification alone does not satisfy this bonus.\nThe bounty bonus requires a newly created, successfully funded public bounty. Drafts, failed funding, top-ups to older bounties and pools of exactly 50 USDC do not qualify. Cancelled or refunded bounties before final review do not earn the bonus.\n\nTracking and rewards\nWe will manually review Gibwork referral records and qualifying activity, then update the leaderboard. Updates are periodic, not live; check the sheet's last-updated time. Newly earned points may remain pending until reviewed.\nYou must earn at least 25 confirmed points to be considered for a reward. The reward rate is 25 points = 5.00 USDC ($5.00), equivalent to 0.20 USDC per point. For an eligible participant whose points pass final review, 25 points earns 5.00 USDC, 50 points earns 10.00 USDC, and 100 points earns 20.00 USDC.\nSubmitting a message enrolls you in the campaign; it does not guarantee a reward. Scores remain provisional until final review. These are gross reward amounts before any applicable payout fees.\nReward pool: 125.00 USDC\nMinimum score for consideration: 25 confirmed points\nReward rate: 25 points = 5.00 USDC\nMinimum payout: 5.00 USDC\nDeadline: October 14, 2026, at 4:00 p.m. EDT (20:00 UTC).",
+            "deadline": "2026-10-14T20:00:00.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 125,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "e49e0929-f634-4de2-9d4b-793ad0a5dd7b",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "125000000",
+              "price": 125,
+              "decimals": 6
+            },
+            "user": {
+              "id": "0c7958be-abcd-4750-87ee-32c17d29135a",
+              "username": "anthony",
+              "profilePicture": "https://ucarecdn.com/5571b854-8c7a-4ba4-99eb-c45e737d0aa3/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "d13c8c10-ad64-407c-a504-e3760abb0ff0",
+            "title": "Engage with the BASIS ETF Flows Report \u2014 Retweet, Like & Comment",
+            "content": "BASIS just published new market research: the ETF ledger turned positive year-to-date Bitcoin ETF flows flipped to +$926M after the strongest ETF week of 2026, while price refused to confirm. Read the post, share it, and tell us what you make of the flow data.Requirements:1. Retweet this post: https://x.com/basis__pro/status/21048667647903008922. Like the post3. Follow @basis__pro4. Comment on the post with your take on the flow data in your own words \u2014 min 60 characters. Emoji-only or one-word comments will be rejected5. No copy-paste comments 80%+ similar to an existing submission will be rejected6. Active account only brand-new or bot accounts will be rejected7. Submit the link to your comment to claimReward: First 100 approved submissions 1 USDC each. Rewards are released after we verify your retweet, like, follow, and comment are live.",
+            "deadline": "2026-10-13T09:24:52.202Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 4,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "a2cb2362-3b6f-4c87-8356-e838020c7f63",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "100000000",
+              "price": 100,
+              "decimals": 6
+            },
+            "user": {
+              "id": "5dba3b6f-109f-4404-965c-3903c3017c39",
+              "username": "basis",
+              "profilePicture": "https://ucarecdn.com/e17116b7-343d-4883-8767-67b130f7884a/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "c35bd56f-9c59-4155-863a-cacfcb36a4b2",
+            "title": "Invite a UGC Creator to Gibwork and Get a Reply \u2014 $30.00",
+            "content": "Find a UGC creator who would be a strong fit for the Gibwork mobile app video bounty. Send them a personal DM inviting them to participate and get a response.\nChoose someone based on their actual videos and ability to create engaging, original short-form content.\nWho to look for\nA creator with examples of high-quality UGC videos, ideally app demos, product walkthroughs, or explainers.Clear visuals, understandable voiceover or on-screen text, and an authentic presentation style.Ability to show the Gibwork mobile app and explain how it works.A verified X account with at least 800 followers, matching the linked bounty's current participation settings.\nWhat to do\nReview the creator's work and choose someone who fits.Send a personalized X DM explaining why you chose them. Include the linked video bounty and its reward: $25 base for approved videos, plus $1.50 per 1,000 views, subject to that bounty's terms.Get a relevant reply from the creator. A sent message alone does not qualify.\nThe reply must address your invitation\u2014for example, expressing interest, asking a question, or declining. Automated replies, message reactions, and read receipts do not count. The creator does not need to complete a video for this outreach submission to qualify.\nExample of a good referral\nIn the previous referral bounty, the winning submission by siam_1205 referred @dibNotanu. It included the creator's profile, video example 1, video example 2, an explanation of how the creator's previous video campaigns and content quality made her a fit, and an outreach proof screenshot.\nUse this as a model for the quality and completeness of your referral. Find a new creator; do not resubmit @dibNotanu or copy the previous submission or its proof.\nWhat to submit\nThe creator's X profile URL.Links to at least two relevant videos they created.A short explanation of why they fit the video bounty.Screenshots showing your sent invitation, the creator's reply, their X handle, and message dates. Expand messages so the full exchange is readable; use multiple screenshots if needed.\nHide unrelated conversations and private information. Do not submit yourself, fabricate proof, send bulk spam, or claim to represent the Gibwork team.\nReward pool: 30.00 USDC total. Minimum payout: 3.00 USDC per approved submission meeting these requirements. This outreach reward is separate from the creator's video bounty reward.",
+            "deadline": "2026-10-06T19:58:26.000Z",
+            "tags": [
+              "Social Media"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": true,
+            "remainingAmount": 6,
+            "xpBonus": 196,
+            "token": null,
+            "asset": {
+              "id": "a9288704-41b8-4fc7-bacf-1f8484ce6af3",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "30000000",
+              "price": 30,
+              "decimals": 6
+            },
+            "user": {
+              "id": "0c7958be-abcd-4750-87ee-32c17d29135a",
+              "username": "anthony",
+              "profilePicture": "https://ucarecdn.com/5571b854-8c7a-4ba4-99eb-c45e737d0aa3/",
+              "isPremium": true,
+              "membership": {
+                "tier": "pro",
+                "entitlementLevel": 2,
+                "isPro": true
+              }
+            },
+            "type": "tasks"
+          },
+          {
+            "id": "9f881000-866b-4366-a057-292645172adf",
+            "title": "JOIN RAYCASH APP POINTS SYSTEM",
+            "content": "Join the Raycash Points system and earn incentive points for using the Raycash app.(Later Points converted into Tokens)\ud83d\udcdd TaskJoin Raycash using my referral link: https://raycash.xyz/r/UZ4ZBWComplete the required steps to participate in the Raycash Points program.Take a screenshot showing that you have successfully joined.Submit the screenshot as proof of completion.\ud83c\udf81 IncentiveRaycash Points are incentive points awarded through the Raycash app's points system.\ud83d\udcf8 Proof RequiredSubmit \"one clear screenshot\" confirming your successful participation in the Raycash Points program.",
+            "deadline": "2026-10-07T14:39:23.434Z",
+            "tags": [
+              "Design"
+            ],
+            "status": "CREATED",
+            "isFeatured": false,
+            "isOpen": true,
+            "isHidden": false,
+            "allowOnlyVerifiedSubmissions": false,
+            "remainingAmount": 4,
+            "xpBonus": 45,
+            "token": null,
+            "asset": {
+              "id": "245da4e2-b601-46e0-b99b-81a0ddf6ebb8",
+              "mintAddress": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+              "symbol": "USDC",
+              "imageUrl": "https://cdn.gib.work/token-images/usdc.png",
+              "amount": "5000000",
+              "price": 5,
+              "decimals": 6
+            },
+            "user": {
+              "id": "b84984b6-665b-4646-9912-95360bb5d824",
+              "username": "official",
+              "profilePicture": "https://ucarecdn.com/b4cd2b24-7c2a-4a73-a1b4-9812bc31c8d7/",
+              "isPremium": false,
+              "membership": {
+                "tier": "free",
+                "entitlementLevel": 0,
+                "isPro": false
+              }
+            },
+            "type": "tasks"
+          }
+        ]
+      }
+    }
+  ]
+}

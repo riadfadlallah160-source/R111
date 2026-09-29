@@ -1,0 +1,91 @@
+name: Superteam Direct Live
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'superteam-run/**'
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Register and fetch
+        shell: bash
+        run: |
+          set -euo pipefail
+          NAME="riad-superteam-$GITHUB_RUN_ID"
+          curl -fsS -X POST "https://superteam.fun/api/agents"             -H "Content-Type: application/json"             -d "{\"name\":\"$NAME\"}" > /tmp/agent.json
+
+          KEY="$(jq -r '.apiKey // .result.apiKey // empty' /tmp/agent.json)"
+          CLAIM="$(jq -r '.claimCode // .result.claimCode // empty' /tmp/agent.json)"
+          AGENT_ID="$(jq -r '.agentId // .result.agentId // empty' /tmp/agent.json)"
+          USERNAME="$(jq -r '.username // .result.username // empty' /tmp/agent.json)"
+
+          test -n "$KEY"
+          test -n "$CLAIM"
+
+          curl -fsS "https://superteam.fun/api/agents/listings/live?take=100"             -H "Authorization: Bearer $KEY" > /tmp/live.json || true
+
+          curl -fsS "https://superteam.fun/api/listings?take=100" > /tmp/public.json || true
+
+          jq -n             --arg claimCode "$CLAIM"             --arg agentId "$AGENT_ID"             --arg username "$USERNAME"             '{claimCode:$claimCode,agentId:$agentId,username:$username}' > agent-claim.json
+
+          jq '
+            def rows:
+              if type=="array" then .
+              elif (.result|type)=="array" then .result
+              elif (.listings|type)=="array" then .listings
+              elif ((.result|type)=="object" and (.result.listings|type)=="array") then .result.listings
+              else [] end;
+            rows | map({
+              id:(.id // .listingId),
+              slug,
+              title:(.title // .name),
+              type,
+              agentAccess,
+              reward:(.rewardAmount // .reward // .totalReward // .compensation),
+              token:(.token // .currency),
+              deadline,
+              status,
+              compensationType
+            })
+          ' /tmp/live.json > live-agent-listings.json 2>/dev/null || echo '[]' > live-agent-listings.json
+
+          jq '
+            def rows:
+              if type=="array" then .
+              elif (.result|type)=="array" then .result
+              elif (.listings|type)=="array" then .listings
+              elif ((.result|type)=="object" and (.result.listings|type)=="array") then .result.listings
+              else [] end;
+            rows
+            | map(select((.status // "")=="OPEN" and ((.agentAccess // "")=="AGENT_ALLOWED" or (.agentAccess // "")=="AGENT_ONLY")))
+            | map({
+              id:(.id // .listingId),
+              slug,
+              title:(.title // .name),
+              type,
+              agentAccess,
+              reward:(.rewardAmount // .reward // .totalReward // .compensation),
+              token:(.token // .currency),
+              deadline,
+              status,
+              compensationType
+            })
+          ' /tmp/public.json > public-agent-open.json 2>/dev/null || echo '[]' > public-agent-open.json
+
+          rm -f /tmp/agent.json /tmp/live.json /tmp/public.json
+
+      - name: Upload sanitized result
+        uses: actions/upload-artifact@v4
+        with:
+          name: superteam-direct-live
+          path: |
+            agent-claim.json
+            live-agent-listings.json
+            public-agent-open.json
+          retention-days: 1

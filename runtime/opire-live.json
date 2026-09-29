@@ -1,406 +1,112 @@
 {
-  "scanned_at": "2026-09-29T11:32:20.277228+00:00",
+  "scanned_at": "2026-09-29T11:33:48.311770+00:00",
   "source": "https://api.opire.dev/rewards",
   "raw_count": 5,
-  "matching_count": 0,
-  "matches": [],
-  "sample_raw": [
+  "eligible_100_to_10000_count": 0,
+  "eligible": [],
+  "all_verified": [
     {
-      "id": "01KSXXX60RR76RSSXZXD0F4AGF",
+      "amount_usd": 100.0,
       "title": "c1work",
-      "url": "https://github.com/rodrigompy/bugb/issues/1",
-      "platform": "GitHub",
-      "featuredBy": null,
-      "claimerUsers": [],
-      "tryingUsers": [],
-      "programmingLanguages": [],
-      "createdAt": 1780194646040,
-      "pendingPrice": {
-        "value": 10000,
-        "unit": "USD_CENT"
-      },
-      "organization": {
-        "id": "01KSXXX5R3XKG9F7Z34JHFK2C5",
-        "logoURL": "https://avatars.githubusercontent.com/u/219452619?v=4",
-        "url": "https://github.com/rodrigompy",
-        "name": "rodrigompy"
-      },
-      "project": {
-        "id": "01KSXXX5Z4SYTRXCNER02C5A2D",
-        "url": "https://github.com/rodrigompy/bugb",
-        "name": "bugb",
-        "isPublic": true,
-        "isBotInstalled": false
-      }
+      "issue_url": "https://github.com/rodrigompy/bugb/issues/1",
+      "claimers": 0,
+      "trying": 0,
+      "languages": [],
+      "opire_id": "01KSXXX60RR76RSSXZXD0F4AGF",
+      "project": "bugb",
+      "project_public": true,
+      "github_state": "closed",
+      "github_state_reason": "completed",
+      "github_comments": 1,
+      "github_assignees": [
+        "rodrigompy"
+      ],
+      "repo_archived": true,
+      "repo_pushed_at": "2026-05-31T03:37:40Z",
+      "repo_stars": 1,
+      "repo_forks": 4,
+      "eligible": false
     },
     {
-      "id": "01J42C08V4J78ZAWH8JH2RQS8G",
+      "amount_usd": 42.0,
       "title": "research implementation for Windows",
-      "url": "https://github.com/radumarias/rencfs/issues/3",
-      "platform": "GitHub",
-      "featuredBy": null,
-      "claimerUsers": [],
-      "tryingUsers": [],
-      "programmingLanguages": [
+      "issue_url": "https://github.com/radumarias/rencfs/issues/3",
+      "claimers": 0,
+      "trying": 0,
+      "languages": [
         "Rust"
       ],
-      "createdAt": 1722361586532,
-      "pendingPrice": {
-        "value": 4200,
-        "unit": "USD_CENT"
-      },
-      "organization": {
-        "id": "01J42C08AZ48K958VHT5PQQQTX",
-        "logoURL": "https://avatars.githubusercontent.com/u/8073584?v=4",
-        "url": "https://github.com/radumarias",
-        "name": "radumarias"
-      },
-      "project": {
-        "id": "01J42C08CR747R4858H02ZCAYY",
-        "url": "https://github.com/radumarias/rencfs",
-        "name": "rencfs",
-        "isPublic": true,
-        "isBotInstalled": false
-      }
+      "opire_id": "01J42C08V4J78ZAWH8JH2RQS8G",
+      "project": "rencfs",
+      "project_public": true,
+      "github_state": "open",
+      "github_state_reason": null,
+      "github_comments": 45,
+      "github_assignees": [],
+      "repo_archived": false,
+      "repo_pushed_at": "2024-12-21T04:34:32Z",
+      "repo_stars": 4,
+      "repo_forks": 36,
+      "eligible": false
     },
     {
-      "id": "01HTN11YX5NYSS7GGB3SHNCJSS",
+      "amount_usd": 30.0,
       "title": "Open target URLs not in PWA but in default browser",
-      "url": "https://github.com/trovu/trovu/issues/329",
-      "platform": "GitHub",
-      "featuredBy": null,
-      "claimerUsers": [
-        {
-          "id": "01HVPW9GDTZ9C42XTB5PE26EAG",
-          "username": "MindfulPol",
-          "avatarURL": "https://avatars.githubusercontent.com/u/25509514?v=4"
-        },
-        {
-          "id": "01HVZ4KMTSG210DJXSZVWBHK3P",
-          "username": "iamnomercy64",
-          "avatarURL": "https://avatars.githubusercontent.com/u/167659492?v=4"
-        },
-        {
-          "id": "01JDEDGFKQ0JEZP537PR5ZXA4Z",
-          "username": "krshhn",
-          "avatarURL": "https://avatars.githubusercontent.com/u/129416344?v=4"
-        },
-        {
-          "id": "01JV2R9578WSGK8RC45D3GQNVY",
-          "username": "TheodorNEngoy",
-          "avatarURL": "https://avatars.githubusercontent.com/u/140903820?v=4"
-        },
-        {
-          "id": "01K4CT5GJDG7DWFC6SMJA5HAQR",
-          "username": "sg-surya",
-          "avatarURL": "https://avatars.githubusercontent.com/u/128205329?v=4"
-        },
-        {
-          "id": "01KHC5YRBTWTE35FXKW3G1M6EN",
-          "username": "Jhon-Crow",
-          "avatarURL": "https://avatars.githubusercontent.com/u/133867474?v=4"
-        },
-        {
-          "id": "01KK4KMJDDANY138KEZK3JTM1T",
-          "username": "1028bc",
-          "avatarURL": "https://avatars.githubusercontent.com/u/266190512?v=4"
-        },
-        {
-          "id": "01KMNZ3VPP0RSRZ37HWDT98R9C",
-          "username": "codejupiter",
-          "avatarURL": "https://avatars.githubusercontent.com/u/143454364?v=4"
-        },
-        {
-          "id": "01KNGKB2FX2N712PHBP2C1MWEZ",
-          "username": "mitchellecm7",
-          "avatarURL": "https://avatars.githubusercontent.com/u/149884682?v=4"
-        },
-        {
-          "id": "01KRAFS0ZG5DVEXWEJB3DV3TFM",
-          "username": "Abergelnathan",
-          "avatarURL": "https://avatars.githubusercontent.com/u/6845391?v=4"
-        },
-        {
-          "id": "01KRB6ZZVQ732118C2NHXAQTZ7",
-          "username": "JjCyberz",
-          "avatarURL": "https://avatars.githubusercontent.com/u/107339077?v=4"
-        },
-        {
-          "id": "01KRBM8KHKY8ETHHWET0298MP4",
-          "username": "diegog956",
-          "avatarURL": "https://avatars.githubusercontent.com/u/119092215?v=4"
-        },
-        {
-          "id": "01KRQVM8RT008FHX33AFA0NARS",
-          "username": "NguyenTrung-3107",
-          "avatarURL": "https://avatars.githubusercontent.com/u/81838362?v=4"
-        },
-        {
-          "id": "01KS3NA2SD2KSZ122Q7VQWTGEK",
-          "username": "iyop666",
-          "avatarURL": "https://avatars.githubusercontent.com/u/134927879?v=4"
-        },
-        {
-          "id": "01KS675K9578CG36KCP7KC5PHC",
-          "username": "marleneborgesveiga95-a11y",
-          "avatarURL": "https://avatars.githubusercontent.com/u/286794976?v=4"
-        },
-        {
-          "id": "01KSHT2FAQ3BARQBKFKZWQ4CVA",
-          "username": "arjunannamalai",
-          "avatarURL": "https://avatars.githubusercontent.com/u/87747431?v=4"
-        },
-        {
-          "id": "01KT8F2M038R30YN93FN6JBKR4",
-          "username": "LamX-05",
-          "avatarURL": "https://avatars.githubusercontent.com/u/180555432?v=4"
-        },
-        {
-          "id": "01KW81BQZ2HG2WT3494KBFZTWK",
-          "username": "aniruddha-verma",
-          "avatarURL": "https://avatars.githubusercontent.com/u/89046355?v=4"
-        },
-        {
-          "id": "01KWSSVZXH98AHQSD4VGS20XWA",
-          "username": "mdsanzidhasnat",
-          "avatarURL": "https://avatars.githubusercontent.com/u/191873432?v=4"
-        },
-        {
-          "id": "01KX90CR27TTH7GCMSNNR2T59Y",
-          "username": "mohamad-shafeez",
-          "avatarURL": "https://avatars.githubusercontent.com/u/79343931?v=4"
-        },
-        {
-          "id": "01M0WXC1YFP6MPAR4QQ7NBKJHT",
-          "username": "11Rabbit11",
-          "avatarURL": "https://avatars.githubusercontent.com/u/62289259?v=4"
-        },
-        {
-          "id": "01M1B0F3RD77W9RNFGDVWXTP9Z",
-          "username": "saavimittal",
-          "avatarURL": "https://avatars.githubusercontent.com/u/131975994?v=4"
-        },
-        {
-          "id": "01M1FD0JGQNM2KPC6X33810YX5",
-          "username": "Blito13",
-          "avatarURL": "https://avatars.githubusercontent.com/u/92063853?v=4"
-        }
-      ],
-      "tryingUsers": [
-        {
-          "id": "01HVKTTCY7VMG2TFX2F5BG65G0",
-          "username": "EstephanoDev",
-          "avatarURL": "https://avatars.githubusercontent.com/u/151201555?v=4"
-        },
-        {
-          "id": "01HVMF8AE61FB39M1HJQH19EZW",
-          "username": "DyxBenjamin",
-          "avatarURL": "https://avatars.githubusercontent.com/u/84478481?v=4"
-        },
-        {
-          "id": "01HVMHAW1GB14B1NTAVNXW5QKY",
-          "username": "torresgol10",
-          "avatarURL": "https://avatars.githubusercontent.com/u/40922354?v=4"
-        },
-        {
-          "id": "01HVPW9GDTZ9C42XTB5PE26EAG",
-          "username": "MindfulPol",
-          "avatarURL": "https://avatars.githubusercontent.com/u/25509514?v=4"
-        },
-        {
-          "id": "01HVYX5CJG0R5PDJVQS5KFBY60",
-          "username": "Ky210299",
-          "avatarURL": "https://avatars.githubusercontent.com/u/149157122?v=4"
-        },
-        {
-          "id": "01HVZ4KMTSG210DJXSZVWBHK3P",
-          "username": "iamnomercy64",
-          "avatarURL": "https://avatars.githubusercontent.com/u/167659492?v=4"
-        },
-        {
-          "id": "01JD6JRBRY9XM5SY1VPHVZ8ABF",
-          "username": "optimusprimecode",
-          "avatarURL": "https://avatars.githubusercontent.com/u/189195604?v=4"
-        },
-        {
-          "id": "01JDEDGFKQ0JEZP537PR5ZXA4Z",
-          "username": "krshhn",
-          "avatarURL": "https://avatars.githubusercontent.com/u/129416344?v=4"
-        },
-        {
-          "id": "01JEDCAAN4TP0YNM7QV34HX4DB",
-          "username": "hellozzm",
-          "avatarURL": "https://avatars.githubusercontent.com/u/15192382?v=4"
-        },
-        {
-          "id": "01JEWCMK9WCQZSFTSY7V5TT3KE",
-          "username": "arc-bluezy",
-          "avatarURL": "https://avatars.githubusercontent.com/u/191427280?v=4"
-        },
-        {
-          "id": "01JF01SE6H26W172AHMHT3GQCT",
-          "username": "hmohammed",
-          "avatarURL": "https://avatars.githubusercontent.com/u/512674?v=4"
-        },
-        {
-          "id": "01JHN89MVJ23X6BEK0YMDRN9WK",
-          "username": "rahul-754",
-          "avatarURL": "https://avatars.githubusercontent.com/u/161922950?v=4"
-        },
-        {
-          "id": "01JQEQHGZC18VFS258AEV88R1M",
-          "username": "Saboor100",
-          "avatarURL": "https://avatars.githubusercontent.com/u/185671776?v=4"
-        },
-        {
-          "id": "01JV2R9578WSGK8RC45D3GQNVY",
-          "username": "TheodorNEngoy",
-          "avatarURL": "https://avatars.githubusercontent.com/u/140903820?v=4"
-        },
-        {
-          "id": "01K2YT721XBANMFV6CJZ3J8K9H",
-          "username": "ishanraj953",
-          "avatarURL": "https://avatars.githubusercontent.com/u/179708459?v=4"
-        },
-        {
-          "id": "01K4CT5GJDG7DWFC6SMJA5HAQR",
-          "username": "sg-surya",
-          "avatarURL": "https://avatars.githubusercontent.com/u/128205329?v=4"
-        },
-        {
-          "id": "01K74VRBH0TH3EYHZ2S4JVS2PD",
-          "username": "ava-sig",
-          "avatarURL": "https://avatars.githubusercontent.com/u/3773948?v=4"
-        },
-        {
-          "id": "01KAFVEQHMHYRV0QHJ6T0NBHD2",
-          "username": "Qwerty-2308",
-          "avatarURL": "https://avatars.githubusercontent.com/u/220698518?v=4"
-        },
-        {
-          "id": "01KGJ6EZ4Q55C90STAJ75Y5WPP",
-          "username": "imsurajj",
-          "avatarURL": "https://avatars.githubusercontent.com/u/136044973?v=4"
-        },
-        {
-          "id": "01KHC5YRBTWTE35FXKW3G1M6EN",
-          "username": "Jhon-Crow",
-          "avatarURL": "https://avatars.githubusercontent.com/u/133867474?v=4"
-        },
-        {
-          "id": "01KK4KMJDDANY138KEZK3JTM1T",
-          "username": "1028bc",
-          "avatarURL": "https://avatars.githubusercontent.com/u/266190512?v=4"
-        },
-        {
-          "id": "01KMNZ3VPP0RSRZ37HWDT98R9C",
-          "username": "codejupiter",
-          "avatarURL": "https://avatars.githubusercontent.com/u/143454364?v=4"
-        },
-        {
-          "id": "01KMPNS22YHABCYF1YS60GFGWD",
-          "username": "sidneisilvadev",
-          "avatarURL": "https://avatars.githubusercontent.com/u/42078612?v=4"
-        },
-        {
-          "id": "01KNGKB2FX2N712PHBP2C1MWEZ",
-          "username": "mitchellecm7",
-          "avatarURL": "https://avatars.githubusercontent.com/u/149884682?v=4"
-        },
-        {
-          "id": "01KRAFS0ZG5DVEXWEJB3DV3TFM",
-          "username": "Abergelnathan",
-          "avatarURL": "https://avatars.githubusercontent.com/u/6845391?v=4"
-        },
-        {
-          "id": "01KRB6ZZVQ732118C2NHXAQTZ7",
-          "username": "JjCyberz",
-          "avatarURL": "https://avatars.githubusercontent.com/u/107339077?v=4"
-        },
-        {
-          "id": "01KRBM8KHKY8ETHHWET0298MP4",
-          "username": "diegog956",
-          "avatarURL": "https://avatars.githubusercontent.com/u/119092215?v=4"
-        },
-        {
-          "id": "01KRQVM8RT008FHX33AFA0NARS",
-          "username": "NguyenTrung-3107",
-          "avatarURL": "https://avatars.githubusercontent.com/u/81838362?v=4"
-        },
-        {
-          "id": "01KS3NA2SD2KSZ122Q7VQWTGEK",
-          "username": "iyop666",
-          "avatarURL": "https://avatars.githubusercontent.com/u/134927879?v=4"
-        },
-        {
-          "id": "01KS675K9578CG36KCP7KC5PHC",
-          "username": "marleneborgesveiga95-a11y",
-          "avatarURL": "https://avatars.githubusercontent.com/u/286794976?v=4"
-        },
-        {
-          "id": "01KSHT2FAQ3BARQBKFKZWQ4CVA",
-          "username": "arjunannamalai",
-          "avatarURL": "https://avatars.githubusercontent.com/u/87747431?v=4"
-        },
-        {
-          "id": "01KT8F2M038R30YN93FN6JBKR4",
-          "username": "LamX-05",
-          "avatarURL": "https://avatars.githubusercontent.com/u/180555432?v=4"
-        },
-        {
-          "id": "01KW81BQZ2HG2WT3494KBFZTWK",
-          "username": "aniruddha-verma",
-          "avatarURL": "https://avatars.githubusercontent.com/u/89046355?v=4"
-        },
-        {
-          "id": "01KWSSVZXH98AHQSD4VGS20XWA",
-          "username": "mdsanzidhasnat",
-          "avatarURL": "https://avatars.githubusercontent.com/u/191873432?v=4"
-        },
-        {
-          "id": "01KX90CR27TTH7GCMSNNR2T59Y",
-          "username": "mohamad-shafeez",
-          "avatarURL": "https://avatars.githubusercontent.com/u/79343931?v=4"
-        },
-        {
-          "id": "01M0WXC1YFP6MPAR4QQ7NBKJHT",
-          "username": "11Rabbit11",
-          "avatarURL": "https://avatars.githubusercontent.com/u/62289259?v=4"
-        },
-        {
-          "id": "01M1B0F3RD77W9RNFGDVWXTP9Z",
-          "username": "saavimittal",
-          "avatarURL": "https://avatars.githubusercontent.com/u/131975994?v=4"
-        },
-        {
-          "id": "01M1FD0JGQNM2KPC6X33810YX5",
-          "username": "Blito13",
-          "avatarURL": "https://avatars.githubusercontent.com/u/92063853?v=4"
-        }
-      ],
-      "programmingLanguages": [
+      "issue_url": "https://github.com/trovu/trovu/issues/329",
+      "claimers": 23,
+      "trying": 38,
+      "languages": [
         "TypeScript",
         "JavaScript",
         "HTML"
       ],
-      "createdAt": 1712250223525,
-      "pendingPrice": {
-        "value": 3000,
-        "unit": "USD_CENT"
-      },
-      "organization": {
-        "id": "01HTN0RBWRA30CQQ9Y96J22VAD",
-        "logoURL": "https://avatars.githubusercontent.com/u/38375402?v=4",
-        "url": "https://github.com/trovu",
-        "name": "trovu"
-      },
-      "project": {
-        "id": "01HTN0RC01363712C9MHZC55DR",
-        "url": "https://github.com/trovu/trovu",
-        "name": "trovu",
-        "isPublic": true,
-        "isBotInstalled": true
-      }
+      "opire_id": "01HTN11YX5NYSS7GGB3SHNCJSS",
+      "project": "trovu",
+      "project_public": true,
+      "github_state": "open",
+      "github_state_reason": null,
+      "github_comments": 91,
+      "github_assignees": [],
+      "repo_archived": false,
+      "repo_pushed_at": "2026-09-29T00:13:14Z",
+      "repo_stars": 75,
+      "repo_forks": 84,
+      "eligible": false
+    },
+    {
+      "amount_usd": 20.0,
+      "title": "Images on the bottom of level up messages",
+      "issue_url": "https://github.com/buape/kiai-bounties/issues/1",
+      "claimers": 0,
+      "trying": 0,
+      "languages": [],
+      "opire_id": "01JYY6Y3VD3NR0104WDMWC20AZ",
+      "project": "kiai-bounties",
+      "project_public": true,
+      "github_error": "HTTP Error 404: Not Found",
+      "eligible": false
+    },
+    {
+      "amount_usd": 20.0,
+      "title": "500 Server Error - Auto Solve hcapcha",
+      "issue_url": "https://github.com/flowese/UdioWrapper/issues/7",
+      "claimers": 15,
+      "trying": 24,
+      "languages": [
+        "Python"
+      ],
+      "opire_id": "01HW8CK374Y67WDDZG22BYVZQ4",
+      "project": "UdioWrapper",
+      "project_public": true,
+      "github_state": "open",
+      "github_state_reason": null,
+      "github_comments": 67,
+      "github_assignees": [],
+      "repo_archived": false,
+      "repo_pushed_at": "2024-07-22T17:47:47Z",
+      "repo_stars": 181,
+      "repo_forks": 67,
+      "eligible": false
     }
   ]
 }

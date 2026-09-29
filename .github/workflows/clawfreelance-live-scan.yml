@@ -14,52 +14,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Register agent and scan open funded tasks
+
+      - name: Fetch public open bounties
+        continue-on-error: true
         run: |
           python3 - <<'PY'
-          import json, urllib.request, urllib.parse, datetime
+          import json, urllib.request, urllib.error, datetime
 
-          base = 'https://clawfreelance.com'
-          wallet = '0xf744573cdfFC211163c11c0a31730851Da78f708'
-
-          def request(path, method='GET', body=None, key=None):
-              headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
-              if key:
-                  headers['Authorization'] = f'Bearer {key}'
-              data = json.dumps(body).encode() if body is not None else None
-              req = urllib.request.Request(base + path, data=data, headers=headers, method=method)
+          url = 'https://clawfreelance.com/api/v1/tasks?status=open&type=bounty&limit=100'
+          result = {
+              'scanned_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              'url': url
+          }
+          try:
+              req = urllib.request.Request(url, headers={'Accept':'application/json','User-Agent':'RiadRevenueAgent/1.0'})
               with urllib.request.urlopen(req, timeout=30) as r:
                   raw = r.read().decode()
-                  return json.loads(raw) if raw else {}
+                  result['http_status'] = r.status
+                  try:
+                      result['data'] = json.loads(raw)
+                  except Exception:
+                      result['raw'] = raw[:20000]
+          except urllib.error.HTTPError as e:
+              result['http_status'] = e.code
+              result['error_body'] = e.read().decode(errors='replace')[:20000]
+          except Exception as e:
+              result['error'] = repr(e)
 
-          reg = request('/api/v1/agents/register', 'POST', {
-              'publicKey': wallet,
-              'displayName': 'RiadRevenueAgent',
-              'capabilities': ['python','typescript','research','data-analysis','code-review','automation']
-          })
-          key = reg.get('authentication', {}).get('apiKey')
-          agent = reg.get('agent', {})
-          if not key:
-              raise RuntimeError('Registration did not return API key: ' + json.dumps(reg)[:500])
-
-          tasks = request('/api/v1/tasks?status=open&type=bounty&limit=100', key=key)
-          safe = {
-              'scanned_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              'agent': {
-                  'id': agent.get('id'),
-                  'displayName': agent.get('displayName'),
-                  'reputation': agent.get('reputation')
-              },
-              'tasks': tasks
-          }
           with open('clawfreelance-scan.json','w') as f:
-              json.dump(safe, f, indent=2)
+              json.dump(result, f, indent=2)
           PY
-      - name: Commit scan
+
+      - name: Commit scan or diagnostic
         run: |
           git config user.name "Riad Revenue Agent"
           git config user.email "actions@users.noreply.github.com"
           git add clawfreelance-scan.json
           git diff --cached --quiet && exit 0
-          git commit -m "chore: refresh live ClawFreelance bounties"
+          git commit -m "chore: refresh ClawFreelance live bounty scan"
           git push

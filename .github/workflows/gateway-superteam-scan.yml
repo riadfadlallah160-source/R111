@@ -1,0 +1,47 @@
+name: Production Gateway Superteam Scan
+
+on:
+  push:
+    paths:
+      - '.github/workflows/gateway-superteam-scan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read production Superteam feed
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, urllib.error, datetime
+
+          url = 'https://fifty-million-agent-gateway.onrender.com/revenue/superteam-live'
+          result = {'scanned_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'url': url}
+          try:
+              req = urllib.request.Request(url, headers={'Accept':'application/json','User-Agent':'RiadRevenueAgent/1.0'})
+              with urllib.request.urlopen(req, timeout=45) as r:
+                  raw = r.read().decode()
+                  result['http_status'] = r.status
+                  try: result['data'] = json.loads(raw)
+                  except Exception: result['raw'] = raw[:50000]
+          except urllib.error.HTTPError as e:
+              result['http_status'] = e.code
+              result['error_body'] = e.read().decode(errors='replace')[:20000]
+          except Exception as e:
+              result['error'] = repr(e)
+
+          with open('gateway-superteam-scan.json','w') as f:
+              json.dump(result, f, indent=2)
+          PY
+      - name: Commit scan
+        run: |
+          git config user.name "Riad Revenue Agent"
+          git config user.email "actions@users.noreply.github.com"
+          git add gateway-superteam-scan.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: refresh production Superteam feed"
+          git push

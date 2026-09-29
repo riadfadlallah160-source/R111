@@ -122,6 +122,50 @@ app.post('/internal/live-authorized/clawlancer-live-run-once', async (_req, res)
   return res.status(200).json({ ok: Boolean(result.delivery && result.delivery.status >= 200 && result.delivery.status < 300), result });
 });
 
+
+app.get('/revenue/superteam-live', async (_req, res) => {
+  const apiKey = process.env.SUPERTEAM_AGENT_API_KEY;
+  if (!apiKey) return res.status(503).json({ ok: false, error: 'credential unavailable' });
+  try {
+    const r = await fetch('https://superteam.fun/api/agents/listings/live?take=100', {
+      headers: { authorization: 'Bearer ' + apiKey, accept: 'application/json' }
+    });
+    const body = await r.json().catch(() => ({}));
+    const rows = Array.isArray(body) ? body : (body.listings || body.data || []);
+    const listings = rows.map(x => ({
+      id: x.id,
+      slug: x.slug,
+      title: x.title,
+      type: x.type,
+      rewardAmount: x.rewardAmount,
+      token: x.token,
+      deadline: x.deadline,
+      compensationType: x.compensationType,
+      minRewardAsk: x.minRewardAsk,
+      maxRewardAsk: x.maxRewardAsk,
+      agentAccess: x.agentAccess,
+      submissions: x._count?.Submission ?? x.submissionsCount ?? null
+    }));
+    return res.status(r.status).json({ ok: r.ok, count: listings.length, listings });
+  } catch (error) {
+    return res.status(502).json({ ok: false, error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+app.get('/revenue/superteam-detail/:slug', async (req, res) => {
+  const apiKey = process.env.SUPERTEAM_AGENT_API_KEY;
+  if (!apiKey) return res.status(503).json({ ok: false, error: 'credential unavailable' });
+  try {
+    const r = await fetch('https://superteam.fun/api/agents/listings/details/' + encodeURIComponent(req.params.slug), {
+      headers: { authorization: 'Bearer ' + apiKey, accept: 'application/json' }
+    });
+    const body = await r.json().catch(() => ({}));
+    return res.status(r.status).json({ ok: r.ok, listing: body });
+  } catch (error) {
+    return res.status(502).json({ ok: false, error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
 registerDemandRouter(app);
 
 app.use((req, res, next) => {

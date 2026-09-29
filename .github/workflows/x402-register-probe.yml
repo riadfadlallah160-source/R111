@@ -1,0 +1,65 @@
+name: x402 deploy and register
+on:
+  push:
+    branches: [main]
+    paths:
+      - webtools.js
+      - intel.js
+      - server.js
+      - .github/workflows/x402-register-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  register:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for new x402 route
+        shell: bash
+        run: |
+          set -u
+          mkdir -p runtime/x402
+          endpoint="https://fifty-million-agent-gateway.onrender.com/v1/web/page-to-markdown"
+          code=000
+          for i in $(seq 1 40); do
+            code=$(curl -sS -o /tmp/challenge.json -w "%{http_code}" -X POST "$endpoint" -H 'content-type: application/json' -d '{"url":"https://example.com"}' || true)
+            echo "attempt=$i status=$code"
+            if [ "$code" = "402" ]; then break; fi
+            sleep 15
+          done
+          printf '{"httpStatus":"%s","capturedAt":"%s","body":' "$code" "$(date -u +%FT%TZ)" > runtime/x402/challenge.json
+          cat /tmp/challenge.json >> runtime/x402/challenge.json
+          printf '}\n' >> runtime/x402/challenge.json
+
+      - name: Register origin with Agent402
+        shell: bash
+        run: |
+          curl -sS -X POST "https://agent402.tools/api/index/register"             -H 'content-type: application/json'             -d '{"origin":"https://fifty-million-agent-gateway.onrender.com"}'             > runtime/x402/register.json || true
+          cat runtime/x402/register.json
+
+      - name: Query Agent402 index and routing
+        shell: bash
+        run: |
+          sleep 8
+          curl -sS "https://agent402.tools/api/index?seller=fifty-million-agent-gateway.onrender.com" > runtime/x402/index.json || true
+          curl -sS "https://agent402.tools/api/find?q=live%20page%20html%20to%20markdown" > runtime/x402/find-page-markdown.json || true
+          curl -sS "https://agent402.tools/api/find?q=live%20dns%20lookup%20domain" > runtime/x402/find-dns.json || true
+          echo INDEX
+          head -c 20000 runtime/x402/index.json
+          echo
+          echo FIND
+          head -c 20000 runtime/x402/find-page-markdown.json
+          echo
+
+      - name: Commit probe results
+        shell: bash
+        run: |
+          git config user.name "50M Revenue Probe"
+          git config user.email "50m-demand@agentmail.to"
+          git add runtime/x402
+          git diff --cached --quiet && exit 0
+          git commit -m "Record x402 deployment and registration state"
+          git push

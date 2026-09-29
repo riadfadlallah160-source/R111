@@ -16,80 +16,106 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch and rank live Opire rewards
+      - name: Fetch, verify, and rank live Opire rewards
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p runtime
           curl -fsSL --retry 3 --connect-timeout 10 https://api.opire.dev/rewards -o /tmp/opire-rewards.json
           python3 - <<'PY'
-          import json, re, urllib.request
+          import json, os, re, urllib.request, urllib.parse
           from datetime import datetime, timezone
 
           with open('/tmp/opire-rewards.json', encoding='utf-8') as f:
               raw=json.load(f)
-
           rows=raw if isinstance(raw,list) else raw.get('rewards') or raw.get('data') or raw.get('items') or []
 
-          def val(o,*keys):
-              for k in keys:
-                  if isinstance(o,dict) and o.get(k) not in (None,''):
-                      return o.get(k)
-              return None
-
-          def amount(o):
-              candidates=[
-                  val(o,'amount','value','reward','price','totalAmount','total_amount','amountUsd','amount_usd'),
-              ]
-              if isinstance(o,dict):
-                  for nest in ('reward','bounty','issue'):
-                      if isinstance(o.get(nest),dict):
-                          candidates += [val(o[nest],'amount','value','price','amountUsd','amount_usd')]
-              for x in candidates:
+          def price_usd(o):
+              p=o.get('pendingPrice') if isinstance(o,dict) else None
+              if isinstance(p,dict) and isinstance(p.get('value'),(int,float)):
+                  unit=str(p.get('unit') or '')
+                  return float(p['value'])/100 if unit=='USD_CENT' else float(p['value'])
+              for k in ('amountUsd','amount_usd','amount','value','price'):
+                  x=o.get(k) if isinstance(o,dict) else None
                   if isinstance(x,(int,float)): return float(x)
                   if isinstance(x,str):
                       m=re.search(r'(\d+(?:\.\d+)?)',x.replace(',',''))
                       if m: return float(m.group(1))
               return None
 
-          picked=[]
+          token=os.getenv('GH_TOKEN','')
+          def gh_json(url):
+              req=urllib.request.Request(url,headers={
+                  'Accept':'application/vnd.github+json',
+                  'Authorization':f'Bearer {token}',
+                  'X-GitHub-Api-Version':'2022-11-28',
+                  'User-Agent':'R111-opire-scanner'
+              })
+              with urllib.request.urlopen(req,timeout=15) as r:
+                  return json.load(r)
+
+          verified=[]
           for o in rows:
               if not isinstance(o,dict): continue
-              a=amount(o)
-              if a is None or a < 100 or a > 10000: continue
-              issue=val(o,'issueUrl','issue_url','url','githubUrl','github_url')
-              repo=val(o,'repository','repo','repositoryName','repository_name')
-              title=val(o,'title','name')
-              status=val(o,'status','state')
-              picked.append({
-                  'amount_usd':a,'title':title,'status':status,'issue_url':issue,'repository':repo,
-                  'raw':o
-              })
+              a=price_usd(o)
+              url=o.get('url')
+              m=re.match(r'https://github\.com/([^/]+)/([^/]+)/issues/(\d+)',str(url or ''))
+              rec={
+                  'amount_usd':a,'title':o.get('title'),'issue_url':url,
+                  'claimers':len(o.get('claimerUsers') or []),
+                  'trying':len(o.get('tryingUsers') or []),
+                  'languages':o.get('programmingLanguages') or [],
+                  'opire_id':o.get('id'),
+                  'project':(o.get('project') or {}).get('name'),
+                  'project_public':(o.get('project') or {}).get('isPublic'),
+              }
+              if m:
+                  owner,repo,num=m.group(1),m.group(2),int(m.group(3))
+                  try:
+                      issue=gh_json(f'https://api.github.com/repos/{owner}/{repo}/issues/{num}')
+                      meta=gh_json(f'https://api.github.com/repos/{owner}/{repo}')
+                      rec.update({
+                          'github_state':issue.get('state'),
+                          'github_state_reason':issue.get('state_reason'),
+                          'github_comments':issue.get('comments'),
+                          'github_assignees':[x.get('login') for x in issue.get('assignees') or []],
+                          'repo_archived':meta.get('archived'),
+                          'repo_pushed_at':meta.get('pushed_at'),
+                          'repo_stars':meta.get('stargazers_count'),
+                          'repo_forks':meta.get('forks_count'),
+                      })
+                  except Exception as e:
+                      rec['github_error']=str(e)
+              rec['eligible']=bool(
+                  a is not None and 100 <= a <= 10000 and
+                  rec.get('github_state')=='open' and not rec.get('repo_archived') and
+                  rec.get('project_public') is not False
+              )
+              verified.append(rec)
 
-          picked.sort(key=lambda x:(-x['amount_usd'], str(x.get('title') or '')))
+          eligible=[x for x in verified if x['eligible']]
+          eligible.sort(key=lambda x:(x['claimers']+x['trying'], -x['amount_usd'], x.get('github_comments') or 0))
           out={
               'scanned_at':datetime.now(timezone.utc).isoformat(),
               'source':'https://api.opire.dev/rewards',
               'raw_count':len(rows),
-              'matching_count':len(picked),
-              'matches':picked[:200],
-              'sample_raw':rows[:3],
+              'eligible_100_to_10000_count':len(eligible),
+              'eligible':eligible,
+              'all_verified':verified,
           }
           with open('runtime/opire-live.json','w',encoding='utf-8') as f:
               json.dump(out,f,indent=2,ensure_ascii=False)
-          print(json.dumps({k:out[k] for k in ('scanned_at','raw_count','matching_count')},indent=2))
+          print(json.dumps({'raw_count':len(rows),'eligible_count':len(eligible),'eligible':eligible},indent=2))
           PY
 
-      - name: Persist scan
+      - name: Persist verified scan
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add runtime/opire-live.json
-          if git diff --cached --quiet; then
-            echo "No scan change"
-            exit 0
-          fi
-          git commit -m "chore: refresh live Opire bounty scan"
+          git commit -m "chore: refresh verified Opire bounty scan" || exit 0
           git push

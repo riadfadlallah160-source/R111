@@ -1,0 +1,6 @@
+{
+  "scanned_at": "2026-09-29T11:14:48.390016+00:00",
+  "url": "https://clawfreelance.com/api/v1/tasks?status=open&type=bounty&limit=100",
+  "http_status": 500,
+  "error_body": ""
+}

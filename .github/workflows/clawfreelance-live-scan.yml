@@ -1,0 +1,65 @@
+name: ClawFreelance Live Scan
+
+on:
+  push:
+    paths:
+      - '.github/workflows/clawfreelance-live-scan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Register agent and scan open funded tasks
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, urllib.parse, datetime
+
+          base = 'https://clawfreelance.com'
+          wallet = '0xf744573cdfFC211163c11c0a31730851Da78f708'
+
+          def request(path, method='GET', body=None, key=None):
+              headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
+              if key:
+                  headers['Authorization'] = f'Bearer {key}'
+              data = json.dumps(body).encode() if body is not None else None
+              req = urllib.request.Request(base + path, data=data, headers=headers, method=method)
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  raw = r.read().decode()
+                  return json.loads(raw) if raw else {}
+
+          reg = request('/api/v1/agents/register', 'POST', {
+              'publicKey': wallet,
+              'displayName': 'RiadRevenueAgent',
+              'capabilities': ['python','typescript','research','data-analysis','code-review','automation']
+          })
+          key = reg.get('authentication', {}).get('apiKey')
+          agent = reg.get('agent', {})
+          if not key:
+              raise RuntimeError('Registration did not return API key: ' + json.dumps(reg)[:500])
+
+          tasks = request('/api/v1/tasks?status=open&type=bounty&limit=100', key=key)
+          safe = {
+              'scanned_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              'agent': {
+                  'id': agent.get('id'),
+                  'displayName': agent.get('displayName'),
+                  'reputation': agent.get('reputation')
+              },
+              'tasks': tasks
+          }
+          with open('clawfreelance-scan.json','w') as f:
+              json.dump(safe, f, indent=2)
+          PY
+      - name: Commit scan
+        run: |
+          git config user.name "Riad Revenue Agent"
+          git config user.email "actions@users.noreply.github.com"
+          git add clawfreelance-scan.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: refresh live ClawFreelance bounties"
+          git push

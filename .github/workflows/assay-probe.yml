@@ -1,0 +1,46 @@
+name: Assay x402 external-buyer probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/assay-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe ASSAY discovery and rating state
+        shell: bash
+        run: |
+          set -u
+          mkdir -p runtime/assay
+          service="https://fifty-million-agent-gateway.onrender.com/v1/web/page-to-markdown"
+          encoded=$(python - <<'PY'
+import urllib.parse
+print(urllib.parse.quote("https://fifty-million-agent-gateway.onrender.com/v1/web/page-to-markdown", safe=""))
+PY
+)
+          curl -L -sS --max-time 30 "https://assay.nominal-labs.com/tier/$encoded" > runtime/assay/tier.json || true
+          curl -L -sS --max-time 30 "https://assay.nominal-labs.com/SKILL.md" > runtime/assay/skill.md || true
+          curl -L -sS --max-time 30 "https://assay.nominal-labs.com/leaderboard" > runtime/assay/leaderboard.txt || true
+          printf '{"capturedAt":"%s","service":"%s"}\n' "$(date -u +%FT%TZ)" "$service" > runtime/assay/meta.json
+          echo TIER
+          head -c 10000 runtime/assay/tier.json
+          echo
+          echo SKILL
+          head -c 30000 runtime/assay/skill.md
+          echo
+      - name: Commit probe results
+        shell: bash
+        run: |
+          git config user.name "50M Revenue Probe"
+          git config user.email "50m-demand@agentmail.to"
+          git add runtime/assay
+          git diff --cached --quiet && exit 0
+          git commit -m "Record ASSAY x402 discovery state"
+          git push

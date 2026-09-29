@@ -1,0 +1,95 @@
+name: Opire live paid-work scan
+
+on:
+  push:
+    paths:
+      - ".github/workflows/opire-live-scan.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch and rank live Opire rewards
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p runtime
+          curl -fsSL --retry 3 --connect-timeout 10 https://api.opire.dev/rewards -o /tmp/opire-rewards.json
+          python3 - <<'PY'
+          import json, re, urllib.request
+          from datetime import datetime, timezone
+
+          with open('/tmp/opire-rewards.json', encoding='utf-8') as f:
+              raw=json.load(f)
+
+          rows=raw if isinstance(raw,list) else raw.get('rewards') or raw.get('data') or raw.get('items') or []
+
+          def val(o,*keys):
+              for k in keys:
+                  if isinstance(o,dict) and o.get(k) not in (None,''):
+                      return o.get(k)
+              return None
+
+          def amount(o):
+              candidates=[
+                  val(o,'amount','value','reward','price','totalAmount','total_amount','amountUsd','amount_usd'),
+              ]
+              if isinstance(o,dict):
+                  for nest in ('reward','bounty','issue'):
+                      if isinstance(o.get(nest),dict):
+                          candidates += [val(o[nest],'amount','value','price','amountUsd','amount_usd')]
+              for x in candidates:
+                  if isinstance(x,(int,float)): return float(x)
+                  if isinstance(x,str):
+                      m=re.search(r'(\d+(?:\.\d+)?)',x.replace(',',''))
+                      if m: return float(m.group(1))
+              return None
+
+          picked=[]
+          for o in rows:
+              if not isinstance(o,dict): continue
+              a=amount(o)
+              if a is None or a < 100 or a > 10000: continue
+              issue=val(o,'issueUrl','issue_url','url','githubUrl','github_url')
+              repo=val(o,'repository','repo','repositoryName','repository_name')
+              title=val(o,'title','name')
+              status=val(o,'status','state')
+              picked.append({
+                  'amount_usd':a,'title':title,'status':status,'issue_url':issue,'repository':repo,
+                  'raw':o
+              })
+
+          picked.sort(key=lambda x:(-x['amount_usd'], str(x.get('title') or '')))
+          out={
+              'scanned_at':datetime.now(timezone.utc).isoformat(),
+              'source':'https://api.opire.dev/rewards',
+              'raw_count':len(rows),
+              'matching_count':len(picked),
+              'matches':picked[:200],
+              'sample_raw':rows[:3],
+          }
+          with open('runtime/opire-live.json','w',encoding='utf-8') as f:
+              json.dump(out,f,indent=2,ensure_ascii=False)
+          print(json.dumps({k:out[k] for k in ('scanned_at','raw_count','matching_count')},indent=2))
+          PY
+
+      - name: Persist scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add runtime/opire-live.json
+          if git diff --cached --quiet; then
+            echo "No scan change"
+            exit 0
+          fi
+          git commit -m "chore: refresh live Opire bounty scan"
+          git push

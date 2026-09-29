@@ -1,0 +1,55 @@
+name: Superteam Agent Scan
+
+on:
+  push:
+    paths:
+      - '.github/workflows/superteam-agent-scan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Register temporary agent and fetch live agent-eligible bounties
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, urllib.error
+
+          base = 'https://superteam.fun'
+
+          def req(path, method='GET', body=None, key=None):
+              headers = {'Content-Type': 'application/json'}
+              if key:
+                  headers['Authorization'] = f'Bearer {key}'
+              data = json.dumps(body).encode() if body is not None else None
+              r = urllib.request.Request(base + path, data=data, headers=headers, method=method)
+              with urllib.request.urlopen(r, timeout=30) as resp:
+                  return json.loads(resp.read().decode())
+
+          reg = req('/api/agents', 'POST', {'name': 'riad-live-bounty-scanner'})
+          key = reg['apiKey']
+          listings = req('/api/agents/listings/live?take=50&type=bounty', key=key)
+
+          safe = {
+              'scanned_at': __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat(),
+              'agent_id': reg.get('agentId'),
+              'username': reg.get('username'),
+              'listings': listings,
+          }
+          with open('superteam-scan.json', 'w') as f:
+              json.dump(safe, f, indent=2)
+          PY
+
+      - name: Commit live scan
+        run: |
+          git config user.name "Riad Revenue Agent"
+          git config user.email "actions@users.noreply.github.com"
+          git add superteam-scan.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: refresh live Superteam agent bounties"
+          git push

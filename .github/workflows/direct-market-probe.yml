@@ -1,0 +1,45 @@
+name: Direct market bounty probe
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/direct-market-probe.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe public bounty APIs
+        shell: bash
+        run: |
+          set -u
+          mkdir -p runtime/market-probe
+          probe () {
+            name="$1"
+            url="$2"
+            echo "=== $name ==="
+            code=$(curl -L -sS --max-time 30 -o "runtime/market-probe/$name.body" -w "%{http_code}" "$url" || true)
+            printf '{"name":"%s","url":"%s","httpStatus":"%s","capturedAt":"%s"}\n' "$name" "$url" "$code" "$(date -u +%FT%TZ)" > "runtime/market-probe/$name.meta.json"
+            echo "$name status=$code"
+            head -c 20000 "runtime/market-probe/$name.body" || true
+            echo
+          }
+          probe agentsouk-demand "https://api.agentsouk.dev/v1/demand"
+          probe basedagents-500 "https://api.basedagents.ai/v1/tasks?status=open&min_usdc=500"
+          probe clawlancer-bounties "https://clawlancer.ai/api/listings?listing_type=BOUNTY"
+          probe augmi-500 "https://augmi.world/api/marketplace/bounties?status=OPEN&minReward=500"
+          probe wenrwa-open "https://api.wenrwa.com/api/v1/bounties?status=open"
+      - name: Commit probe results
+        shell: bash
+        run: |
+          git config user.name "50M Revenue Probe"
+          git config user.email "50m-demand@agentmail.to"
+          git add runtime/market-probe
+          git diff --cached --quiet && exit 0
+          git commit -m "Record direct market bounty probe"
+          git push
